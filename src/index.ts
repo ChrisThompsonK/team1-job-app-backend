@@ -2,7 +2,7 @@ import type { Request, Response } from "express";
 import express from "express";
 
 const app = express();
-const port =3000;
+const port = 3000;
 // Middleware to parse JSON
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
