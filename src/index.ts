@@ -1,13 +1,8 @@
-import path from "node:path";
 import type { Request, Response } from "express";
 import express from "express";
 
 const app = express();
-const port = process.env.PORT || 3000;
-
-// Serve static files from public directory
-app.use(express.static(path.join(process.cwd(), "public")));
-
+const port =3000;
 // Middleware to parse JSON
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
