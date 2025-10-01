@@ -74,7 +74,7 @@ describe("index.ts - Express App", () => {
   describe("Application Configuration", () => {
     it("should use correct default port", () => {
       const originalPort = process.env.PORT;
-      process.env.PORT = undefined;
+      delete process.env.PORT;
 
       const port = process.env.PORT || 3000;
       expect(port).toBe(3000);
@@ -87,9 +87,9 @@ describe("index.ts - Express App", () => {
 
     it("should use port 3000 as default", () => {
       const originalPort = process.env.PORT;
-      process.env.PORT = undefined;
+      delete process.env.PORT;
 
-      const port = process.env.PORT || 3000;
+      const port =3000;
       expect(port).toBe(3000);
 
       // Restore original PORT
