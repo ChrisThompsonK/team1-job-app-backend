@@ -1,8 +1,6 @@
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 import type { Request, Response } from "express";
 import express from "express";
-
 
 const app = express();
 const port = process.env.PORT || 3000;
