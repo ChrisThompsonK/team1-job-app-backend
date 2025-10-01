@@ -1,5 +1,5 @@
 {
-  "name": "team1-job-app-frontend",
+  "name": "team1-job-app-backend",
   "version": "1.0.0",
   "description": "Modern Node.js TypeScript project with ES modules",
   "type": "module",
@@ -10,6 +10,10 @@
     "start": "node dist/index.js",
     "clean": "rm -rf dist",
     "type-check": "tsc --noEmit",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage",
     "lint": "biome lint .",
     "lint:fix": "biome lint --write .",
     "format": "biome format --write .",
@@ -28,8 +32,10 @@
     "@biomejs/biome": "^2.2.4",
     "@types/express": "^5.0.3",
     "@types/node": "^20.8.0",
+    "@vitest/coverage-v8": "^3.2.4",
     "tsx": "^3.14.0",
-    "typescript": "^5.2.0"
+    "typescript": "^5.2.0",
+    "vitest": "^3.2.4"
   },
   "engines": {
     "node": ">=18.0.0"
