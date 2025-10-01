@@ -3,15 +3,12 @@ import { fileURLToPath } from "node:url";
 import type { Request, Response } from "express";
 import express from "express";
 
-// ES module equivalent of __dirname
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const app = express();
 const port = process.env.PORT || 3000;
 
 // Serve static files from public directory
-app.use(express.static(path.join(__dirname, "../public")));
+app.use(express.static(path.join(process.cwd(), "public")));
 
 // Middleware to parse JSON
 app.use(express.json());
