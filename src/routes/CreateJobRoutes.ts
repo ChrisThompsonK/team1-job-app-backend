@@ -4,7 +4,7 @@ import type { JobController } from "../controllers/JobController";
 export const createJobRoutes = (_jobController: JobController) => {
   const router = Router();
 
-  router.post("/createJobs", (_req: Request, res: Response) => {
+  router.post("/jobs", (_req: Request, res: Response) => {
     //jobController.createJob(req,res);
     res.status(201).send("Job created");
   });
