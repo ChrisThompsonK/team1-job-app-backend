@@ -1,12 +1,27 @@
-import { type Request, type Response, Router } from "express";
+import { Router } from "express";
 import type { JobController } from "../controllers/JobController";
 
-export const createJobRoutes = (_jobController: JobController) => {
+export const createJobRoutes = (jobController: JobController) => {
   const router = Router();
 
-  router.post("/jobs", (_req: Request, res: Response) => {
-    //jobController.createJob(req,res);
-    res.status(201).send("Job created");
+  // Get all jobs
+  router.get("/jobs", (req, res) => {
+    jobController.getAllJobs(req, res);
+  });
+
+  // Get job by ID
+  router.get("/jobs/:id", (req, res) => {
+    jobController.getJobById(req, res);
+  });
+
+  // Create new job
+  router.post("/jobs", (req, res) => {
+    jobController.createJob(req, res);
+  });
+
+  // Delete job by ID
+  router.delete("/jobs/:id", (req, res) => {
+    jobController.deleteJob(req, res);
   });
 
   return router;
