@@ -1,13 +1,27 @@
-import { type Request, type Response, Router } from "express";
+import { Router } from "express";
 import type { JobController } from "../controllers/JobController";
+import { asyncHandler } from "../middleware/errorHandler";
 
-export const createJobRoutes = (_jobController: JobController) => {
+export const createJobRoutes = (jobController: JobController) => {
   const router = Router();
 
-  router.post("/jobs", (_req: Request, res: Response) => {
-    //jobController.createJob(req,res);
-    res.status(201).send("Job created");
-  });
+  // Job routes - all wrapped with asyncHandler for error handling
+  router.get(
+    "/jobs",
+    asyncHandler(jobController.getAllJobs.bind(jobController))
+  );
+  router.get(
+    "/jobs/capability/:capability",
+    asyncHandler(jobController.getJobsByCapability.bind(jobController))
+  );
+  router.get(
+    "/jobs/band/:band",
+    asyncHandler(jobController.getJobsByBand.bind(jobController))
+  );
+  router.get(
+    "/jobs/:id",
+    asyncHandler(jobController.getJobById.bind(jobController))
+  );
 
   return router;
 };

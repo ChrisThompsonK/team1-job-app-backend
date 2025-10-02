@@ -2,8 +2,9 @@ import { JobController } from "../controllers/JobController";
 import { JobRepository } from "../repositories/JobRepository";
 import { JobService } from "../services/JobService";
 
-const jobRepository: JobRepository = new JobRepository();
-const jobService: JobService = new JobService(jobRepository);
-const jobController: JobController = new JobController(jobService);
+// Dependency injection container
+const jobRepository = new JobRepository();
+const jobService = new JobService(jobRepository);
+const jobController = new JobController(jobService);
 
 export { jobController };
