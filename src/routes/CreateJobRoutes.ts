@@ -1,13 +1,13 @@
-import { JobController } from "../controllers/JobController";
-import { Router,Request,Response } from "express";
+import { type Request, type Response, Router } from "express";
+import type { JobController } from "../controllers/JobController";
 
-export const createJobRoutes=(jobController: JobController)=>{
-    const router=Router();
-    
-    router.post("/jobs", (req:Request,res:Response)=>{
-        //jobController.createJob(req,res);
-        res.status(201).send("Job created");
-    });
+export const createJobRoutes = (_jobController: JobController) => {
+  const router = Router();
 
-    return router;
-}
+  router.post("/jobs", (_req: Request, res: Response) => {
+    //jobController.createJob(req,res);
+    res.status(201).send("Job created");
+  });
+
+  return router;
+};

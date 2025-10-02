@@ -1,9 +1,9 @@
+import cors from "cors";
 import type { Request, Response } from "express";
-import { jobController } from "./di/Jobs";
-import { createJobRoutes } from "./routes/CreateJobRoutes";
 import express from "express";
 import morgan from "morgan";
-import cors from "cors";
+import { jobController } from "./di/Jobs";
+import { createJobRoutes } from "./routes/CreateJobRoutes";
 
 const app = express();
 
@@ -13,7 +13,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));
 app.use(cors());
 
-
 // Hello World endpoint
 app.get("/", (_req: Request, res: Response) => {
   res.json({
@@ -21,5 +20,5 @@ app.get("/", (_req: Request, res: Response) => {
     message: "Welcome to the Job Application System",
   });
 });
-app.use("/api",createJobRoutes(jobController));
+app.use("/api", createJobRoutes(jobController));
 export default app;

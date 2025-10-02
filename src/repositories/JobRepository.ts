@@ -1,3 +1,1 @@
-export class JobRepository {
-    
-}
+export class JobRepository {}
