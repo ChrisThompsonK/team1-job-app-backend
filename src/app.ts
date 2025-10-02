@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import express from "express";
-import { setupMiddleware } from "./middleware";
 import { jobController } from "./di/Jobs";
+import { setupMiddleware } from "./middleware";
 import { createJobRoutes } from "./routes/CreateJobRoutes";
 
 const app = express();
