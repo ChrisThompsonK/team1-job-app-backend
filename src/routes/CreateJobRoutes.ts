@@ -11,18 +11,6 @@ export const createJobRoutes = (jobController: JobController) => {
     asyncHandler(jobController.getAllJobs.bind(jobController))
   );
   router.get(
-    "/jobs/open",
-    asyncHandler(jobController.getOpenJobs.bind(jobController))
-  );
-  router.get(
-    "/jobs/closing-soon",
-    asyncHandler(jobController.getJobsClosingSoon.bind(jobController))
-  );
-  router.get(
-    "/jobs/search",
-    asyncHandler(jobController.searchJobs.bind(jobController))
-  );
-  router.get(
     "/jobs/capability/:capability",
     asyncHandler(jobController.getJobsByCapability.bind(jobController))
   );

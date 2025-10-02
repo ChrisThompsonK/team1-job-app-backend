@@ -21,18 +21,6 @@ export class JobController {
     });
   }
 
-  // GET /jobs/open - Get only open jobs
-  async getOpenJobs(_req: Request, res: Response): Promise<void> {
-    const jobs = await this.jobService.getOpenJobs();
-
-    res.status(200).json({
-      success: true,
-      message: "Open jobs retrieved successfully",
-      data: jobs,
-      count: jobs.length,
-    });
-  }
-
   // GET /jobs/:id - Get specific job by ID
   async getJobById(req: Request, res: Response): Promise<void> {
     const { id } = req.params;
@@ -85,54 +73,6 @@ export class JobController {
     res.status(200).json({
       success: true,
       message: `Jobs for band ${band} retrieved successfully`,
-      data: jobs,
-      count: jobs.length,
-    });
-  }
-
-  // GET /jobs/search?capability=X&band=Y&location=Z&status=W - Advanced search
-  async searchJobs(req: Request, res: Response): Promise<void> {
-    const { capability, band, location, status } = req.query;
-
-    // Convert query parameters to strings and filter out undefined values
-    const filters: Record<string, string> = {};
-    if (typeof capability === "string") filters.capability = capability;
-    if (typeof band === "string") filters.band = band;
-    if (typeof location === "string") filters.location = location;
-    if (typeof status === "string") filters.status = status;
-
-    const jobs = await this.jobService.searchJobs(filters);
-
-    // Build a descriptive message based on filters used
-    const filterDescriptions = [];
-    if (filters.capability)
-      filterDescriptions.push(`capability: ${filters.capability}`);
-    if (filters.band) filterDescriptions.push(`band: ${filters.band}`);
-    if (filters.location)
-      filterDescriptions.push(`location: ${filters.location}`);
-    if (filters.status) filterDescriptions.push(`status: ${filters.status}`);
-
-    const filterMessage =
-      filterDescriptions.length > 0
-        ? ` with filters (${filterDescriptions.join(", ")})`
-        : "";
-
-    res.status(200).json({
-      success: true,
-      message: `Jobs retrieved successfully${filterMessage}`,
-      data: jobs,
-      count: jobs.length,
-      filters: filters,
-    });
-  }
-
-  // GET /jobs/closing-soon - Get jobs closing in next 7 days
-  async getJobsClosingSoon(_req: Request, res: Response): Promise<void> {
-    const jobs = await this.jobService.getJobsClosingSoon();
-
-    res.status(200).json({
-      success: true,
-      message: "Jobs closing soon retrieved successfully",
       data: jobs,
       count: jobs.length,
     });

@@ -112,16 +112,6 @@ class InMemoryJobStore {
       return true;
     });
   }
-
-  // Get jobs by capability
-  getJobsByCapability(capability: Capability): Job[] {
-    return this.jobs.filter((job) => job.capability === capability);
-  }
-
-  // Get only active/open jobs
-  getOpenJobs(): Job[] {
-    return this.jobs.filter((job) => job.status === JobStatus.OPEN);
-  }
 }
 
 // Singleton instance for the temporary data store
@@ -141,13 +131,5 @@ export class JobRepository {
 
   async getJobsWithFilters(filters: JobFilters): Promise<Job[]> {
     return jobStore.getJobsWithFilters(filters);
-  }
-
-  async getJobsByCapability(capability: Capability): Promise<Job[]> {
-    return jobStore.getJobsByCapability(capability);
-  }
-
-  async getOpenJobs(): Promise<Job[]> {
-    return jobStore.getOpenJobs();
   }
 }
