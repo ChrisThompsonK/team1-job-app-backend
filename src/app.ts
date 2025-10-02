@@ -22,12 +22,9 @@ app.get("/", (_req: Request, res: Response) => {
     version: "1.0.0",
     endpoints: {
       jobs: "/api/jobs",
-      openJobs: "/api/jobs/open",
       jobById: "/api/jobs/:id",
       jobsByCapability: "/api/jobs/capability/:capability",
       jobsByBand: "/api/jobs/band/:band",
-      searchJobs: "/api/jobs/search",
-      closingSoon: "/api/jobs/closing-soon",
     },
   });
 });
