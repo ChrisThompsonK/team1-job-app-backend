@@ -6,7 +6,7 @@ export const usersTable = sqliteTable("Job_Roles", {
   responsibilities: text().notNull(),
   jobSpecLink: text().notNull(),
   location: text().notNull(),
-  Capability: text().notNull(),
+  capability: text().notNull(),
   band: text().notNull(),
   closingDate: text().notNull(),
   status: text().notNull(),
