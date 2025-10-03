@@ -11,16 +11,16 @@ export const createJobRoutes = (jobController: JobController) => {
     asyncHandler(jobController.getAllJobs.bind(jobController))
   );
   router.get(
-    "/jobs/capability/:capability",
-    asyncHandler(jobController.getJobsByCapability.bind(jobController))
-  );
-  router.get(
-    "/jobs/band/:band",
-    asyncHandler(jobController.getJobsByBand.bind(jobController))
-  );
-  router.get(
     "/jobs/:id",
     asyncHandler(jobController.getJobById.bind(jobController))
+  );
+  router.post(
+    "/jobs",
+    asyncHandler(jobController.createJob.bind(jobController))
+  );
+  router.put(
+    "/jobs/:id",
+    asyncHandler(jobController.editJob.bind(jobController))
   );
 
   return router;
