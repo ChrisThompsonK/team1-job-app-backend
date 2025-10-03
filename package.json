@@ -19,7 +19,11 @@
     "format": "biome format --write .",
     "format:check": "biome format .",
     "check": "biome check .",
-    "check:fix": "biome check --write ."
+    "check:fix": "biome check --write .",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "tsx src/db/migrate.ts",
+    "db:seed": "tsx src/db/seeds/runSeeds.ts",
+    "db:setup": "npm run db:migrate && npm run db:seed"
   },
   "keywords": [
     "typescript",
