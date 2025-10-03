@@ -133,12 +133,12 @@ export class JobRepository {
     return jobStore.getJobsWithFilters(filters);
   }
 
-  async createJobRole(job: Job): Promise<void>{
+  async createJobRole(job: Job): Promise<void> {
     //sql goes here
     console.log(job);
   }
 
-  async editJobRole(job: Job): Promise<void>{
+  async editJobRole(job: Job): Promise<void> {
     //sql goes here
     console.log(job);
   }

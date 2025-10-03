@@ -22,7 +22,7 @@ app.get("/", (_req: Request, res: Response) => {
       jobsByCapability: "/api/jobs/capability/:capability",
       jobsByBand: "/api/jobs/band/:band",
       createJob: "/api/jobs [POST]",
-      editJob: "/api/jobs/:id [PUT]"
+      editJob: "/api/jobs/:id [PUT]",
     },
   });
 });

@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import { BusinessError, NotFoundError } from "../middleware/errorHandler";
+import type { Job } from "../models/JobModel";
 import type { JobService } from "../services/JobService";
-import { Job } from "../models/JobModel";
 
 export class JobController {
   private jobService: JobService;
@@ -81,41 +81,101 @@ export class JobController {
 
   //Create a new job
   async createJob(req: Request, res: Response): Promise<void> {
-    const { jobRoleName, description, jobSpecLink, responsibilities, 
-      numberOfOpenPositions, location, closingDate, band, capability} = req.body
+    const {
+      jobRoleName,
+      description,
+      jobSpecLink,
+      responsibilities,
+      numberOfOpenPositions,
+      location,
+      closingDate,
+      band,
+      capability,
+    } = req.body;
 
-      if(!jobRoleName || !description || !jobSpecLink || !responsibilities || !numberOfOpenPositions
-        || !location || !closingDate || !band || !capability){
-        throw new BusinessError("All fields are required to create a job", 400);
-      }
-      
-      const newJobRole: Job = {jobRoleName, description, responsibilities,
-        jobSpecLink, location, capability, band, closingDate,numberOfOpenPositions}
+    if (
+      !jobRoleName ||
+      !description ||
+      !jobSpecLink ||
+      !responsibilities ||
+      !numberOfOpenPositions ||
+      !location ||
+      !closingDate ||
+      !band ||
+      !capability
+    ) {
+      throw new BusinessError("All fields are required to create a job", 400);
+    }
 
-      await this.jobService.createJobRole(newJobRole);
+    const newJobRole: Job = {
+      jobRoleName,
+      description,
+      responsibilities,
+      jobSpecLink,
+      location,
+      capability,
+      band,
+      closingDate,
+      numberOfOpenPositions,
+    };
 
-      res.status(201).json({
-        success: true,
-        message: `Job ${jobRoleName} created successfully`,
-      })
+    await this.jobService.createJobRole(newJobRole);
+
+    res.status(201).json({
+      success: true,
+      message: `Job ${jobRoleName} created successfully`,
+    });
   }
 
-  async editJob(req: Request, res: Response): Promise<void>{
-    const { id, jobRoleName, description, jobSpecLink, responsibilities, 
-      numberOfOpenPositions, location, closingDate, band, capability, status} = req.body
+  async editJob(req: Request, res: Response): Promise<void> {
+    const {
+      id,
+      jobRoleName,
+      description,
+      jobSpecLink,
+      responsibilities,
+      numberOfOpenPositions,
+      location,
+      closingDate,
+      band,
+      capability,
+      status,
+    } = req.body;
 
-      if(!id || !jobRoleName || !description || !jobSpecLink || !responsibilities || !numberOfOpenPositions
-        || !location || !closingDate || !band || !capability || !status){
-        throw new BusinessError("All fields are required to create a job", 400);
-      }
-      const updatedJobRole: Job = {id, jobRoleName, description, responsibilities,
-        jobSpecLink, location, capability, band, closingDate,numberOfOpenPositions, status}
+    if (
+      !id ||
+      !jobRoleName ||
+      !description ||
+      !jobSpecLink ||
+      !responsibilities ||
+      !numberOfOpenPositions ||
+      !location ||
+      !closingDate ||
+      !band ||
+      !capability ||
+      !status
+    ) {
+      throw new BusinessError("All fields are required to create a job", 400);
+    }
+    const updatedJobRole: Job = {
+      id,
+      jobRoleName,
+      description,
+      responsibilities,
+      jobSpecLink,
+      location,
+      capability,
+      band,
+      closingDate,
+      numberOfOpenPositions,
+      status,
+    };
 
-      await this.jobService.editJobRole(updatedJobRole);
+    await this.jobService.editJobRole(updatedJobRole);
 
-      res.status(200).json({
-        success: true,
-        message: `Job ${jobRoleName} edited successfully`,
-      })
+    res.status(200).json({
+      success: true,
+      message: `Job ${jobRoleName} edited successfully`,
+    });
   }
 }

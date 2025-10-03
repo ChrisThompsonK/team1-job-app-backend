@@ -54,14 +54,17 @@ export class JobService {
   }
 
   //Create new job-role
-  async createJobRole(job: Job): Promise<void>{
+  async createJobRole(job: Job): Promise<void> {
     const validBands = Object.values(Band);
     const bandEnum = validBands.find((b) => b === job.band);
     const validCapabilities = Object.values(Capability);
-    const capabilityEnum = validCapabilities.find((cap) => cap === job.capability);
+    const capabilityEnum = validCapabilities.find(
+      (cap) => cap === job.capability
+    );
 
     if (!bandEnum) {
-      throw new Error(`Invalid band. Must be one of: ${validBands.join(", ")}`);}
+      throw new Error(`Invalid band. Must be one of: ${validBands.join(", ")}`);
+    }
     if (!capabilityEnum) {
       throw new Error(
         `Invalid capability. Must be one of: ${validCapabilities.join(", ")}`
@@ -71,11 +74,13 @@ export class JobService {
   }
 
   //Edit job-role
-  async editJobRole(job: Job): Promise<void>{
+  async editJobRole(job: Job): Promise<void> {
     const validBands = Object.values(Band);
     const bandEnum = validBands.find((b) => b === job.band);
     const validCapabilities = Object.values(Capability);
-    const capabilityEnum = validCapabilities.find((cap) => cap === job.capability);
+    const capabilityEnum = validCapabilities.find(
+      (cap) => cap === job.capability
+    );
 
     if (!bandEnum) {
       throw new Error(`Invalid band. Must be one of: ${validBands.join(", ")}`);
