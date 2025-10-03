@@ -1,12 +1,15 @@
 import type { Request, Response } from "express";
 import { BusinessError, NotFoundError } from "../middleware/errorHandler";
 import type { JobService } from "../services/JobService";
+import type { JobValidator } from "../validators/JobValidator";
 
 export class JobController {
   private jobService: JobService;
+  private jobValidator: JobValidator;
 
-  constructor(jobService: JobService) {
+  constructor(jobService: JobService, jobValidator: JobValidator) {
     this.jobService = jobService;
+    this.jobValidator = jobValidator;
   }
 
   // GET /jobs - Get all jobs
@@ -42,39 +45,44 @@ export class JobController {
     });
   }
 
-  // GET /jobs/capability/:capability - Get jobs by capability
-  async getJobsByCapability(req: Request, res: Response): Promise<void> {
-    const { capability } = req.params;
+  //Create a new job
+  async createJob(req: Request, res: Response): Promise<void> {
+    try {
+      const newJobRole = this.jobValidator.createValidatedJob(req.body);
+      await this.jobService.createJobRole(newJobRole);
 
-    if (!capability) {
-      throw new BusinessError("Capability is required", 400);
+      res.status(201).json({
+        success: true,
+        message: `Job ${newJobRole.jobRoleName} created successfully`,
+      });
+    } catch (error) {
+      throw new BusinessError(
+        error instanceof Error ? error.message : "Invalid job data",
+        400
+      );
     }
-
-    const jobs = await this.jobService.getJobsByCapability(capability);
-
-    res.status(200).json({
-      success: true,
-      message: `Jobs for ${capability} capability retrieved successfully`,
-      data: jobs,
-      count: jobs.length,
-    });
   }
 
-  // GET /jobs/band/:band - Get jobs by band
-  async getJobsByBand(req: Request, res: Response): Promise<void> {
-    const { band } = req.params;
+  async editJob(req: Request, res: Response): Promise<void> {
+    const { id } = req.params;
 
-    if (!band) {
-      throw new BusinessError("Band is required", 400);
+    if (!id) {
+      throw new BusinessError("Job ID is required", 400);
     }
 
-    const jobs = await this.jobService.getJobsByBand(band);
+    try {
+      const updatedJobRole = this.jobValidator.createValidatedJob(req.body, id);
+      await this.jobService.editJobRole(updatedJobRole);
 
-    res.status(200).json({
-      success: true,
-      message: `Jobs for band ${band} retrieved successfully`,
-      data: jobs,
-      count: jobs.length,
-    });
+      res.status(200).json({
+        success: true,
+        message: `Job ${updatedJobRole.jobRoleName} edited successfully`,
+      });
+    } catch (error) {
+      throw new BusinessError(
+        error instanceof Error ? error.message : "Invalid job data",
+        400
+      );
+    }
   }
 }

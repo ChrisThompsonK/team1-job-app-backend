@@ -1,12 +1,14 @@
-import type { Job, JobFilters } from "../models/JobModel";
-import { Band, Capability } from "../models/JobModel";
+import type { Job } from "../models/JobModel";
 import type { JobRepository } from "../repositories/JobRepository";
+import type { JobValidator } from "../validators/JobValidator";
 
 export class JobService {
   private jobRepository: JobRepository;
+  private jobValidator: JobValidator;
 
-  constructor(jobRepository: JobRepository) {
+  constructor(jobRepository: JobRepository, jobValidator: JobValidator) {
     this.jobRepository = jobRepository;
+    this.jobValidator = jobValidator;
   }
 
   // Get all jobs
@@ -23,33 +25,15 @@ export class JobService {
     return await this.jobRepository.getJobById(id.trim());
   }
 
-  // Get jobs by capability with validation
-  async getJobsByCapability(capability: string): Promise<Job[]> {
-    // Validate that the capability is one of our enum values
-    const validCapabilities = Object.values(Capability);
-    const capabilityEnum = validCapabilities.find((cap) => cap === capability);
-
-    if (!capabilityEnum) {
-      throw new Error(
-        `Invalid capability. Must be one of: ${validCapabilities.join(", ")}`
-      );
-    }
-
-    const filters: JobFilters = { capability: capabilityEnum };
-    return await this.jobRepository.getJobsWithFilters(filters);
+  //Create new job-role
+  async createJobRole(job: Job): Promise<void> {
+    this.jobValidator.validateBandAndCapability(job);
+    await this.jobRepository.createJobRole(job);
   }
 
-  // Get jobs by band with validation
-  async getJobsByBand(band: string): Promise<Job[]> {
-    // Validate that the band is one of our enum values
-    const validBands = Object.values(Band);
-    const bandEnum = validBands.find((b) => b === band);
-
-    if (!bandEnum) {
-      throw new Error(`Invalid band. Must be one of: ${validBands.join(", ")}`);
-    }
-
-    const filters: JobFilters = { band: bandEnum };
-    return await this.jobRepository.getJobsWithFilters(filters);
+  //Edit job-role
+  async editJobRole(job: Job): Promise<void> {
+    this.jobValidator.validateBandAndCapability(job);
+    await this.jobRepository.editJobRole(job);
   }
 }
