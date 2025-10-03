@@ -1,6 +1,6 @@
-import { usersTable } from "../schemas/jobs";
+import { jobsTable } from "../schemas/jobs";
 
-export const jobRolesSeeds = [
+export const jobRolesSeeds: typeof jobsTable.$inferInsert[] = [
   {
     jobRoleName: "Senior Software Engineer",
     description:
@@ -9,7 +9,7 @@ export const jobRolesSeeds = [
       "Design and implement scalable software systems, code review, technical leadership, mentoring team members",
     jobSpecLink: "https://company.com/careers/senior-software-engineer",
     location: "London, UK",
-    Capability: "Engineering",
+    capability: "Engineering",
     band: "Senior",
     closingDate: "2025-11-15",
     status: "Open",
@@ -23,7 +23,7 @@ export const jobRolesSeeds = [
       "Product roadmap planning, stakeholder management, user research, feature prioritization, market analysis",
     jobSpecLink: "https://company.com/careers/product-manager",
     location: "Manchester, UK",
-    Capability: "Product",
+    capability: "Product",
     band: "Mid",
     closingDate: "2025-10-30",
     status: "Open",
@@ -37,7 +37,7 @@ export const jobRolesSeeds = [
       "Data analysis, machine learning model development, statistical analysis, data visualization, reporting",
     jobSpecLink: "https://company.com/careers/data-scientist",
     location: "Birmingham, UK",
-    Capability: "Data & Analytics",
+    capability: "Data & Analytics",
     band: "Mid",
     closingDate: "2025-12-01",
     status: "Open",
@@ -51,7 +51,7 @@ export const jobRolesSeeds = [
       "User research, wireframing, prototyping, usability testing, design systems, collaboration with developers",
     jobSpecLink: "https://company.com/careers/ux-designer",
     location: "Remote, UK",
-    Capability: "Design",
+    capability: "Design",
     band: "Junior",
     closingDate: "2025-11-20",
     status: "Open",
@@ -65,7 +65,7 @@ export const jobRolesSeeds = [
       "Infrastructure management, automation, monitoring, security implementation, cloud services management",
     jobSpecLink: "https://company.com/careers/devops-engineer",
     location: "Edinburgh, UK",
-    Capability: "Platform",
+    capability: "Platform",
     band: "Senior",
     closingDate: "2025-10-25",
     status: "Open",
@@ -79,7 +79,7 @@ export const jobRolesSeeds = [
       "React/Vue development, responsive design, performance optimization, testing, accessibility implementation",
     jobSpecLink: "https://company.com/careers/frontend-developer",
     location: "Bristol, UK",
-    Capability: "Engineering",
+    capability: "Engineering",
     band: "Mid",
     closingDate: "2025-11-10",
     status: "Open",
@@ -93,7 +93,7 @@ export const jobRolesSeeds = [
       "Test planning, automated testing, manual testing, bug reporting, quality assurance processes",
     jobSpecLink: "https://company.com/careers/qa-engineer",
     location: "Leeds, UK",
-    Capability: "Quality",
+    capability: "Quality",
     band: "Junior",
     closingDate: "2025-11-05",
     status: "Open",
@@ -107,7 +107,7 @@ export const jobRolesSeeds = [
       "Architecture design, technical documentation, stakeholder consultation, technology evaluation",
     jobSpecLink: "https://company.com/careers/solutions-architect",
     location: "London, UK",
-    Capability: "Architecture",
+    capability: "Architecture",
     band: "Principal",
     closingDate: "2025-12-15",
     status: "Open",
@@ -121,7 +121,7 @@ export const jobRolesSeeds = [
       "Requirements gathering, process analysis, stakeholder management, documentation, solution design",
     jobSpecLink: "https://company.com/careers/business-analyst",
     location: "Cardiff, UK",
-    Capability: "Business Analysis",
+    capability: "Business Analysis",
     band: "Mid",
     closingDate: "2025-10-28",
     status: "Closed",
@@ -135,7 +135,7 @@ export const jobRolesSeeds = [
       "Security monitoring, vulnerability assessment, incident response, security policy development",
     jobSpecLink: "https://company.com/careers/cybersecurity-specialist",
     location: "Glasgow, UK",
-    Capability: "Security",
+    capability: "Security",
     band: "Senior",
     closingDate: "2025-11-30",
     status: "Open",
@@ -143,4 +143,4 @@ export const jobRolesSeeds = [
   },
 ];
 
-export { usersTable as jobRolesTable };
+export { jobsTable as jobRolesTable };
