@@ -1,6 +1,6 @@
 import { jobsTable } from "../schemas/jobs";
 
-export const jobRolesSeeds: typeof jobsTable.$inferInsert[] = [
+export const jobRolesSeeds: (typeof jobsTable.$inferInsert)[] = [
   {
     jobRoleName: "Senior Software Engineer",
     description:
