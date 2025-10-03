@@ -1,4 +1,4 @@
-import type { Job, JobFilters } from "../models/JobModel";
+import type { Job } from "../models/JobModel";
 import { Band, Capability, JobStatus } from "../models/JobModel";
 
 // TEMPORARY: In-memory storage - replace with actual database when ready
@@ -96,22 +96,6 @@ class InMemoryJobStore {
   getJobById(id: string): Job | null {
     return this.jobs.find((job) => job.id === id) || null;
   }
-
-  // Get jobs with filters
-  getJobsWithFilters(filters: JobFilters): Job[] {
-    return this.jobs.filter((job) => {
-      if (filters.capability && job.capability !== filters.capability)
-        return false;
-      if (filters.band && job.band !== filters.band) return false;
-      if (
-        filters.location &&
-        !job.location.toLowerCase().includes(filters.location.toLowerCase())
-      )
-        return false;
-      if (filters.status && job.status !== filters.status) return false;
-      return true;
-    });
-  }
 }
 
 // Singleton instance for the temporary data store
@@ -127,10 +111,6 @@ export class JobRepository {
 
   async getJobById(id: string): Promise<Job | null> {
     return jobStore.getJobById(id);
-  }
-
-  async getJobsWithFilters(filters: JobFilters): Promise<Job[]> {
-    return jobStore.getJobsWithFilters(filters);
   }
 
   async createJobRole(job: Job): Promise<void> {

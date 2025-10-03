@@ -1,16 +1,14 @@
-import {
-  validateBand,
-  validateBandAndCapability,
-  validateCapability,
-} from "../middleware/jobValidation";
-import type { Job, JobFilters } from "../models/JobModel";
+import type { Job } from "../models/JobModel";
 import type { JobRepository } from "../repositories/JobRepository";
+import type { JobValidator } from "../validators/JobValidator";
 
 export class JobService {
   private jobRepository: JobRepository;
+  private jobValidator: JobValidator;
 
-  constructor(jobRepository: JobRepository) {
+  constructor(jobRepository: JobRepository, jobValidator: JobValidator) {
     this.jobRepository = jobRepository;
+    this.jobValidator = jobValidator;
   }
 
   // Get all jobs
@@ -27,29 +25,15 @@ export class JobService {
     return await this.jobRepository.getJobById(id.trim());
   }
 
-  // Get jobs by capability with validation
-  async getJobsByCapability(capability: string): Promise<Job[]> {
-    const capabilityEnum = validateCapability(capability);
-    const filters: JobFilters = { capability: capabilityEnum };
-    return await this.jobRepository.getJobsWithFilters(filters);
-  }
-
-  // Get jobs by band with validation
-  async getJobsByBand(band: string): Promise<Job[]> {
-    const bandEnum = validateBand(band);
-    const filters: JobFilters = { band: bandEnum };
-    return await this.jobRepository.getJobsWithFilters(filters);
-  }
-
   //Create new job-role
   async createJobRole(job: Job): Promise<void> {
-    validateBandAndCapability(job);
+    this.jobValidator.validateBandAndCapability(job);
     await this.jobRepository.createJobRole(job);
   }
 
   //Edit job-role
   async editJobRole(job: Job): Promise<void> {
-    validateBandAndCapability(job);
+    this.jobValidator.validateBandAndCapability(job);
     await this.jobRepository.editJobRole(job);
   }
 }
