@@ -6,11 +6,11 @@ import {
   JobStatus,
   SortBy,
   SortOrder,
-} from "../models/JobModel";
+} from "../models/JobModel.js";
 import {
   describeFilters,
   parseJobFilters,
-} from "../utils/QueryParameterParser";
+} from "../utils/QueryParameterParser.js";
 
 describe("QueryParameterParser Functions", () => {
   describe("parseJobFilters", () => {
