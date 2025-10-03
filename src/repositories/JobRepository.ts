@@ -132,4 +132,14 @@ export class JobRepository {
   async getJobsWithFilters(filters: JobFilters): Promise<Job[]> {
     return jobStore.getJobsWithFilters(filters);
   }
+
+  async createJobRole(job: Job): Promise<void>{
+    //sql goes here
+    console.log(job);
+  }
+
+  async editJobRole(job: Job): Promise<void>{
+    //sql goes here
+    console.log(job);
+  }
 }

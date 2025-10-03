@@ -22,6 +22,14 @@ export const createJobRoutes = (jobController: JobController) => {
     "/jobs/:id",
     asyncHandler(jobController.getJobById.bind(jobController))
   );
+  router.post(
+    "/jobs",
+    asyncHandler(jobController.createJob.bind(jobController))
+  )
+  router.put(
+    "/jobs/:id",
+    asyncHandler(jobController.editJob.bind(jobController))
+  )
 
   return router;
 };

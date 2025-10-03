@@ -21,7 +21,7 @@ export enum JobStatus {
 
 // Job model representing a job posting with all required fields
 export interface Job {
-  id: string; // Unique identifier for the job
+  id?: string; // Unique identifier for the job
   jobRoleName: string; // The title/name of the job role
   description: string; // Detailed job description
   responsibilities: string[]; // Array of job responsibilities
@@ -30,7 +30,7 @@ export interface Job {
   capability: Capability; // The capability/department using enum
   band: Band; // Job band/level using enum
   closingDate: Date; // When applications close
-  status: JobStatus; // Current status of the job posting using enum
+  status?: JobStatus; // Current status of the job posting using enum
   numberOfOpenPositions: number; // How many positions are available
 }
 

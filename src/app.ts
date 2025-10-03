@@ -21,6 +21,8 @@ app.get("/", (_req: Request, res: Response) => {
       jobById: "/api/jobs/:id",
       jobsByCapability: "/api/jobs/capability/:capability",
       jobsByBand: "/api/jobs/band/:band",
+      createJob: "/api/jobs [POST]",
+      editJob: "/api/jobs/:id [PUT]"
     },
   });
 });
