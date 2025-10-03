@@ -55,42 +55,27 @@ export class JobService {
 
   //Create new job-role
   async createJobRole(job: Job): Promise<void> {
-    const validBands = Object.values(Band);
-    const bandEnum = validBands.find((b) => b === job.band);
-    const validCapabilities = Object.values(Capability);
-    const capabilityEnum = validCapabilities.find(
-      (cap) => cap === job.capability
-    );
-
-    if (!bandEnum) {
-      throw new Error(`Invalid band. Must be one of: ${validBands.join(", ")}`);
-    }
-    if (!capabilityEnum) {
-      throw new Error(
-        `Invalid capability. Must be one of: ${validCapabilities.join(", ")}`
-      );
-    }
+    this.validateBandAndCapability(job);
     await this.jobRepository.createJobRole(job);
   }
 
   //Edit job-role
   async editJobRole(job: Job): Promise<void> {
-    const validBands = Object.values(Band);
-    const bandEnum = validBands.find((b) => b === job.band);
-    const validCapabilities = Object.values(Capability);
-    const capabilityEnum = validCapabilities.find(
-      (cap) => cap === job.capability
-    );
+    this.validateBandAndCapability(job);
+    await this.jobRepository.editJobRole(job);
+  }
 
+  // Private helper to validate band and capability
+  private validateBandAndCapability(job: Job): void {
+    const validBands = Object.values(Band);
+    const validCapabilities = Object.values(Capability);
+    const bandEnum = validBands.find((b) => b === job.band);
+    const capabilityEnum = validCapabilities.find((cap) => cap === job.capability);
     if (!bandEnum) {
       throw new Error(`Invalid band. Must be one of: ${validBands.join(", ")}`);
     }
     if (!capabilityEnum) {
-      throw new Error(
-        `Invalid capability. Must be one of: ${validCapabilities.join(", ")}`
-      );
+      throw new Error(`Invalid capability. Must be one of: ${validCapabilities.join(", ")}`);
     }
-
-    await this.jobRepository.editJobRole(job);
   }
 }
