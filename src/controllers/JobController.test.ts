@@ -12,6 +12,7 @@ const mockJobService = {
   getJobById: vi.fn(),
   createJobRole: vi.fn(),
   editJobRole: vi.fn(),
+  getFilteredJobs: vi.fn(),
 } as const;
 
 const mockJobValidator = {
@@ -309,6 +310,215 @@ describe("JobController", () => {
       await expect(
         jobController.editJob(mockRequest as Request, mockResponse as Response)
       ).rejects.toThrow(new BusinessError("Invalid job data", 400));
+    });
+  });
+
+  describe("getFilteredJobs", () => {
+    beforeEach(() => {
+      mockRequest = {
+        query: {},
+      };
+    });
+
+    it("should return filtered jobs successfully", async () => {
+      const queryParams = {
+        capability: "DATA",
+        band: "E3",
+        page: "1",
+        limit: "10",
+      };
+
+      const mockResult = {
+        jobs: [
+          {
+            id: "1",
+            jobRoleName: "Senior Data Engineer",
+            capability: Capability.DATA,
+            band: Band.E3,
+          },
+        ],
+        pagination: {
+          currentPage: 1,
+          totalPages: 1,
+          totalItems: 1,
+          itemsPerPage: 10,
+          hasNextPage: false,
+          hasPreviousPage: false,
+        },
+        filters: {
+          capability: Capability.DATA,
+          band: Band.E3,
+          page: 1,
+          limit: 10,
+        },
+      };
+
+      mockRequest.query = queryParams;
+      mockJobService.getFilteredJobs.mockResolvedValue(mockResult);
+
+      await jobController.getFilteredJobs(
+        mockRequest as Request,
+        mockResponse as Response
+      );
+
+      expect(mockJobService.getFilteredJobs).toHaveBeenCalledWith({
+        capability: Capability.DATA,
+        band: Band.E3,
+        page: 1,
+        limit: 10,
+        sortOrder: "asc",
+      });
+
+      expect(mockStatus).toHaveBeenCalledWith(200);
+      expect(mockJson).toHaveBeenCalledWith({
+        success: true,
+        message: "Filtered jobs retrieved successfully",
+        data: mockResult.jobs,
+        pagination: mockResult.pagination,
+        filters: mockResult.filters,
+        filtersDescription: expect.stringContaining("capability: Data"),
+      });
+    });
+
+    it("should handle empty query parameters", async () => {
+      const mockResult = {
+        jobs: [],
+        pagination: {
+          currentPage: 1,
+          totalPages: 0,
+          totalItems: 0,
+          itemsPerPage: 10,
+          hasNextPage: false,
+          hasPreviousPage: false,
+        },
+        filters: {
+          page: 1,
+          limit: 10,
+          sortOrder: "asc",
+        },
+      };
+
+      mockJobService.getFilteredJobs.mockResolvedValue(mockResult);
+
+      await jobController.getFilteredJobs(
+        mockRequest as Request,
+        mockResponse as Response
+      );
+
+      expect(mockJobService.getFilteredJobs).toHaveBeenCalledWith({
+        page: 1,
+        limit: 10,
+        sortOrder: "asc",
+      });
+
+      expect(mockStatus).toHaveBeenCalledWith(200);
+      expect(mockJson).toHaveBeenCalledWith({
+        success: true,
+        message: "Filtered jobs retrieved successfully",
+        data: [],
+        pagination: mockResult.pagination,
+        filters: mockResult.filters,
+        filtersDescription: "No filters applied",
+      });
+    });
+
+    it("should handle complex filtering parameters", async () => {
+      const queryParams = {
+        capability: "ENGINEERING",
+        location: "London",
+        search: "senior engineer",
+        closingDateFrom: "2024-10-01",
+        closingDateTo: "2024-12-31",
+        minPositions: "2",
+        sortBy: "closingDate",
+        sortOrder: "desc",
+        page: "2",
+        limit: "5",
+      };
+
+      const mockResult = {
+        jobs: [],
+        pagination: {
+          currentPage: 2,
+          totalPages: 3,
+          totalItems: 15,
+          itemsPerPage: 5,
+          hasNextPage: true,
+          hasPreviousPage: true,
+        },
+        filters: {
+          capability: Capability.ENGINEERING,
+          location: "London",
+          search: "senior engineer",
+          closingDateFrom: new Date("2024-10-01"),
+          closingDateTo: new Date("2024-12-31"),
+          minPositions: 2,
+          sortBy: "closingDate",
+          sortOrder: "desc",
+          page: 2,
+          limit: 5,
+        },
+      };
+
+      mockRequest.query = queryParams;
+      mockJobService.getFilteredJobs.mockResolvedValue(mockResult);
+
+      await jobController.getFilteredJobs(
+        mockRequest as Request,
+        mockResponse as Response
+      );
+
+      expect(mockJobService.getFilteredJobs).toHaveBeenCalledWith(
+        expect.objectContaining({
+          capability: Capability.ENGINEERING,
+          location: "London",
+          search: "senior engineer",
+          minPositions: 2,
+          page: 2,
+          limit: 5,
+        })
+      );
+
+      expect(mockStatus).toHaveBeenCalledWith(200);
+    });
+
+    it("should throw BusinessError when service throws validation error", async () => {
+      mockJobService.getFilteredJobs.mockRejectedValue(
+        new Error("Closing date 'from' cannot be after 'to' date")
+      );
+
+      await expect(
+        jobController.getFilteredJobs(
+          mockRequest as Request,
+          mockResponse as Response
+        )
+      ).rejects.toThrow(
+        new BusinessError("Closing date 'from' cannot be after 'to' date", 400)
+      );
+    });
+
+    it("should throw BusinessError with generic message for unknown errors", async () => {
+      mockJobService.getFilteredJobs.mockRejectedValue(
+        new Error("Database connection failed")
+      );
+
+      await expect(
+        jobController.getFilteredJobs(
+          mockRequest as Request,
+          mockResponse as Response
+        )
+      ).rejects.toThrow(new BusinessError("Database connection failed", 400));
+    });
+
+    it("should handle non-Error exceptions", async () => {
+      mockJobService.getFilteredJobs.mockRejectedValue("String error");
+
+      await expect(
+        jobController.getFilteredJobs(
+          mockRequest as Request,
+          mockResponse as Response
+        )
+      ).rejects.toThrow(new BusinessError("Invalid filter parameters", 400));
     });
   });
 });
