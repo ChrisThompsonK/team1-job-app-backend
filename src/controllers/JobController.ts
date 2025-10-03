@@ -155,7 +155,7 @@ export class JobController {
       !capability ||
       !status
     ) {
-      throw new BusinessError("All fields are required to create a job", 400);
+      throw new BusinessError("All fields are required to edit a job", 400);
     }
     const updatedJobRole: Job = {
       id,
