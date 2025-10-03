@@ -158,3 +158,5 @@ build/Release
 
 # Biome cache
 .biome/
+
+*.db
