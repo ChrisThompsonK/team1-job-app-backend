@@ -1,7 +1,7 @@
-import { JobController } from "../controllers/JobController";
-import { JobRepository } from "../repositories/JobRepository";
-import { JobService } from "../services/JobService";
-import { JobValidator } from "../validators/JobValidator";
+import { JobController } from "../controllers/JobController.js";
+import { JobRepository } from "../repositories/JobRepository.js";
+import { JobService } from "../services/JobService.js";
+import { JobValidator } from "../validators/JobValidator.js";
 
 // Dependency injection container
 const jobRepository = new JobRepository();

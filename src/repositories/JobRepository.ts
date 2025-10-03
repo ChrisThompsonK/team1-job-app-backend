@@ -1,5 +1,9 @@
-import type { Job } from "../models/JobModel";
-import { Band, Capability, JobStatus } from "../models/JobModel";
+import type {
+  Job,
+  JobFilters,
+  PaginatedJobResponse,
+} from "../models/JobModel.js";
+import { Band, Capability, JobStatus } from "../models/JobModel.js";
 
 // TEMPORARY: In-memory storage - replace with actual database when ready
 class InMemoryJobStore {
@@ -111,6 +115,23 @@ export class JobRepository {
 
   async getJobById(id: string): Promise<Job | null> {
     return jobStore.getJobById(id);
+  }
+
+  async getFilteredJobs(filters: JobFilters): Promise<PaginatedJobResponse> {
+    // SQL filtering query will go here when database is implemented
+    // For now, return empty response structure
+    return {
+      jobs: [],
+      pagination: {
+        currentPage: filters.page || 1,
+        totalPages: 0,
+        totalItems: 0,
+        itemsPerPage: filters.limit || 10,
+        hasNextPage: false,
+        hasPreviousPage: false,
+      },
+      filters,
+    };
   }
 
   async createJobRole(job: Job): Promise<void> {

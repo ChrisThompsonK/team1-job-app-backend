@@ -1,6 +1,6 @@
 import { Router } from "express";
-import type { JobController } from "../controllers/JobController";
-import { asyncHandler } from "../middleware/errorHandler";
+import type { JobController } from "../controllers/JobController.js";
+import { asyncHandler } from "../middleware/errorHandler.js";
 
 export const createJobRoutes = (jobController: JobController) => {
   const router = Router();
@@ -21,6 +21,10 @@ export const createJobRoutes = (jobController: JobController) => {
   router.put(
     "/jobs/:id",
     asyncHandler(jobController.editJob.bind(jobController))
+  );
+  router.get(
+    "/jobs/search",
+    asyncHandler(jobController.getFilteredJobs.bind(jobController))
   );
 
   return router;

@@ -1,6 +1,10 @@
-import type { Job } from "../models/JobModel";
-import type { JobRepository } from "../repositories/JobRepository";
-import type { JobValidator } from "../validators/JobValidator";
+import type {
+  Job,
+  JobFilters,
+  PaginatedJobResponse,
+} from "../models/JobModel.js";
+import type { JobRepository } from "../repositories/JobRepository.js";
+import type { JobValidator } from "../validators/JobValidator.js";
 
 export class JobService {
   private jobRepository: JobRepository;
@@ -23,6 +27,36 @@ export class JobService {
     }
 
     return await this.jobRepository.getJobById(id.trim());
+  }
+
+  // Get filtered jobs with validation
+  async getFilteredJobs(filters: JobFilters): Promise<PaginatedJobResponse> {
+    // Validate date range
+    if (filters.closingDateFrom && filters.closingDateTo) {
+      if (filters.closingDateFrom > filters.closingDateTo) {
+        throw new Error("Closing date 'from' cannot be after 'to' date");
+      }
+    }
+
+    // Validate position range
+    if (filters.minPositions && filters.maxPositions) {
+      if (filters.minPositions > filters.maxPositions) {
+        throw new Error(
+          "Minimum positions cannot be greater than maximum positions"
+        );
+      }
+    }
+
+    // Validate pagination parameters
+    if (filters.page && filters.page < 1) {
+      throw new Error("Page number must be 1 or greater");
+    }
+
+    if (filters.limit && (filters.limit < 1 || filters.limit > 100)) {
+      throw new Error("Limit must be between 1 and 100");
+    }
+
+    return await this.jobRepository.getFilteredJobs(filters);
   }
 
   //Create new job-role
