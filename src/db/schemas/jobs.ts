@@ -1,5 +1,5 @@
 import { int, sqliteTable, text } from "drizzle-orm/sqlite-core";
-export const jobsTable = sqliteTable("Job_Roles", {
+export const jobsTable = sqliteTable("job_Roles", {
   id: int().primaryKey({ autoIncrement: true }),
   jobRoleName: text().notNull(),
   description: text().notNull(),
