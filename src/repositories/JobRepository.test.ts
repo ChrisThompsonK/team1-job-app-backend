@@ -5,8 +5,8 @@ import {
   JobStatus,
   SortBy,
   SortOrder,
-} from "../models/JobModel";
-import { JobRepository } from "../repositories/JobRepository";
+} from "../models/JobModel.js";
+import { JobRepository } from "../repositories/JobRepository.js";
 
 describe("JobRepository", () => {
   let jobRepository: JobRepository;
