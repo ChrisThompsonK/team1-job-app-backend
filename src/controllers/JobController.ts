@@ -128,8 +128,8 @@ export class JobController {
   }
 
   async editJob(req: Request, res: Response): Promise<void> {
+    const { id } = req.params;
     const {
-      id,
       jobRoleName,
       description,
       jobSpecLink,
@@ -142,8 +142,11 @@ export class JobController {
       status,
     } = req.body;
 
+    if (!id) {
+      throw new BusinessError("Job ID is required", 400);
+    }
+
     if (
-      !id ||
       !jobRoleName ||
       !description ||
       !jobSpecLink ||
