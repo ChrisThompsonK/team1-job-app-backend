@@ -6,15 +6,15 @@ const db = drizzle("file:jobApp.db");
 export async function runSeeds(): Promise<void> {
   try {
     console.log("🌱 Starting database seeding...");
-    
+
     // Clear existing data (optional - remove if you want to append)
     console.log("🗑️  Clearing existing job roles...");
     await db.delete(jobRolesTable);
-    
+
     // Insert seed data
     console.log("📝 Inserting job roles seed data...");
     await db.insert(jobRolesTable).values(jobRolesSeeds);
-    
+
     console.log(`✅ Successfully seeded ${jobRolesSeeds.length} job roles`);
   } catch (error) {
     console.error("❌ Error seeding database:", error);

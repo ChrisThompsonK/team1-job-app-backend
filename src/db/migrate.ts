@@ -6,9 +6,9 @@ const db = drizzle("file:jobApp.db");
 export async function runMigrations(): Promise<void> {
   try {
     console.log("🔄 Running database migrations...");
-    
+
     await migrate(db, { migrationsFolder: "./drizzle" });
-    
+
     console.log("✅ Migrations completed successfully!");
   } catch (error) {
     console.error("❌ Error running migrations:", error);
