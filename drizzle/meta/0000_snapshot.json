@@ -1,11 +1,11 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "dd13f400-5480-4e4b-8773-18484e02a302",
+  "id": "70ad7622-661c-438c-8450-af1d82c5056b",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
-    "job_roles": {
-      "name": "job_roles",
+    "Job_Roles": {
+      "name": "Job_Roles",
       "columns": {
         "id": {
           "name": "id",
