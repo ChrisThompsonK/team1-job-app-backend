@@ -49,6 +49,21 @@ class DatabaseJobStore {
   });
   private db = drizzle(this.client);
 
+  private mapJobToDbValues(job: Job) {
+    return {
+      jobRoleName: job.jobRoleName ?? "",
+      description: job.description ?? "",
+      responsibilities: (job.responsibilities ?? []).join(", "),
+      jobSpecLink: job.jobSpecLink ?? "",
+      location: job.location ?? "",
+      capability: job.capability ?? "",
+      band: job.band ?? "",
+      closingDate: job.closingDate?.toISOString() ?? new Date().toISOString(),
+      status: job.status ?? JobStatus.DRAFT,
+      numberOfOpenPositions: job.numberOfOpenPositions ?? 0,
+    };
+  }
+
   async getAllJobs(): Promise<Job[]> {
     const rows = await this.db.select().from(jobsTable).all();
     return rows.map(mapJobRowToJob);
@@ -106,7 +121,9 @@ class DatabaseJobStore {
         like(jobsTable.description, searchPattern),
         like(jobsTable.responsibilities, searchPattern)
       );
-      conditions.push(searchCondition);
+      if (searchCondition) {
+        conditions.push(searchCondition);
+      }
     }
 
     if (closingDateFrom) {
@@ -204,18 +221,7 @@ class DatabaseJobStore {
   }
 
   async createJobRole(job: Job): Promise<void> {
-    await this.db.insert(jobsTable).values({
-      jobRoleName: job.jobRoleName ?? "",
-      description: job.description ?? "",
-      responsibilities: (job.responsibilities ?? []).join(", "),
-      jobSpecLink: job.jobSpecLink ?? "",
-      location: job.location ?? "",
-      capability: job.capability ?? "",
-      band: job.band ?? "",
-      closingDate: job.closingDate?.toISOString() ?? new Date().toISOString(),
-      status: job.status ?? JobStatus.DRAFT,
-      numberOfOpenPositions: job.numberOfOpenPositions ?? 0,
-    });
+    await this.db.insert(jobsTable).values(this.mapJobToDbValues(job));
   }
 
   async editJobRole(job: Job): Promise<void> {
@@ -225,18 +231,7 @@ class DatabaseJobStore {
 
     await this.db
       .update(jobsTable)
-      .set({
-        jobRoleName: job.jobRoleName ?? "",
-        description: job.description ?? "",
-        responsibilities: (job.responsibilities ?? []).join(", "),
-        jobSpecLink: job.jobSpecLink ?? "",
-        location: job.location ?? "",
-        capability: job.capability ?? "",
-        band: job.band ?? "",
-        closingDate: job.closingDate?.toISOString() ?? new Date().toISOString(),
-        status: job.status ?? JobStatus.DRAFT,
-        numberOfOpenPositions: job.numberOfOpenPositions ?? 0,
-      })
+      .set(this.mapJobToDbValues(job))
       .where(eq(jobsTable.id, Number.parseInt(job.id, 10)));
   }
 }

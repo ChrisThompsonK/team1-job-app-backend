@@ -1,0 +1,1 @@
+ALTER TABLE `job_roles` RENAME TO `Job_Roles`;
