@@ -223,17 +223,23 @@ describe("JobRepository - Database Tests", () => {
     });
 
     it("should filter by closing date range", async () => {
+      // Use relative dates: from 30 days ago to 30 days from now
+      const closingDateFrom = new Date();
+      closingDateFrom.setDate(closingDateFrom.getDate() - 30);
+      const closingDateTo = new Date();
+      closingDateTo.setDate(closingDateTo.getDate() + 30);
+
       const result = await jobRepository.getFilteredJobs({
-        closingDateFrom: new Date("2025-10-01"),
-        closingDateTo: new Date("2025-12-31"),
+        closingDateFrom,
+        closingDateTo,
       });
 
       if (result.jobs.length > 0) {
         result.jobs.forEach((job) => {
           const closingDate = job.closingDate;
           if (closingDate) {
-            expect(closingDate >= new Date("2025-10-01")).toBe(true);
-            expect(closingDate <= new Date("2025-12-31")).toBe(true);
+            expect(closingDate >= closingDateFrom).toBe(true);
+            expect(closingDate <= closingDateTo).toBe(true);
           }
         });
       }
