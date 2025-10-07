@@ -34,10 +34,59 @@ export interface Job {
   numberOfOpenPositions?: number; // How many positions are available
 }
 
-// This interface can be used for filtering jobs
+// Sorting options for jobs
+export enum SortBy {
+  JOB_ROLE_NAME = "jobRoleName",
+  CLOSING_DATE = "closingDate",
+  BAND = "band",
+  CAPABILITY = "capability",
+  LOCATION = "location",
+  CREATED_DATE = "createdDate",
+}
+
+export enum SortOrder {
+  ASC = "asc",
+  DESC = "desc",
+}
+
+// Enhanced interface for filtering and searching jobs
 export interface JobFilters {
+  // Basic filters
   capability?: Capability;
   band?: Band;
   location?: string;
   status?: JobStatus;
+
+  // Text search (searches across jobRoleName, description, responsibilities)
+  search?: string;
+
+  // Date filters
+  closingDateFrom?: Date;
+  closingDateTo?: Date;
+
+  // Position filters
+  minPositions?: number;
+  maxPositions?: number;
+
+  // Pagination
+  page?: number;
+  limit?: number;
+
+  // Sorting
+  sortBy?: SortBy;
+  sortOrder?: SortOrder;
+}
+
+// Response interface for paginated results
+export interface PaginatedJobResponse {
+  jobs: Job[];
+  pagination: {
+    currentPage: number;
+    totalPages: number;
+    totalItems: number;
+    itemsPerPage: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+  };
+  filters: JobFilters;
 }

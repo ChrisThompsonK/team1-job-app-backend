@@ -10,7 +10,7 @@ const mockJobRepository = {
   getJobById: vi.fn(),
   createJobRole: vi.fn(),
   editJobRole: vi.fn(),
-  getJobsWithFilters: vi.fn(),
+  getFilteredJobs: vi.fn(),
 } as const;
 
 const mockJobValidator = {
@@ -299,6 +299,147 @@ describe("JobService", () => {
         invalidJob
       );
       expect(mockJobRepository.editJobRole).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("getFilteredJobs", () => {
+    it("should return filtered jobs from repository", async () => {
+      const filters = {
+        capability: Capability.DATA,
+        band: Band.E3,
+        page: 1,
+        limit: 10,
+      };
+
+      const expectedResponse = {
+        jobs: [
+          {
+            id: "1",
+            jobRoleName: "Senior Data Engineer",
+            capability: Capability.DATA,
+            band: Band.E3,
+          },
+        ],
+        pagination: {
+          currentPage: 1,
+          totalPages: 1,
+          totalItems: 1,
+          itemsPerPage: 10,
+          hasNextPage: false,
+          hasPreviousPage: false,
+        },
+        filters,
+      };
+
+      mockJobRepository.getFilteredJobs.mockResolvedValue(expectedResponse);
+
+      const result = await jobService.getFilteredJobs(filters);
+
+      expect(result).toEqual(expectedResponse);
+      expect(mockJobRepository.getFilteredJobs).toHaveBeenCalledWith(filters);
+    });
+
+    it("should validate date range and throw error if from date is after to date", async () => {
+      const filters = {
+        closingDateFrom: new Date("2024-12-31"),
+        closingDateTo: new Date("2024-10-01"),
+      };
+
+      await expect(jobService.getFilteredJobs(filters)).rejects.toThrow(
+        "Closing date 'from' cannot be after 'to' date"
+      );
+
+      expect(mockJobRepository.getFilteredJobs).not.toHaveBeenCalled();
+    });
+
+    it("should validate position range and throw error if min is greater than max", async () => {
+      const filters = {
+        minPositions: 10,
+        maxPositions: 5,
+      };
+
+      await expect(jobService.getFilteredJobs(filters)).rejects.toThrow(
+        "Minimum positions cannot be greater than maximum positions"
+      );
+
+      expect(mockJobRepository.getFilteredJobs).not.toHaveBeenCalled();
+    });
+
+    it("should validate page number and throw error if less than 1", async () => {
+      const filters = {
+        page: -1, // Use negative number since QueryParameterParser would set 0 to 1
+      };
+
+      await expect(jobService.getFilteredJobs(filters)).rejects.toThrow(
+        "Page number must be 1 or greater"
+      );
+
+      expect(mockJobRepository.getFilteredJobs).not.toHaveBeenCalled();
+    });
+
+    it("should validate limit and throw error if outside valid range", async () => {
+      const filters1 = { limit: -1 }; // Use negative numbers
+      const filters2 = { limit: 200 }; // Use number over 100
+
+      await expect(jobService.getFilteredJobs(filters1)).rejects.toThrow(
+        "Limit must be between 1 and 100"
+      );
+
+      await expect(jobService.getFilteredJobs(filters2)).rejects.toThrow(
+        "Limit must be between 1 and 100"
+      );
+
+      expect(mockJobRepository.getFilteredJobs).not.toHaveBeenCalled();
+    });
+
+    it("should allow valid date range", async () => {
+      const filters = {
+        closingDateFrom: new Date("2024-10-01"),
+        closingDateTo: new Date("2024-12-31"),
+      };
+
+      const expectedResponse = {
+        jobs: [],
+        pagination: {
+          currentPage: 1,
+          totalPages: 0,
+          totalItems: 0,
+          itemsPerPage: 10,
+          hasNextPage: false,
+          hasPreviousPage: false,
+        },
+        filters,
+      };
+
+      mockJobRepository.getFilteredJobs.mockResolvedValue(expectedResponse);
+
+      await expect(jobService.getFilteredJobs(filters)).resolves.not.toThrow();
+      expect(mockJobRepository.getFilteredJobs).toHaveBeenCalledWith(filters);
+    });
+
+    it("should allow valid position range", async () => {
+      const filters = {
+        minPositions: 1,
+        maxPositions: 5,
+      };
+
+      const expectedResponse = {
+        jobs: [],
+        pagination: {
+          currentPage: 1,
+          totalPages: 0,
+          totalItems: 0,
+          itemsPerPage: 10,
+          hasNextPage: false,
+          hasPreviousPage: false,
+        },
+        filters,
+      };
+
+      mockJobRepository.getFilteredJobs.mockResolvedValue(expectedResponse);
+
+      await expect(jobService.getFilteredJobs(filters)).resolves.not.toThrow();
+      expect(mockJobRepository.getFilteredJobs).toHaveBeenCalledWith(filters);
     });
   });
 });

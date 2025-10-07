@@ -1,5 +1,5 @@
-import type { Job } from "../models/JobModel";
-import { Band, Capability, JobStatus } from "../models/JobModel";
+import type { Job } from "../models/JobModel.js";
+import { Band, Capability, JobStatus } from "../models/JobModel.js";
 
 /**
  * Interface for incoming job request data

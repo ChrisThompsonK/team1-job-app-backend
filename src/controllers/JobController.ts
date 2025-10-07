@@ -1,7 +1,11 @@
 import type { Request, Response } from "express";
-import { BusinessError, NotFoundError } from "../middleware/errorHandler";
-import type { JobService } from "../services/JobService";
-import type { JobValidator } from "../validators/JobValidator";
+import { BusinessError, NotFoundError } from "../middleware/errorHandler.js";
+import type { JobService } from "../services/JobService.js";
+import {
+  describeFilters,
+  parseJobFilters,
+} from "../utils/QueryParameterParser.js";
+import type { JobValidator } from "../validators/JobValidator.js";
 
 export class JobController {
   private jobService: JobService;
@@ -43,6 +47,28 @@ export class JobController {
       message: "Job retrieved successfully",
       data: job,
     });
+  }
+
+  // GET /jobs/search - Get filtered jobs with query parameters
+  async getFilteredJobs(req: Request, res: Response): Promise<void> {
+    try {
+      const filters = parseJobFilters(req);
+      const result = await this.jobService.getFilteredJobs(filters);
+
+      res.status(200).json({
+        success: true,
+        message: "Filtered jobs retrieved successfully",
+        data: result.jobs,
+        pagination: result.pagination,
+        filters: result.filters,
+        filtersDescription: describeFilters(filters),
+      });
+    } catch (error) {
+      throw new BusinessError(
+        error instanceof Error ? error.message : "Invalid filter parameters",
+        400
+      );
+    }
   }
 
   //Create a new job

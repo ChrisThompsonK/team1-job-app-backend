@@ -1,9 +1,9 @@
 import type { Request, Response } from "express";
 import express from "express";
-import { jobController } from "./di/container";
-import { errorHandler, notFoundHandler } from "./middleware/errorHandler";
-import { configureMiddleware } from "./middleware/middlewareConfig";
-import { createJobRoutes } from "./routes/CreateJobRoutes";
+import { jobController } from "./di/container.js";
+import { errorHandler, notFoundHandler } from "./middleware/errorHandler.js";
+import { configureMiddleware } from "./middleware/middlewareConfig.js";
+import { createJobRoutes } from "./routes/CreateJobRoutes.js";
 
 const app = express();
 
@@ -21,6 +21,33 @@ app.get("/", (_req: Request, res: Response) => {
       jobById: "/api/jobs/:id",
       createJob: "/api/jobs [POST]",
       editJob: "/api/jobs/:id [PUT]",
+      filteredJobs: "/api/jobs/search",
+    },
+    filtering: {
+      endpoint: "/api/jobs/search",
+      description: "Server-side filtering with query parameters",
+      queryParameters: {
+        capability: "Filter by capability (DATA, WORKDAY, ENGINEERING)",
+        band: "Filter by band (E1, E2, E3, E4, E5)",
+        location: "Filter by location (partial match)",
+        status: "Filter by status (open, closed, draft)",
+        search:
+          "Text search across job title, description, and responsibilities",
+        closingDateFrom: "Filter jobs closing after this date (YYYY-MM-DD)",
+        closingDateTo: "Filter jobs closing before this date (YYYY-MM-DD)",
+        minPositions: "Minimum number of open positions",
+        maxPositions: "Maximum number of open positions",
+        page: "Page number for pagination (default: 1)",
+        limit: "Items per page (1-100, default: 10)",
+        sortBy:
+          "Sort field (jobRoleName, closingDate, band, capability, location)",
+        sortOrder: "Sort direction (asc, desc, default: asc)",
+      },
+      examples: [
+        "/api/jobs/search?capability=DATA&band=E3",
+        "/api/jobs/search?search=engineer&sortBy=closingDate&sortOrder=desc",
+        "/api/jobs/search?location=London&minPositions=2&page=1&limit=5",
+      ],
     },
   });
 });
