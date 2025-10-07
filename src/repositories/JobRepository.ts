@@ -106,9 +106,7 @@ class DatabaseJobStore {
         like(jobsTable.description, searchPattern),
         like(jobsTable.responsibilities, searchPattern)
       );
-      if (searchCondition) {
-        conditions.push(searchCondition);
-      }
+      conditions.push(searchCondition);
     }
 
     if (closingDateFrom) {
