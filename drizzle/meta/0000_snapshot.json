@@ -1,11 +1,11 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "3e4d60b9-fe58-4a04-b425-003898b7aec7",
+  "id": "dd13f400-5480-4e4b-8773-18484e02a302",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
-    "Job_Roles": {
-      "name": "Job_Roles",
+    "job_roles": {
+      "name": "job_roles",
       "columns": {
         "id": {
           "name": "id",
@@ -49,8 +49,8 @@
           "notNull": true,
           "autoincrement": false
         },
-        "Capability": {
-          "name": "Capability",
+        "capability": {
+          "name": "capability",
           "type": "text",
           "primaryKey": false,
           "notNull": true,

@@ -1,1 +1,0 @@
-ALTER TABLE `Job_Roles` RENAME COLUMN "Capability" TO "capability";
