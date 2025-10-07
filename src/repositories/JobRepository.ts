@@ -5,10 +5,8 @@ import {
   asc,
   desc,
   eq,
-  gte,
   type InferSelectModel,
   like,
-  lte,
   or,
   sql,
 } from "drizzle-orm";
@@ -85,10 +83,6 @@ class DatabaseJobStore {
       location,
       status,
       search,
-      closingDateFrom,
-      closingDateTo,
-      minPositions,
-      maxPositions,
       page = 1,
       limit = 10,
       sortBy = "closingDate",
@@ -124,24 +118,6 @@ class DatabaseJobStore {
       if (searchCondition) {
         conditions.push(searchCondition);
       }
-    }
-
-    if (closingDateFrom) {
-      conditions.push(
-        gte(jobsTable.closingDate, closingDateFrom.toISOString())
-      );
-    }
-
-    if (closingDateTo) {
-      conditions.push(lte(jobsTable.closingDate, closingDateTo.toISOString()));
-    }
-
-    if (minPositions !== undefined) {
-      conditions.push(gte(jobsTable.numberOfOpenPositions, minPositions));
-    }
-
-    if (maxPositions !== undefined) {
-      conditions.push(lte(jobsTable.numberOfOpenPositions, maxPositions));
     }
 
     // Count total items for pagination

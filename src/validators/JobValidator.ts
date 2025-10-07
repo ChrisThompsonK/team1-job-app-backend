@@ -121,6 +121,9 @@ export class JobValidator {
         "Number of open positions is required and must be a number"
       );
     }
+    if (numberOfOpenPositions < 1) {
+      throw new Error("Number of open positions must be at least 1");
+    }
     if (!location || typeof location !== "string") {
       throw new Error("Location is required and must be a string");
     }

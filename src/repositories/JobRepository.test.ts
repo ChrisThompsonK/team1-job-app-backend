@@ -222,53 +222,6 @@ describe("JobRepository - Database Tests", () => {
       }
     });
 
-    it("should filter by closing date range", async () => {
-      // Use relative dates: from 30 days ago to 30 days from now
-      const closingDateFrom = new Date();
-      closingDateFrom.setDate(closingDateFrom.getDate() - 30);
-      const closingDateTo = new Date();
-      closingDateTo.setDate(closingDateTo.getDate() + 30);
-
-      const result = await jobRepository.getFilteredJobs({
-        closingDateFrom,
-        closingDateTo,
-      });
-
-      if (result.jobs.length > 0) {
-        result.jobs.forEach((job) => {
-          const closingDate = job.closingDate;
-          if (closingDate) {
-            expect(closingDate >= closingDateFrom).toBe(true);
-            expect(closingDate <= closingDateTo).toBe(true);
-          }
-        });
-      }
-    });
-
-    it("should filter by minimum positions", async () => {
-      const result = await jobRepository.getFilteredJobs({
-        minPositions: 2,
-      });
-
-      if (result.jobs.length > 0) {
-        expect(
-          result.jobs.every((j) => (j.numberOfOpenPositions ?? 0) >= 2)
-        ).toBe(true);
-      }
-    });
-
-    it("should filter by maximum positions", async () => {
-      const result = await jobRepository.getFilteredJobs({
-        maxPositions: 2,
-      });
-
-      if (result.jobs.length > 0) {
-        expect(
-          result.jobs.every((j) => (j.numberOfOpenPositions ?? 0) <= 2)
-        ).toBe(true);
-      }
-    });
-
     it("should handle pagination with page 2", async () => {
       const result = await jobRepository.getFilteredJobs({
         page: 2,
@@ -341,13 +294,13 @@ describe("JobRepository - Database Tests", () => {
     it("should combine multiple filters correctly", async () => {
       const result = await jobRepository.getFilteredJobs({
         status: JobStatus.OPEN,
-        minPositions: 1,
+        capability: Capability.ENGINEERING,
       });
 
       if (result.jobs.length > 0) {
         result.jobs.forEach((job) => {
           expect(job.status).toBe(JobStatus.OPEN);
-          expect((job.numberOfOpenPositions ?? 0) >= 1).toBe(true);
+          expect(job.capability).toBe(Capability.ENGINEERING);
         });
       }
     });

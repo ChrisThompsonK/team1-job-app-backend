@@ -22,10 +22,6 @@ describe("QueryParameterParser Functions", () => {
           status: "open",
           location: "London",
           search: "engineer",
-          closingDateFrom: "2024-10-01",
-          closingDateTo: "2024-12-31",
-          minPositions: "2",
-          maxPositions: "10",
           page: "2",
           limit: "5",
           sortBy: "jobRoleName",
@@ -41,10 +37,6 @@ describe("QueryParameterParser Functions", () => {
         status: JobStatus.OPEN,
         location: "London",
         search: "engineer",
-        closingDateFrom: new Date("2024-10-01"),
-        closingDateTo: new Date("2024-12-31"),
-        minPositions: 2,
-        maxPositions: 10,
         page: 2,
         limit: 5,
         sortBy: SortBy.JOB_ROLE_NAME,
@@ -82,25 +74,9 @@ describe("QueryParameterParser Functions", () => {
       expect(result.sortOrder).toBe(SortOrder.ASC); // Falls back to default
     });
 
-    it("should handle invalid date formats", () => {
-      const mockRequest = {
-        query: {
-          closingDateFrom: "invalid-date",
-          closingDateTo: "not-a-date",
-        },
-      } as Partial<Request>;
-
-      const result = parseJobFilters(mockRequest as Request);
-
-      expect(result.closingDateFrom).toBeUndefined();
-      expect(result.closingDateTo).toBeUndefined();
-    });
-
     it("should handle invalid number formats", () => {
       const mockRequest = {
         query: {
-          minPositions: "not-a-number",
-          maxPositions: "-5",
           page: "0",
           limit: "150",
         },
@@ -108,8 +84,6 @@ describe("QueryParameterParser Functions", () => {
 
       const result = parseJobFilters(mockRequest as Request);
 
-      expect(result.minPositions).toBeUndefined();
-      expect(result.maxPositions).toBeUndefined();
       expect(result.page).toBe(1); // Invalid page defaults to 1
       expect(result.limit).toBe(10); // Invalid limit defaults to 10
     });
@@ -166,7 +140,6 @@ describe("QueryParameterParser Functions", () => {
         band: Band.E3,
         location: "London",
         search: "engineer",
-        minPositions: 2,
       };
 
       const result = describeFilters(filters);
@@ -175,19 +148,6 @@ describe("QueryParameterParser Functions", () => {
       expect(result).toContain("band: E3");
       expect(result).toContain('location: "London"');
       expect(result).toContain('search: "engineer"');
-      expect(result).toContain("min positions: 2");
-    });
-
-    it("should handle date filters in description", () => {
-      const filters = {
-        closingDateFrom: new Date("2024-10-01"),
-        closingDateTo: new Date("2024-12-31"),
-      };
-
-      const result = describeFilters(filters);
-
-      expect(result).toContain("closing after: 2024-10-01");
-      expect(result).toContain("closing before: 2024-12-31");
     });
 
     it("should return no filters message when no filters are active", () => {

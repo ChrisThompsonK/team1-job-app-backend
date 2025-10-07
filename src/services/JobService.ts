@@ -31,22 +31,6 @@ export class JobService {
 
   // Get filtered jobs with validation
   async getFilteredJobs(filters: JobFilters): Promise<PaginatedJobResponse> {
-    // Validate date range
-    if (filters.closingDateFrom && filters.closingDateTo) {
-      if (filters.closingDateFrom > filters.closingDateTo) {
-        throw new Error("Closing date 'from' cannot be after 'to' date");
-      }
-    }
-
-    // Validate position range
-    if (filters.minPositions && filters.maxPositions) {
-      if (filters.minPositions > filters.maxPositions) {
-        throw new Error(
-          "Minimum positions cannot be greater than maximum positions"
-        );
-      }
-    }
-
     // Validate pagination parameters
     if (filters.page && filters.page < 1) {
       throw new Error("Page number must be 1 or greater");

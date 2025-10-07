@@ -33,10 +33,6 @@ app.get("/", (_req: Request, res: Response) => {
         status: "Filter by status (open, closed, draft)",
         search:
           "Text search across job title, description, and responsibilities",
-        closingDateFrom: "Filter jobs closing after this date (YYYY-MM-DD)",
-        closingDateTo: "Filter jobs closing before this date (YYYY-MM-DD)",
-        minPositions: "Minimum number of open positions",
-        maxPositions: "Maximum number of open positions",
         page: "Page number for pagination (default: 1)",
         limit: "Items per page (1-100, default: 10)",
         sortBy:
@@ -46,7 +42,7 @@ app.get("/", (_req: Request, res: Response) => {
       examples: [
         "/api/jobs/search?capability=DATA&band=E3",
         "/api/jobs/search?search=engineer&sortBy=closingDate&sortOrder=desc",
-        "/api/jobs/search?location=London&minPositions=2&page=1&limit=5",
+        "/api/jobs/search?location=London&page=1&limit=5",
       ],
     },
   });

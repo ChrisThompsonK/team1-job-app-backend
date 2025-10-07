@@ -69,7 +69,7 @@ function parseSortOrder(value: string): SortOrder | null {
 /**
  * Parse date from string (supports YYYY-MM-DD format)
  */
-function parseDate(value: string): Date | null {
+function _parseDate(value: string): Date | null {
   const date = new Date(value);
   return Number.isNaN(date.getTime()) ? null : date;
 }
@@ -114,28 +114,6 @@ export function parseJobFilters(req: Request): JobFilters {
 
   if (query.search && typeof query.search === "string") {
     filters.search = query.search.trim();
-  }
-
-  // Parse date filters
-  if (query.closingDateFrom && typeof query.closingDateFrom === "string") {
-    const date = parseDate(query.closingDateFrom);
-    if (date) filters.closingDateFrom = date;
-  }
-
-  if (query.closingDateTo && typeof query.closingDateTo === "string") {
-    const date = parseDate(query.closingDateTo);
-    if (date) filters.closingDateTo = date;
-  }
-
-  // Parse number filters
-  if (query.minPositions && typeof query.minPositions === "string") {
-    const num = parsePositiveInteger(query.minPositions);
-    if (num !== null) filters.minPositions = num;
-  }
-
-  if (query.maxPositions && typeof query.maxPositions === "string") {
-    const num = parsePositiveInteger(query.maxPositions);
-    if (num !== null) filters.maxPositions = num;
   }
 
   // Parse pagination
@@ -191,22 +169,6 @@ export function describeFilters(filters: JobFilters): string {
   }
   if (filters.search) {
     descriptions.push(`search: "${filters.search}"`);
-  }
-  if (filters.closingDateFrom) {
-    descriptions.push(
-      `closing after: ${filters.closingDateFrom.toISOString().split("T")[0]}`
-    );
-  }
-  if (filters.closingDateTo) {
-    descriptions.push(
-      `closing before: ${filters.closingDateTo.toISOString().split("T")[0]}`
-    );
-  }
-  if (filters.minPositions) {
-    descriptions.push(`min positions: ${filters.minPositions}`);
-  }
-  if (filters.maxPositions) {
-    descriptions.push(`max positions: ${filters.maxPositions}`);
   }
 
   return descriptions.length > 0
