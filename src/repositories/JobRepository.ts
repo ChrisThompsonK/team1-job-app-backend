@@ -198,7 +198,7 @@ class DatabaseJobStore {
   }
 
   async createJobRole(job: Job): Promise<void> {
-    await this.db.insert(jobsTable).values(this.mapJobToDbValues(job));
+    await this.db.insert(jobsTable).values(this.mapJobToDbValues(job)).run();
   }
 
   async editJobRole(job: Job): Promise<void> {
@@ -209,7 +209,8 @@ class DatabaseJobStore {
     await this.db
       .update(jobsTable)
       .set(this.mapJobToDbValues(job))
-      .where(eq(jobsTable.id, Number.parseInt(job.id, 10)));
+      .where(eq(jobsTable.id, Number.parseInt(job.id, 10)))
+      .run();
   }
 
   async deleteJobRole(id: string): Promise<void> {
@@ -226,7 +227,8 @@ class DatabaseJobStore {
 
     await this.db
       .delete(jobsTable)
-      .where(eq(jobsTable.id, Number.parseInt(id, 10)));
+      .where(eq(jobsTable.id, Number.parseInt(id, 10)))
+      .run();
   }
 }
 
