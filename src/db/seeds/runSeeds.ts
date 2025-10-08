@@ -1,9 +1,10 @@
 import { createClient } from "@libsql/client";
 import { drizzle } from "drizzle-orm/libsql";
+import { env } from "../../config/env.js";
 import { jobRolesSeeds, jobRolesTable } from "./index";
 
 const client = createClient({
-  url: "file:jobApp.db",
+  url: env.databaseUrl,
 });
 
 const db = drizzle(client);

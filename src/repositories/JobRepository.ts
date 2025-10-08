@@ -11,6 +11,7 @@ import {
   sql,
 } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/libsql";
+import { env } from "../config/env.js";
 import { jobsTable } from "../db/schemas/jobs.js";
 import type {
   Job,
@@ -43,7 +44,7 @@ function mapJobRowToJob(row: JobRow): Job {
 
 class DatabaseJobStore {
   private client = createClient({
-    url: "file:jobApp.db",
+    url: env.databaseUrl,
   });
   private db = drizzle(this.client);
 
