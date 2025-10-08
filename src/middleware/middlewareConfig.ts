@@ -9,7 +9,7 @@ export const configureMiddleware = (app: Express): void => {
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
   app.use(morgan("dev"));
-  
+
   // Configure CORS with environment variable
   const corsOrigin = env.corsOrigin === "*" ? "*" : env.corsOrigin.split(",");
   app.use(

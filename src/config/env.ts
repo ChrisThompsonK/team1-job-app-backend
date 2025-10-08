@@ -64,9 +64,7 @@ const loadEnvironmentConfig = (): EnvironmentConfig => {
     const databaseUrl = validateDatabaseUrl(
       getEnvVariable("DATABASE_URL", "file:jobApp.db")
     );
-    const nodeEnv = validateNodeEnv(
-      getEnvVariable("NODE_ENV", "development")
-    );
+    const nodeEnv = validateNodeEnv(getEnvVariable("NODE_ENV", "development"));
     const corsOrigin = getEnvVariable("CORS_ORIGIN", "*");
 
     return {
