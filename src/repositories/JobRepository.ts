@@ -210,6 +210,23 @@ class DatabaseJobStore {
       .set(this.mapJobToDbValues(job))
       .where(eq(jobsTable.id, Number.parseInt(job.id, 10)));
   }
+
+  async deleteJobRole(id: string): Promise<void> {
+    // First check if the job exists
+    const existingJob = await this.db
+      .select()
+      .from(jobsTable)
+      .where(eq(jobsTable.id, Number.parseInt(id, 10)))
+      .get();
+
+    if (!existingJob) {
+      throw new Error(`Job with ID ${id} not found`);
+    }
+
+    await this.db
+      .delete(jobsTable)
+      .where(eq(jobsTable.id, Number.parseInt(id, 10)));
+  }
 }
 
 // Singleton instance for the database job store
@@ -234,5 +251,9 @@ export class JobRepository {
 
   async editJobRole(job: Job): Promise<void> {
     await jobStore.editJobRole(job);
+  }
+
+  async deleteJobRole(id: string): Promise<void> {
+    await jobStore.deleteJobRole(id);
   }
 }

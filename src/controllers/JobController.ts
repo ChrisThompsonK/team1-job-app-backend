@@ -111,4 +111,26 @@ export class JobController {
       );
     }
   }
+
+  async deleteJob(req: Request, res: Response): Promise<void> {
+    const { id } = req.params;
+
+    if (!id) {
+      throw new BusinessError("Job ID is required", 400);
+    }
+
+    try {
+      await this.jobService.deleteJobRole(id);
+
+      res.status(200).json({
+        success: true,
+        message: `Job ${id} deleted successfully`,
+      });
+    } catch (error) {
+      throw new BusinessError(
+        error instanceof Error ? error.message : "Invalid job data",
+        400
+      );
+    }
+  }
 }

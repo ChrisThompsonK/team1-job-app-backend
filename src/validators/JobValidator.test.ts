@@ -9,6 +9,43 @@ describe("JobValidator", () => {
     jobValidator = new JobValidator();
   });
 
+  describe("validateJobId", () => {
+    it("should return trimmed ID for valid ID", () => {
+      const result = jobValidator.validateJobId("  123  ");
+      expect(result).toBe("123");
+    });
+
+    it("should throw error for empty string", () => {
+      expect(() => jobValidator.validateJobId("")).toThrow(
+        "Valid job ID is required"
+      );
+    });
+
+    it("should throw error for whitespace only", () => {
+      expect(() => jobValidator.validateJobId("   ")).toThrow(
+        "Valid job ID is required"
+      );
+    });
+
+    it("should throw error for null", () => {
+      expect(() =>
+        jobValidator.validateJobId(null as unknown as string)
+      ).toThrow("Valid job ID is required");
+    });
+
+    it("should throw error for undefined", () => {
+      expect(() =>
+        jobValidator.validateJobId(undefined as unknown as string)
+      ).toThrow("Valid job ID is required");
+    });
+
+    it("should throw error for non-string", () => {
+      expect(() =>
+        jobValidator.validateJobId(123 as unknown as string)
+      ).toThrow("Valid job ID is required");
+    });
+  });
+
   describe("validateBand", () => {
     it("should return valid band enum for valid band string", () => {
       const result = jobValidator.validateBand("E1");
