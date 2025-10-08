@@ -58,5 +58,5 @@ export class JobService {
   //Delete job-role
   async deleteJobRole(id: string): Promise<void> {
     await this.jobRepository.deleteJobRole(id);
-  } 
+  }
 }

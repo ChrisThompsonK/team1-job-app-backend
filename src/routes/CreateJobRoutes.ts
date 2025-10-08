@@ -29,7 +29,7 @@ export const createJobRoutes = (jobController: JobController) => {
   router.delete(
     "/jobs/:id",
     asyncHandler(jobController.deleteJob.bind(jobController))
-  )
+  );
 
   return router;
 };
