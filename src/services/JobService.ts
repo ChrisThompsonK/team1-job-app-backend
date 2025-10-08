@@ -22,11 +22,8 @@ export class JobService {
 
   // Get job by ID with validation
   async getJobById(id: string): Promise<Job | null> {
-    if (!id || typeof id !== "string" || id.trim() === "") {
-      throw new Error("Valid job ID is required");
-    }
-
-    return await this.jobRepository.getJobById(id.trim());
+    const validatedId = this.jobValidator.validateJobId(id);
+    return await this.jobRepository.getJobById(validatedId);
   }
 
   // Get filtered jobs with validation
@@ -57,6 +54,7 @@ export class JobService {
 
   //Delete job-role
   async deleteJobRole(id: string): Promise<void> {
-    await this.jobRepository.deleteJobRole(id);
+    const validatedId = this.jobValidator.validateJobId(id);
+    await this.jobRepository.deleteJobRole(validatedId);
   }
 }

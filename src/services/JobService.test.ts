@@ -18,6 +18,12 @@ const mockJobValidator = {
   validateCapability: vi.fn(),
   validateBandAndCapability: vi.fn(),
   createValidatedJob: vi.fn(),
+  validateJobId: vi.fn((id: string) => {
+    if (!id || typeof id !== "string" || id.trim() === "") {
+      throw new Error("Valid job ID is required");
+    }
+    return id.trim();
+  }),
 } as const;
 
 describe("JobService", () => {

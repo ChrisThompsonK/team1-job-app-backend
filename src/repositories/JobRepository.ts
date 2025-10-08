@@ -212,6 +212,17 @@ class DatabaseJobStore {
   }
 
   async deleteJobRole(id: string): Promise<void> {
+    // First check if the job exists
+    const existingJob = await this.db
+      .select()
+      .from(jobsTable)
+      .where(eq(jobsTable.id, Number.parseInt(id, 10)))
+      .get();
+
+    if (!existingJob) {
+      throw new Error(`Job with ID ${id} not found`);
+    }
+
     await this.db
       .delete(jobsTable)
       .where(eq(jobsTable.id, Number.parseInt(id, 10)));

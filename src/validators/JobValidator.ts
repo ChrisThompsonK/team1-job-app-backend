@@ -22,6 +22,19 @@ interface JobRequestData {
  */
 export class JobValidator {
   /**
+   * Validates that a job ID is valid (non-empty string)
+   * @param id - The job ID to validate
+   * @returns The trimmed job ID
+   * @throws Error if ID is invalid
+   */
+  validateJobId(id: string): string {
+    if (!id || typeof id !== "string" || id.trim() === "") {
+      throw new Error("Valid job ID is required");
+    }
+    return id.trim();
+  }
+
+  /**
    * Validates that a job has valid band and capability enum values
    * @param job - The job object to validate
    * @throws Error if band or capability is invalid
