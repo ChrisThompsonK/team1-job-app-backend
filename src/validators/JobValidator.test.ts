@@ -76,12 +76,14 @@ describe("JobValidator", () => {
       expect(() =>
         jobValidator.validateCapability("InvalidCapability")
       ).toThrow(
-        "Invalid capability. Must be one of: Data, Workday, Engineering"
+        "Invalid capability. Must be one of: Data & Analytics, Workday, Engineering, Product, Design, Platform, Quality, Architecture, Business Analysis, Security"
       );
     });
 
     it("should handle all valid capability values", () => {
-      expect(jobValidator.validateCapability("Data")).toBe(Capability.DATA);
+      expect(jobValidator.validateCapability("Data & Analytics")).toBe(
+        Capability.DATA
+      );
       expect(jobValidator.validateCapability("Workday")).toBe(
         Capability.WORKDAY
       );
@@ -122,7 +124,7 @@ describe("JobValidator", () => {
       };
 
       expect(() => jobValidator.validateBandAndCapability(job)).toThrow(
-        "Invalid capability. Must be one of: Data, Workday, Engineering"
+        "Invalid capability. Must be one of: Data & Analytics, Workday, Engineering, Product, Design, Platform, Quality, Architecture, Business Analysis, Security"
       );
     });
   });
@@ -177,16 +179,12 @@ describe("JobValidator", () => {
       it("should handle all valid status values", () => {
         const openData = { ...validJobData, status: "open" };
         const closedData = { ...validJobData, status: "closed" };
-        const draftData = { ...validJobData, status: "draft" };
 
         expect(jobValidator.createValidatedJob(openData).status).toBe(
           JobStatus.OPEN
         );
         expect(jobValidator.createValidatedJob(closedData).status).toBe(
           JobStatus.CLOSED
-        );
-        expect(jobValidator.createValidatedJob(draftData).status).toBe(
-          JobStatus.DRAFT
         );
       });
     });
@@ -303,14 +301,14 @@ describe("JobValidator", () => {
           capability: "InvalidCapability",
         };
         expect(() => jobValidator.createValidatedJob(invalidData)).toThrow(
-          "Invalid capability. Must be one of: Data, Workday, Engineering"
+          "Invalid capability. Must be one of: Data & Analytics, Workday, Engineering, Product, Design, Platform, Quality, Architecture, Business Analysis, Security"
         );
       });
 
       it("should throw error for invalid status", () => {
         const invalidData = { ...validJobData, status: "invalid" };
         expect(() => jobValidator.createValidatedJob(invalidData)).toThrow(
-          "Invalid status. Must be one of: open, closed, draft"
+          "Invalid status. Must be one of: open, closed"
         );
       });
     });

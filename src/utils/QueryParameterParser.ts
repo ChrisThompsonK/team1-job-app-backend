@@ -10,9 +10,18 @@ import {
 
 /**
  * Parse capability enum from string
+ * Matches either the enum key (e.g., "DATA") or value (e.g., "Data & Analytics")
  */
 function parseCapability(value: string): Capability | null {
   const upperValue = value.toUpperCase();
+  
+  // Try to match by enum key (e.g., DATA, WORKDAY, ENGINEERING)
+  const keyMatch = Object.entries(Capability).find(
+    ([key]) => key === upperValue
+  );
+  if (keyMatch) return keyMatch[1] as Capability;
+  
+  // Try to match by enum value (case-insensitive)
   return (
     Object.values(Capability).find((cap) => cap.toUpperCase() === upperValue) ||
     null

@@ -260,7 +260,7 @@ describe("JobController", () => {
 
     it("should throw BusinessError when validation fails", async () => {
       const validationError = new Error(
-        "Invalid status. Must be one of: open, closed, draft"
+        "Invalid status. Must be one of: open, closed"
       );
       mockJobValidator.createValidatedJob.mockImplementation(() => {
         throw validationError;

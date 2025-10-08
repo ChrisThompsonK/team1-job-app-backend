@@ -58,7 +58,7 @@ class DatabaseJobStore {
       capability: job.capability ?? "",
       band: job.band ?? "",
       closingDate: job.closingDate?.toISOString() ?? new Date().toISOString(),
-      status: job.status ?? JobStatus.DRAFT,
+      status: job.status ?? JobStatus.OPEN,
       numberOfOpenPositions: job.numberOfOpenPositions ?? 0,
     };
   }

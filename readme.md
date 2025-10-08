@@ -132,10 +132,10 @@ GET /api/jobs/search
 ```
 
 **Query Parameters:**
-- `capability` - Filter by capability (DATA, WORKDAY, ENGINEERING)
+- `capability` - Filter by capability (DATA, WORKDAY, ENGINEERING, PRODUCT, DESIGN, PLATFORM, QUALITY, ARCHITECTURE, BUSINESS_ANALYSIS, SECURITY)
 - `band` - Filter by band (Junior, Mid, Senior, Principal)
 - `location` - Filter by location (partial match)
-- `status` - Filter by status (open, closed, draft)
+- `status` - Filter by status (open, closed)
 - `search` - Text search across job title, description, and responsibilities
 - `page` - Page number for pagination (default: 1)
 - `limit` - Items per page (1-100, default: 10)

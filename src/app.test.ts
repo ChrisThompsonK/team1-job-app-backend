@@ -316,7 +316,7 @@ describe("Job Application Backend API", () => {
         expect(mockJson).toHaveBeenCalledWith({
           success: true,
           message:
-            "Jobs retrieved successfully with filters (capability: Data, band: Junior)",
+            "Jobs retrieved successfully with filters (capability: Data & Analytics, band: Junior)",
           data: [sampleJobs[1]], // Only the Data Junior job
           count: 1,
           filters: { capability: Capability.DATA, band: Band.JUNIOR },
@@ -450,7 +450,6 @@ describe("Job Application Backend API", () => {
 
       expect(Object.values(JobStatus)).toContain(JobStatus.OPEN);
       expect(Object.values(JobStatus)).toContain(JobStatus.CLOSED);
-      expect(Object.values(JobStatus)).toContain(JobStatus.DRAFT);
     });
   });
 
