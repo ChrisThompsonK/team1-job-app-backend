@@ -169,12 +169,12 @@ describe("JobRepository - Database Tests", () => {
 
     it("should filter by band", async () => {
       const result = await jobRepository.getFilteredJobs({
-        band: Band.E3,
+        band: Band.MID,
       });
 
-      // Should only return E3 jobs if any exist
+      // Should only return Mid jobs if any exist
       if (result.jobs.length > 0) {
-        expect(result.jobs.every((j) => j.band === Band.E3)).toBe(true);
+        expect(result.jobs.every((j) => j.band === Band.MID)).toBe(true);
       }
     });
 
@@ -308,7 +308,7 @@ describe("JobRepository - Database Tests", () => {
     it("should return filters in the response", async () => {
       const filters = {
         capability: Capability.ENGINEERING,
-        band: Band.E4,
+        band: Band.SENIOR,
         page: 1,
         limit: 5,
       };
@@ -330,7 +330,7 @@ describe("JobRepository - Database Tests", () => {
         jobSpecLink: "https://example.com/test",
         location: "Test Location",
         capability: Capability.ENGINEERING,
-        band: Band.E2,
+        band: Band.JUNIOR,
         closingDate: new Date("2025-12-31"),
         status: JobStatus.DRAFT,
         numberOfOpenPositions: 1,
@@ -353,7 +353,7 @@ describe("JobRepository - Database Tests", () => {
         jobSpecLink: "https://example.com/test2",
         location: "Test",
         capability: Capability.DATA,
-        band: Band.E1,
+        band: Band.JUNIOR,
         closingDate: new Date("2025-12-31"),
         status: JobStatus.DRAFT,
         numberOfOpenPositions: 1,
@@ -406,7 +406,7 @@ describe("JobRepository - Database Tests", () => {
         jobSpecLink: "https://example.com",
         location: "Test",
         capability: Capability.ENGINEERING,
-        band: Band.E1,
+        band: Band.JUNIOR,
         closingDate: new Date(),
         status: JobStatus.DRAFT,
         numberOfOpenPositions: 1,

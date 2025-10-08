@@ -18,7 +18,7 @@ describe("QueryParameterParser Functions", () => {
       const mockRequest = {
         query: {
           capability: "DATA",
-          band: "E3",
+          band: "Mid",
           status: "open",
           location: "London",
           search: "engineer",
@@ -33,7 +33,7 @@ describe("QueryParameterParser Functions", () => {
 
       expect(result).toEqual({
         capability: Capability.DATA,
-        band: Band.E3,
+        band: Band.MID,
         status: JobStatus.OPEN,
         location: "London",
         search: "engineer",
@@ -106,7 +106,7 @@ describe("QueryParameterParser Functions", () => {
       const mockRequest = {
         query: {
           capability: "data",
-          band: "e3",
+          band: "mid",
           status: "OPEN",
           sortBy: "JOBROLE_NAME",
           sortOrder: "DESC",
@@ -116,7 +116,7 @@ describe("QueryParameterParser Functions", () => {
       const result = parseJobFilters(mockRequest as Request);
 
       expect(result.capability).toBe(Capability.DATA);
-      expect(result.band).toBe(Band.E3);
+      expect(result.band).toBe(Band.MID);
       expect(result.status).toBe(JobStatus.OPEN);
       expect(result.sortOrder).toBe(SortOrder.DESC);
     });
@@ -137,7 +137,7 @@ describe("QueryParameterParser Functions", () => {
     it("should describe active filters correctly", () => {
       const filters = {
         capability: Capability.DATA,
-        band: Band.E3,
+        band: Band.MID,
         location: "London",
         search: "engineer",
       };
@@ -145,7 +145,7 @@ describe("QueryParameterParser Functions", () => {
       const result = describeFilters(filters);
 
       expect(result).toContain("capability: Data");
-      expect(result).toContain("band: E3");
+      expect(result).toContain("band: Mid");
       expect(result).toContain('location: "London"');
       expect(result).toContain('search: "engineer"');
     });
