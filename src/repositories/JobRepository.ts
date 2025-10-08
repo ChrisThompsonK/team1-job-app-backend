@@ -1,114 +1,221 @@
+import { createClient } from "@libsql/client";
+import type { SQL } from "drizzle-orm";
+import {
+  and,
+  asc,
+  desc,
+  eq,
+  type InferSelectModel,
+  like,
+  or,
+  sql,
+} from "drizzle-orm";
+import { drizzle } from "drizzle-orm/libsql";
+import { jobsTable } from "../db/schemas/jobs.js";
 import type {
   Job,
   JobFilters,
   PaginatedJobResponse,
 } from "../models/JobModel.js";
-import { Band, Capability, JobStatus } from "../models/JobModel.js";
+import { type Band, type Capability, JobStatus } from "../models/JobModel.js";
 
-// TEMPORARY: In-memory storage - replace with actual database when ready
-class InMemoryJobStore {
-  private jobs: Job[] = [
-    // Sample job data to test with
-    {
-      id: "job_001",
-      jobRoleName: "Senior Data Engineer",
-      description:
-        "We are looking for a Senior Data Engineer to join our Data team. You will be responsible for building robust data pipelines and ensuring data quality across our systems.",
-      responsibilities: [
-        "Design and implement scalable data pipelines",
-        "Optimize data warehouse performance",
-        "Collaborate with data scientists and analysts",
-        "Ensure data quality and governance",
-      ],
-      jobSpecLink:
-        "https://company.sharepoint.com/sites/hr/jobspecs/senior-data-engineer.pdf",
-      location: "London, UK",
-      capability: Capability.DATA,
-      band: Band.E3,
-      closingDate: new Date("2024-11-15"),
-      status: JobStatus.OPEN,
-      numberOfOpenPositions: 2,
-    },
-    {
-      id: "job_002",
-      jobRoleName: "Workday Integration Specialist",
-      description:
-        "Join our Workday team to help implement and maintain HR system integrations. Perfect opportunity to work with cutting-edge HR technology.",
-      responsibilities: [
-        "Configure Workday integrations",
-        "Troubleshoot integration issues",
-        "Support HR business processes",
-        "Create technical documentation",
-      ],
-      jobSpecLink:
-        "https://company.sharepoint.com/sites/hr/jobspecs/workday-specialist.pdf",
-      location: "Manchester, UK",
-      capability: Capability.WORKDAY,
-      band: Band.E2,
-      closingDate: new Date("2024-10-30"),
-      status: JobStatus.OPEN,
-      numberOfOpenPositions: 1,
-    },
-    {
-      id: "job_003",
-      jobRoleName: "Principal Software Engineer",
-      description:
-        "Lead our engineering team in building next-generation applications. This is a senior technical leadership role with significant impact.",
-      responsibilities: [
-        "Provide technical leadership and mentoring",
-        "Architect complex software systems",
-        "Drive engineering best practices",
-        "Collaborate with product and design teams",
-      ],
-      jobSpecLink:
-        "https://company.sharepoint.com/sites/hr/jobspecs/principal-engineer.pdf",
-      location: "Remote, UK",
-      capability: Capability.ENGINEERING,
-      band: Band.E5,
-      closingDate: new Date("2024-12-01"),
-      status: JobStatus.OPEN,
-      numberOfOpenPositions: 1,
-    },
-    {
-      id: "job_004",
-      jobRoleName: "Junior Data Analyst",
-      description:
-        "Entry-level position for someone passionate about data analysis and insights. Great opportunity to start your data career.",
-      responsibilities: [
-        "Create reports and dashboards",
-        "Analyze business data trends",
-        "Support senior analysts with projects",
-        "Learn data visualization tools",
-      ],
-      jobSpecLink:
-        "https://company.sharepoint.com/sites/hr/jobspecs/junior-analyst.pdf",
-      location: "Birmingham, UK",
-      capability: Capability.DATA,
-      band: Band.E1,
-      closingDate: new Date("2024-10-25"),
-      status: JobStatus.DRAFT,
-      numberOfOpenPositions: 3,
-    },
-  ];
+// Infer the database row type from the schema
+type JobRow = InferSelectModel<typeof jobsTable>;
 
-  // Get all jobs
-  getAllJobs(): Job[] {
-    return [...this.jobs]; // Return a copy to prevent external modification
+// Mapper function to convert database rows to Job model
+function mapJobRowToJob(row: JobRow): Job {
+  return {
+    id: row.id.toString(),
+    jobRoleName: row.jobRoleName,
+    description: row.description,
+    responsibilities: row.responsibilities
+      .split(",")
+      .map((item) => item.trim()),
+    jobSpecLink: row.jobSpecLink,
+    location: row.location,
+    capability: row.capability as Capability,
+    band: row.band as Band,
+    closingDate: new Date(row.closingDate),
+    status: row.status as JobStatus,
+    numberOfOpenPositions: row.numberOfOpenPositions,
+  };
+}
+
+class DatabaseJobStore {
+  private client = createClient({
+    url: "file:jobApp.db",
+  });
+  private db = drizzle(this.client);
+
+  private mapJobToDbValues(job: Job) {
+    return {
+      jobRoleName: job.jobRoleName ?? "",
+      description: job.description ?? "",
+      responsibilities: (job.responsibilities ?? []).join(", "),
+      jobSpecLink: job.jobSpecLink ?? "",
+      location: job.location ?? "",
+      capability: job.capability ?? "",
+      band: job.band ?? "",
+      closingDate: job.closingDate?.toISOString() ?? new Date().toISOString(),
+      status: job.status ?? JobStatus.DRAFT,
+      numberOfOpenPositions: job.numberOfOpenPositions ?? 0,
+    };
   }
 
-  // Get job by ID
-  getJobById(id: string): Job | null {
-    return this.jobs.find((job) => job.id === id) || null;
+  async getAllJobs(): Promise<Job[]> {
+    const rows = await this.db.select().from(jobsTable).all();
+    return rows.map(mapJobRowToJob);
+  }
+
+  async getJobById(id: string): Promise<Job | null> {
+    const row = await this.db
+      .select()
+      .from(jobsTable)
+      .where(eq(jobsTable.id, Number.parseInt(id, 10)))
+      .get();
+    return row ? mapJobRowToJob(row) : null;
+  }
+
+  async getFilteredJobs(filters: JobFilters): Promise<PaginatedJobResponse> {
+    const {
+      capability,
+      band,
+      location,
+      status,
+      search,
+      page = 1,
+      limit = 10,
+      sortBy = "closingDate",
+      sortOrder = "asc",
+    } = filters;
+
+    // Build WHERE conditions
+    const conditions: SQL[] = [];
+
+    if (capability) {
+      conditions.push(eq(jobsTable.capability, capability));
+    }
+
+    if (band) {
+      conditions.push(eq(jobsTable.band, band));
+    }
+
+    if (location) {
+      conditions.push(like(jobsTable.location, `%${location}%`));
+    }
+
+    if (status) {
+      conditions.push(eq(jobsTable.status, status));
+    }
+
+    if (search) {
+      const searchPattern = `%${search}%`;
+      const searchCondition = or(
+        like(jobsTable.jobRoleName, searchPattern),
+        like(jobsTable.description, searchPattern),
+        like(jobsTable.responsibilities, searchPattern)
+      );
+      if (searchCondition) {
+        conditions.push(searchCondition);
+      }
+    }
+
+    // Count total items for pagination
+    let countQuery = this.db
+      .select({ count: sql<number>`count(*)` })
+      .from(jobsTable);
+
+    if (conditions.length > 0) {
+      countQuery = countQuery.where(and(...conditions)) as typeof countQuery;
+    }
+
+    const countResult = await countQuery.get();
+    const totalItems = countResult?.count ?? 0;
+
+    // Calculate pagination
+    const totalPages = Math.ceil(totalItems / limit);
+    const offset = (page - 1) * limit;
+
+    // Build main query with sorting
+    let query = this.db.select().from(jobsTable);
+
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions)) as typeof query;
+    }
+
+    // Apply sorting based on sortBy field
+    if (sortBy === "jobRoleName") {
+      query = (
+        sortOrder === "desc"
+          ? query.orderBy(desc(jobsTable.jobRoleName))
+          : query.orderBy(asc(jobsTable.jobRoleName))
+      ) as typeof query;
+    } else if (sortBy === "closingDate") {
+      query = (
+        sortOrder === "desc"
+          ? query.orderBy(desc(jobsTable.closingDate))
+          : query.orderBy(asc(jobsTable.closingDate))
+      ) as typeof query;
+    } else if (sortBy === "band") {
+      query = (
+        sortOrder === "desc"
+          ? query.orderBy(desc(jobsTable.band))
+          : query.orderBy(asc(jobsTable.band))
+      ) as typeof query;
+    } else if (sortBy === "capability") {
+      query = (
+        sortOrder === "desc"
+          ? query.orderBy(desc(jobsTable.capability))
+          : query.orderBy(asc(jobsTable.capability))
+      ) as typeof query;
+    } else if (sortBy === "location") {
+      query = (
+        sortOrder === "desc"
+          ? query.orderBy(desc(jobsTable.location))
+          : query.orderBy(asc(jobsTable.location))
+      ) as typeof query;
+    }
+
+    // Apply pagination
+    query = query.limit(limit).offset(offset) as typeof query;
+
+    const rows = await query.all();
+    const jobs = rows.map(mapJobRowToJob);
+
+    return {
+      jobs,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalItems,
+        itemsPerPage: limit,
+        hasNextPage: page < totalPages,
+        hasPreviousPage: page > 1,
+      },
+      filters,
+    };
+  }
+
+  async createJobRole(job: Job): Promise<void> {
+    await this.db.insert(jobsTable).values(this.mapJobToDbValues(job));
+  }
+
+  async editJobRole(job: Job): Promise<void> {
+    if (!job.id) {
+      throw new Error("Job ID is required for editing");
+    }
+
+    await this.db
+      .update(jobsTable)
+      .set(this.mapJobToDbValues(job))
+      .where(eq(jobsTable.id, Number.parseInt(job.id, 10)));
   }
 }
 
-// Singleton instance for the temporary data store
-const jobStore = new InMemoryJobStore();
+// Singleton instance for the database job store
+const jobStore = new DatabaseJobStore();
 
 export class JobRepository {
-  // TEMPORARY: These methods use in-memory storage
-  // TODO: Replace with actual database calls when database is ready
-
   async getAllJobs(): Promise<Job[]> {
     return jobStore.getAllJobs();
   }
@@ -118,29 +225,14 @@ export class JobRepository {
   }
 
   async getFilteredJobs(filters: JobFilters): Promise<PaginatedJobResponse> {
-    // SQL filtering query will go here when database is implemented
-    // For now, return empty response structure
-    return {
-      jobs: [],
-      pagination: {
-        currentPage: filters.page || 1,
-        totalPages: 0,
-        totalItems: 0,
-        itemsPerPage: filters.limit || 10,
-        hasNextPage: false,
-        hasPreviousPage: false,
-      },
-      filters,
-    };
+    return jobStore.getFilteredJobs(filters);
   }
 
   async createJobRole(job: Job): Promise<void> {
-    //sql goes here
-    console.log(job);
+    await jobStore.createJobRole(job);
   }
 
   async editJobRole(job: Job): Promise<void> {
-    //sql goes here
-    console.log(job);
+    await jobStore.editJobRole(job);
   }
 }

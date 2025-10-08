@@ -60,14 +60,6 @@ export interface JobFilters {
   // Text search (searches across jobRoleName, description, responsibilities)
   search?: string;
 
-  // Date filters
-  closingDateFrom?: Date;
-  closingDateTo?: Date;
-
-  // Position filters
-  minPositions?: number;
-  maxPositions?: number;
-
   // Pagination
   page?: number;
   limit?: number;

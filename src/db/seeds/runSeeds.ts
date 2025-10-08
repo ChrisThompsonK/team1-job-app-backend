@@ -1,7 +1,12 @@
+import { createClient } from "@libsql/client";
 import { drizzle } from "drizzle-orm/libsql";
 import { jobRolesSeeds, jobRolesTable } from "./index";
 
-const db = drizzle("file:jobApp.db");
+const client = createClient({
+  url: "file:jobApp.db",
+});
+
+const db = drizzle(client);
 
 export async function runSeeds(): Promise<void> {
   try {
@@ -22,16 +27,13 @@ export async function runSeeds(): Promise<void> {
   }
 }
 
-// Run seeds if this file is executed directly
-// In ES modules, we can check if the module is the main module using import.meta.url
-if (import.meta.url === `file://${process.argv[1]}`) {
-  runSeeds()
-    .then(() => {
-      console.log("🎉 Seeding completed successfully!");
-      process.exit(0);
-    })
-    .catch((error) => {
-      console.error("💥 Seeding failed:", error);
-      process.exit(1);
-    });
-}
+// Run seeds
+runSeeds()
+  .then(() => {
+    console.log("🎉 Seeding completed successfully!");
+    process.exit(0);
+  })
+  .catch((error) => {
+    console.error("💥 Seeding failed:", error);
+    process.exit(1);
+  });

@@ -5,7 +5,7 @@ CREATE TABLE `Job_Roles` (
 	`responsibilities` text NOT NULL,
 	`jobSpecLink` text NOT NULL,
 	`location` text NOT NULL,
-	`Capability` text NOT NULL,
+	`capability` text NOT NULL,
 	`band` text NOT NULL,
 	`closingDate` text NOT NULL,
 	`status` text NOT NULL,

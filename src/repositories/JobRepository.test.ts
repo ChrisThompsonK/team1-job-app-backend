@@ -1,139 +1,420 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { createClient } from "@libsql/client";
+import { eq } from "drizzle-orm";
+import { drizzle } from "drizzle-orm/libsql";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { jobsTable } from "../db/schemas/jobs.js";
 import {
   Band,
   Capability,
+  type Job,
   JobStatus,
   SortBy,
   SortOrder,
 } from "../models/JobModel.js";
 import { JobRepository } from "../repositories/JobRepository.js";
 
-describe("JobRepository", () => {
+describe("JobRepository - Database Tests", () => {
   let jobRepository: JobRepository;
+  let originalJobs: Job[] = [];
+  const testJobNames = [
+    "Test Engineer",
+    "Test Job for Responsibilities",
+    "Updated Test Job Title",
+  ];
 
-  beforeEach(() => {
+  beforeEach(async () => {
     jobRepository = new JobRepository();
+    // Store the original state of the database before tests
+    originalJobs = await jobRepository.getAllJobs();
   });
 
-  describe("getFilteredJobs", () => {
-    it("should return empty response structure with correct pagination defaults", async () => {
-      const filters = {
-        capability: Capability.DATA,
-        band: Band.E3,
-      };
+  afterEach(async () => {
+    // Clean up any test jobs created during tests
+    const client = createClient({ url: "file:jobApp.db" });
+    const db = drizzle(client);
 
-      const result = await jobRepository.getFilteredJobs(filters);
+    // Get all current jobs
+    const currentJobs = await jobRepository.getAllJobs();
 
-      expect(result).toEqual({
-        jobs: [],
-        pagination: {
-          currentPage: 1,
-          totalPages: 0,
-          totalItems: 0,
-          itemsPerPage: 10,
-          hasNextPage: false,
-          hasPreviousPage: false,
-        },
-        filters,
+    // Find jobs that were added during the test (by checking job names)
+    const testJobsToDelete = currentJobs.filter((job) =>
+      testJobNames.some((name) => job.jobRoleName?.includes(name))
+    );
+
+    // Delete test jobs
+    for (const job of testJobsToDelete) {
+      if (job.id) {
+        await db
+          .delete(jobsTable)
+          .where(eq(jobsTable.id, Number.parseInt(job.id, 10)));
+      }
+    }
+
+    // Restore any modified jobs to their original state
+    for (const originalJob of originalJobs) {
+      const currentJob = currentJobs.find((j) => j.id === originalJob.id);
+      if (
+        currentJob &&
+        JSON.stringify(currentJob) !== JSON.stringify(originalJob)
+      ) {
+        // Job was modified, restore it
+        await db
+          .update(jobsTable)
+          .set({
+            jobRoleName: originalJob.jobRoleName ?? "",
+            description: originalJob.description ?? "",
+            responsibilities: (originalJob.responsibilities ?? []).join(", "),
+            jobSpecLink: originalJob.jobSpecLink ?? "",
+            location: originalJob.location ?? "",
+            capability: originalJob.capability ?? "",
+            band: originalJob.band ?? "",
+            closingDate:
+              originalJob.closingDate?.toISOString() ??
+              new Date().toISOString(),
+            status: originalJob.status ?? JobStatus.DRAFT,
+            numberOfOpenPositions: originalJob.numberOfOpenPositions ?? 0,
+          })
+          .where(eq(jobsTable.id, Number.parseInt(originalJob.id ?? "0", 10)));
+      }
+    }
+
+    client.close();
+  });
+
+  describe("getAllJobs", () => {
+    it("should return all jobs from the database", async () => {
+      const jobs = await jobRepository.getAllJobs();
+
+      expect(jobs.length).toBeGreaterThan(0);
+      expect(jobs[0]).toHaveProperty("id");
+      expect(jobs[0]).toHaveProperty("jobRoleName");
+      expect(jobs[0]).toHaveProperty("responsibilities");
+      expect(Array.isArray(jobs[0].responsibilities)).toBe(true);
+    });
+
+    it("should parse responsibilities as array from comma-separated string", async () => {
+      const jobs = await jobRepository.getAllJobs();
+
+      expect(Array.isArray(jobs[0].responsibilities)).toBe(true);
+      expect(jobs[0].responsibilities?.length).toBeGreaterThan(0);
+      // Each responsibility should be a string
+      jobs[0].responsibilities?.forEach((resp) => {
+        expect(typeof resp).toBe("string");
       });
     });
 
-    it("should use custom page and limit values in response", async () => {
-      const filters = {
-        page: 3,
-        limit: 5,
-        sortBy: SortBy.JOB_ROLE_NAME,
-        sortOrder: SortOrder.DESC,
-      };
+    it("should convert string IDs and dates correctly", async () => {
+      const jobs = await jobRepository.getAllJobs();
 
-      const result = await jobRepository.getFilteredJobs(filters);
+      expect(typeof jobs[0].id).toBe("string");
+      expect(jobs[0].closingDate).toBeInstanceOf(Date);
+    });
+  });
 
-      expect(result.pagination.currentPage).toBe(3);
-      expect(result.pagination.itemsPerPage).toBe(5);
-      expect(result.filters).toEqual(filters);
+  describe("getJobById", () => {
+    it("should return a specific job by ID", async () => {
+      const jobs = await jobRepository.getAllJobs();
+      const firstJobId = jobs[0].id;
+
+      const job = await jobRepository.getJobById(firstJobId as string);
+
+      expect(job).not.toBeNull();
+      expect(job?.id).toBe(firstJobId);
+      expect(job).toHaveProperty("jobRoleName");
+      expect(job).toHaveProperty("description");
+      expect(Array.isArray(job?.responsibilities)).toBe(true);
     });
 
-    it("should handle all filter types in the response", async () => {
-      const filters = {
-        capability: Capability.ENGINEERING,
-        band: Band.E4,
-        status: JobStatus.OPEN,
-        location: "London",
-        search: "engineer",
-        closingDateFrom: new Date("2024-10-01"),
-        closingDateTo: new Date("2024-12-31"),
-        minPositions: 2,
-        maxPositions: 10,
-        page: 2,
-        limit: 15,
-        sortBy: SortBy.CLOSING_DATE,
-        sortOrder: SortOrder.ASC,
-      };
+    it("should return null for non-existent job ID", async () => {
+      const job = await jobRepository.getJobById("99999");
 
-      const result = await jobRepository.getFilteredJobs(filters);
-
-      expect(result.filters).toEqual(filters);
-      expect(result.pagination.currentPage).toBe(2);
-      expect(result.pagination.itemsPerPage).toBe(15);
+      expect(job).toBeNull();
     });
+  });
 
-    it("should default page to 1 if not provided", async () => {
-      const filters = {
-        capability: Capability.DATA,
-      };
+  describe("getFilteredJobs", () => {
+    it("should return all jobs with default pagination", async () => {
+      const result = await jobRepository.getFilteredJobs({});
 
-      const result = await jobRepository.getFilteredJobs(filters);
-
+      expect(result.jobs.length).toBeGreaterThan(0);
       expect(result.pagination.currentPage).toBe(1);
-    });
-
-    it("should default limit to 10 if not provided", async () => {
-      const filters = {
-        capability: Capability.DATA,
-      };
-
-      const result = await jobRepository.getFilteredJobs(filters);
-
       expect(result.pagination.itemsPerPage).toBe(10);
+      expect(result.pagination.totalItems).toBeGreaterThan(0);
+      expect(typeof result.pagination.totalPages).toBe("number");
     });
 
-    // Note: These tests verify the current placeholder implementation
-    // When the actual SQL implementation is added, these tests should be updated
-    // to test the real filtering logic
-    it("should maintain filter structure for future SQL implementation", async () => {
-      const complexFilters = {
-        capability: Capability.WORKDAY,
-        band: Band.E2,
-        status: JobStatus.DRAFT,
-        location: "Manchester",
-        search: "integration specialist",
-        closingDateFrom: new Date("2024-11-01"),
-        closingDateTo: new Date("2024-11-30"),
-        minPositions: 1,
-        maxPositions: 3,
-        page: 1,
-        limit: 20,
-        sortBy: SortBy.BAND,
-        sortOrder: SortOrder.DESC,
-      };
+    it("should have proper pagination structure", async () => {
+      const result = await jobRepository.getFilteredJobs({});
 
-      const result = await jobRepository.getFilteredJobs(complexFilters);
-
-      // Verify that all filter properties are preserved in the response
-      expect(result.filters).toEqual(complexFilters);
-
-      // Verify response structure is correct for future implementation
       expect(result).toHaveProperty("jobs");
       expect(result).toHaveProperty("pagination");
       expect(result).toHaveProperty("filters");
 
-      expect(Array.isArray(result.jobs)).toBe(true);
-      expect(typeof result.pagination.currentPage).toBe("number");
-      expect(typeof result.pagination.totalPages).toBe("number");
-      expect(typeof result.pagination.totalItems).toBe("number");
-      expect(typeof result.pagination.itemsPerPage).toBe("number");
       expect(typeof result.pagination.hasNextPage).toBe("boolean");
       expect(typeof result.pagination.hasPreviousPage).toBe("boolean");
+    });
+
+    it("should filter by capability", async () => {
+      const result = await jobRepository.getFilteredJobs({
+        capability: Capability.DATA,
+      });
+
+      // Should only return DATA jobs if any exist
+      if (result.jobs.length > 0) {
+        expect(result.jobs.every((j) => j.capability === Capability.DATA)).toBe(
+          true
+        );
+      }
+    });
+
+    it("should filter by band", async () => {
+      const result = await jobRepository.getFilteredJobs({
+        band: Band.E3,
+      });
+
+      // Should only return E3 jobs if any exist
+      if (result.jobs.length > 0) {
+        expect(result.jobs.every((j) => j.band === Band.E3)).toBe(true);
+      }
+    });
+
+    it("should filter by status", async () => {
+      const result = await jobRepository.getFilteredJobs({
+        status: JobStatus.OPEN,
+      });
+
+      // Should only return OPEN jobs if any exist
+      if (result.jobs.length > 0) {
+        expect(result.jobs.every((j) => j.status === JobStatus.OPEN)).toBe(
+          true
+        );
+      }
+    });
+
+    it("should filter by location substring", async () => {
+      const result = await jobRepository.getFilteredJobs({
+        location: "UK",
+      });
+
+      // Should only return UK jobs if any exist
+      if (result.jobs.length > 0) {
+        expect(result.jobs.every((j) => j.location?.includes("UK"))).toBe(true);
+      }
+    });
+
+    it("should search across job role name, description, and responsibilities", async () => {
+      const result = await jobRepository.getFilteredJobs({
+        search: "engineer",
+      });
+
+      // Should return jobs that match the search term
+      if (result.jobs.length > 0) {
+        expect(
+          result.jobs.some(
+            (j) =>
+              j.jobRoleName?.toLowerCase().includes("engineer") ||
+              j.description?.toLowerCase().includes("engineer") ||
+              j.responsibilities?.some((r) =>
+                r.toLowerCase().includes("engineer")
+              )
+          )
+        ).toBe(true);
+      }
+    });
+
+    it("should handle pagination with page 2", async () => {
+      const result = await jobRepository.getFilteredJobs({
+        page: 2,
+        limit: 2,
+      });
+
+      expect(result.pagination.currentPage).toBe(2);
+      expect(result.pagination.itemsPerPage).toBe(2);
+      expect(result.pagination.hasPreviousPage).toBe(true);
+    });
+
+    it("should sort by job role name ascending", async () => {
+      const result = await jobRepository.getFilteredJobs({
+        sortBy: SortBy.JOB_ROLE_NAME,
+        sortOrder: SortOrder.ASC,
+      });
+
+      if (result.jobs.length > 1) {
+        const names = result.jobs.map((j) => j.jobRoleName ?? "");
+        for (let i = 0; i < names.length - 1; i++) {
+          expect(names[i].localeCompare(names[i + 1])).toBeLessThanOrEqual(0);
+        }
+      }
+    });
+
+    it("should sort by job role name descending", async () => {
+      const result = await jobRepository.getFilteredJobs({
+        sortBy: SortBy.JOB_ROLE_NAME,
+        sortOrder: SortOrder.DESC,
+      });
+
+      if (result.jobs.length > 1) {
+        const names = result.jobs.map((j) => j.jobRoleName ?? "");
+        for (let i = 0; i < names.length - 1; i++) {
+          expect(names[i].localeCompare(names[i + 1])).toBeGreaterThanOrEqual(
+            0
+          );
+        }
+      }
+    });
+
+    it("should sort by closing date ascending", async () => {
+      const result = await jobRepository.getFilteredJobs({
+        sortBy: SortBy.CLOSING_DATE,
+        sortOrder: SortOrder.ASC,
+      });
+
+      if (result.jobs.length > 1) {
+        const dates = result.jobs.map((j) => j.closingDate?.getTime() ?? 0);
+        for (let i = 0; i < dates.length - 1; i++) {
+          expect(dates[i]).toBeLessThanOrEqual(dates[i + 1]);
+        }
+      }
+    });
+
+    it("should sort by closing date descending", async () => {
+      const result = await jobRepository.getFilteredJobs({
+        sortBy: SortBy.CLOSING_DATE,
+        sortOrder: SortOrder.DESC,
+      });
+
+      if (result.jobs.length > 1) {
+        const dates = result.jobs.map((j) => j.closingDate?.getTime() ?? 0);
+        for (let i = 0; i < dates.length - 1; i++) {
+          expect(dates[i]).toBeGreaterThanOrEqual(dates[i + 1]);
+        }
+      }
+    });
+
+    it("should combine multiple filters correctly", async () => {
+      const result = await jobRepository.getFilteredJobs({
+        status: JobStatus.OPEN,
+        capability: Capability.ENGINEERING,
+      });
+
+      if (result.jobs.length > 0) {
+        result.jobs.forEach((job) => {
+          expect(job.status).toBe(JobStatus.OPEN);
+          expect(job.capability).toBe(Capability.ENGINEERING);
+        });
+      }
+    });
+
+    it("should return filters in the response", async () => {
+      const filters = {
+        capability: Capability.ENGINEERING,
+        band: Band.E4,
+        page: 1,
+        limit: 5,
+      };
+
+      const result = await jobRepository.getFilteredJobs(filters);
+
+      expect(result.filters).toEqual(filters);
+    });
+  });
+
+  describe("createJobRole", () => {
+    it("should create a new job role", async () => {
+      const beforeCount = (await jobRepository.getAllJobs()).length;
+
+      const newJob: Job = {
+        jobRoleName: "Test Engineer",
+        description: "Test description for automated testing",
+        responsibilities: ["Test responsibility 1", "Test responsibility 2"],
+        jobSpecLink: "https://example.com/test",
+        location: "Test Location",
+        capability: Capability.ENGINEERING,
+        band: Band.E2,
+        closingDate: new Date("2025-12-31"),
+        status: JobStatus.DRAFT,
+        numberOfOpenPositions: 1,
+      };
+
+      await jobRepository.createJobRole(newJob);
+
+      const afterJobs = await jobRepository.getAllJobs();
+      expect(afterJobs.length).toBe(beforeCount + 1);
+      expect(afterJobs.some((j) => j.jobRoleName === "Test Engineer")).toBe(
+        true
+      );
+    });
+
+    it("should store responsibilities as comma-separated values", async () => {
+      const newJob: Job = {
+        jobRoleName: "Test Job for Responsibilities",
+        description: "Testing responsibility storage",
+        responsibilities: ["Resp 1", "Resp 2", "Resp 3"],
+        jobSpecLink: "https://example.com/test2",
+        location: "Test",
+        capability: Capability.DATA,
+        band: Band.E1,
+        closingDate: new Date("2025-12-31"),
+        status: JobStatus.DRAFT,
+        numberOfOpenPositions: 1,
+      };
+
+      await jobRepository.createJobRole(newJob);
+
+      const jobs = await jobRepository.getAllJobs();
+      const createdJob = jobs.find(
+        (j) => j.jobRoleName === "Test Job for Responsibilities"
+      );
+
+      expect(createdJob).toBeDefined();
+      expect(createdJob?.responsibilities).toEqual([
+        "Resp 1",
+        "Resp 2",
+        "Resp 3",
+      ]);
+    });
+  });
+
+  describe("editJobRole", () => {
+    it("should update an existing job role", async () => {
+      const jobs = await jobRepository.getAllJobs();
+      const jobToEdit = jobs[0];
+
+      const updatedJob: Job = {
+        ...jobToEdit,
+        jobRoleName: "Updated Test Job Title",
+        numberOfOpenPositions: 99,
+      };
+
+      await jobRepository.editJobRole(updatedJob);
+
+      const updatedJobFromDb = await jobRepository.getJobById(
+        jobToEdit.id as string
+      );
+      expect(updatedJobFromDb?.jobRoleName).toBe("Updated Test Job Title");
+      expect(updatedJobFromDb?.numberOfOpenPositions).toBe(99);
+
+      // Restore original values for other tests
+      await jobRepository.editJobRole(jobToEdit);
+    });
+
+    it("should throw error when editing without job ID", async () => {
+      const jobWithoutId: Job = {
+        jobRoleName: "No ID Job",
+        description: "Test",
+        responsibilities: [],
+        jobSpecLink: "https://example.com",
+        location: "Test",
+        capability: Capability.ENGINEERING,
+        band: Band.E1,
+        closingDate: new Date(),
+        status: JobStatus.DRAFT,
+        numberOfOpenPositions: 1,
+      };
+
+      await expect(jobRepository.editJobRole(jobWithoutId)).rejects.toThrow(
+        "Job ID is required for editing"
+      );
     });
   });
 });

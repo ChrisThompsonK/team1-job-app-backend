@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "3e4d60b9-fe58-4a04-b425-003898b7aec7",
+  "id": "70ad7622-661c-438c-8450-af1d82c5056b",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "Job_Roles": {
@@ -49,8 +49,8 @@
           "notNull": true,
           "autoincrement": false
         },
-        "Capability": {
-          "name": "Capability",
+        "capability": {
+          "name": "capability",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
