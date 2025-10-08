@@ -145,7 +145,7 @@ GET /api/jobs/search
 **Examples:**
 ```bash
 # Filter by capability and band
-GET /api/jobs/search?capability=DATA&band=Senior
+GET /api/jobs/search?capability=DATA&band=SENIOR
 
 # Search with sorting
 GET /api/jobs/search?search=engineer&sortBy=closingDate&sortOrder=desc
