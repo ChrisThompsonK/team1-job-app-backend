@@ -48,22 +48,21 @@ describe("JobValidator", () => {
 
   describe("validateBand", () => {
     it("should return valid band enum for valid band string", () => {
-      const result = jobValidator.validateBand("E1");
-      expect(result).toBe(Band.E1);
+      const result = jobValidator.validateBand("Junior");
+      expect(result).toBe(Band.JUNIOR);
     });
 
     it("should throw error for invalid band", () => {
-      expect(() => jobValidator.validateBand("E6")).toThrow(
-        "Invalid band. Must be one of: E1, E2, E3, E4, E5"
+      expect(() => jobValidator.validateBand("InvalidBand")).toThrow(
+        "Invalid band. Must be one of: Junior, Mid, Senior, Principal"
       );
     });
 
     it("should handle all valid band values", () => {
-      expect(jobValidator.validateBand("E1")).toBe(Band.E1);
-      expect(jobValidator.validateBand("E2")).toBe(Band.E2);
-      expect(jobValidator.validateBand("E3")).toBe(Band.E3);
-      expect(jobValidator.validateBand("E4")).toBe(Band.E4);
-      expect(jobValidator.validateBand("E5")).toBe(Band.E5);
+      expect(jobValidator.validateBand("Junior")).toBe(Band.JUNIOR);
+      expect(jobValidator.validateBand("Mid")).toBe(Band.MID);
+      expect(jobValidator.validateBand("Senior")).toBe(Band.SENIOR);
+      expect(jobValidator.validateBand("Principal")).toBe(Band.PRINCIPAL);
     });
   });
 
@@ -95,7 +94,7 @@ describe("JobValidator", () => {
   describe("validateBandAndCapability", () => {
     it("should pass validation for job with valid band and capability", () => {
       const job = {
-        band: Band.E3,
+        band: Band.MID,
         capability: Capability.ENGINEERING,
         jobRoleName: "Test Role",
       };
@@ -105,19 +104,19 @@ describe("JobValidator", () => {
 
     it("should throw error for job with invalid band", () => {
       const job = {
-        band: "E6" as unknown as Band,
+        band: "InvalidBand" as unknown as Band,
         capability: Capability.ENGINEERING,
         jobRoleName: "Test Role",
       };
 
       expect(() => jobValidator.validateBandAndCapability(job)).toThrow(
-        "Invalid band. Must be one of: E1, E2, E3, E4, E5"
+        "Invalid band. Must be one of: Junior, Mid, Senior, Principal"
       );
     });
 
     it("should throw error for job with invalid capability", () => {
       const job = {
-        band: Band.E3,
+        band: Band.MID,
         capability: "InvalidCapability" as unknown as Capability,
         jobRoleName: "Test Role",
       };
@@ -139,7 +138,7 @@ describe("JobValidator", () => {
       jobSpecLink: "https://sharepoint.example.com/job-spec-1",
       location: "London",
       capability: "Engineering",
-      band: "E4",
+      band: "Senior",
       closingDate: "2025-12-31",
       numberOfOpenPositions: 2,
     };
@@ -158,7 +157,7 @@ describe("JobValidator", () => {
           jobSpecLink: "https://sharepoint.example.com/job-spec-1",
           location: "London",
           capability: Capability.ENGINEERING,
-          band: Band.E4,
+          band: Band.SENIOR,
           numberOfOpenPositions: 2,
         });
         expect(result.closingDate).toBeInstanceOf(Date);
@@ -292,9 +291,9 @@ describe("JobValidator", () => {
 
     describe("enum validation errors", () => {
       it("should throw error for invalid band", () => {
-        const invalidData = { ...validJobData, band: "E6" };
+        const invalidData = { ...validJobData, band: "InvalidBand" };
         expect(() => jobValidator.createValidatedJob(invalidData)).toThrow(
-          "Invalid band. Must be one of: E1, E2, E3, E4, E5"
+          "Invalid band. Must be one of: Junior, Mid, Senior, Principal"
         );
       });
 

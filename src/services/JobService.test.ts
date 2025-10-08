@@ -47,13 +47,13 @@ describe("JobService", () => {
           id: "1",
           jobRoleName: "Senior Software Engineer",
           capability: Capability.ENGINEERING,
-          band: Band.E4,
+          band: Band.SENIOR,
         },
         {
           id: "2",
           jobRoleName: "Data Analyst",
           capability: Capability.DATA,
-          band: Band.E2,
+          band: Band.JUNIOR,
         },
       ];
 
@@ -83,7 +83,7 @@ describe("JobService", () => {
         id: jobId,
         jobRoleName: "Senior Software Engineer",
         capability: Capability.ENGINEERING,
-        band: Band.E4,
+        band: Band.SENIOR,
       };
 
       mockJobRepository.getJobById.mockResolvedValue(expectedJob);
@@ -146,7 +146,7 @@ describe("JobService", () => {
         id: trimmedId,
         jobRoleName: "Senior Software Engineer",
         capability: Capability.ENGINEERING,
-        band: Band.E4,
+        band: Band.SENIOR,
       };
 
       mockJobRepository.getJobById.mockResolvedValue(expectedJob);
@@ -169,7 +169,7 @@ describe("JobService", () => {
       jobSpecLink: "https://sharepoint.example.com/job-spec-1",
       location: "London",
       capability: Capability.ENGINEERING,
-      band: Band.E4,
+      band: Band.SENIOR,
       closingDate: new Date("2025-12-31"),
       numberOfOpenPositions: 2,
     };
@@ -188,7 +188,7 @@ describe("JobService", () => {
 
     it("should throw error when validation fails", async () => {
       const validationError = new Error(
-        "Invalid band. Must be one of: E1, E2, E3, E4, E5"
+        "Invalid band. Must be one of: Junior, Mid, Senior, Principal"
       );
       mockJobValidator.validateBandAndCapability.mockImplementation(() => {
         throw validationError;
@@ -232,7 +232,7 @@ describe("JobService", () => {
       jobSpecLink: "https://sharepoint.example.com/updated-job-spec-1",
       location: "Updated London",
       capability: Capability.ENGINEERING,
-      band: Band.E5,
+      band: Band.PRINCIPAL,
       closingDate: new Date("2025-12-31"),
       numberOfOpenPositions: 3,
       status: JobStatus.OPEN,
@@ -286,12 +286,12 @@ describe("JobService", () => {
     it("should handle validation errors for invalid enum values", async () => {
       const invalidJob = {
         ...validJob,
-        band: "E6" as unknown as Band,
+        band: "InvalidBand" as unknown as Band,
         capability: "InvalidCapability" as unknown as Capability,
       };
 
       const validationError = new Error(
-        "Invalid band. Must be one of: E1, E2, E3, E4, E5"
+        "Invalid band. Must be one of: Junior, Mid, Senior, Principal"
       );
       mockJobValidator.validateBandAndCapability.mockImplementation(() => {
         throw validationError;
@@ -312,7 +312,7 @@ describe("JobService", () => {
     it("should return filtered jobs from repository", async () => {
       const filters = {
         capability: Capability.DATA,
-        band: Band.E3,
+        band: Band.MID,
         page: 1,
         limit: 10,
       };
@@ -323,7 +323,7 @@ describe("JobService", () => {
             id: "1",
             jobRoleName: "Senior Data Engineer",
             capability: Capability.DATA,
-            band: Band.E3,
+            band: Band.MID,
           },
         ],
         pagination: {

@@ -21,7 +21,7 @@ describe("Job Application Backend API", () => {
     jobSpecLink: "https://sharepoint.example.com/job-spec-1",
     location: "London",
     capability: Capability.ENGINEERING,
-    band: Band.E4,
+    band: Band.SENIOR,
     closingDate: new Date("2025-12-31"),
     status: JobStatus.OPEN,
     numberOfOpenPositions: 2,
@@ -41,7 +41,7 @@ describe("Job Application Backend API", () => {
       jobSpecLink: "https://sharepoint.example.com/job-spec-2",
       location: "Manchester",
       capability: Capability.DATA,
-      band: Band.E2,
+      band: Band.JUNIOR,
       closingDate: new Date("2025-11-15"),
       status: JobStatus.OPEN,
       numberOfOpenPositions: 1,
@@ -240,8 +240,8 @@ describe("Job Application Backend API", () => {
 
     describe("GET /api/jobs/band/:band", () => {
       it("should return jobs filtered by band", () => {
-        mockRequest.params = { band: Band.E4 };
-        const e4Jobs = sampleJobs.filter((job) => job.band === Band.E4);
+        mockRequest.params = { band: Band.SENIOR };
+        const seniorJobs = sampleJobs.filter((job) => job.band === Band.SENIOR);
 
         const getJobsByBandHandler = (req: Request, res: Response) => {
           const { band } = req.params;
@@ -260,9 +260,9 @@ describe("Job Application Backend API", () => {
         expect(mockStatus).toHaveBeenCalledWith(200);
         expect(mockJson).toHaveBeenCalledWith({
           success: true,
-          message: `Jobs for band ${Band.E4} retrieved successfully`,
-          data: e4Jobs,
-          count: 1,
+          message: `Jobs for band ${Band.SENIOR} retrieved successfully`,
+          data: seniorJobs,
+          count: seniorJobs.length,
         });
       });
     });
@@ -271,7 +271,7 @@ describe("Job Application Backend API", () => {
       it("should return jobs with search filters applied", () => {
         mockRequest.query = {
           capability: Capability.DATA,
-          band: Band.E2,
+          band: Band.JUNIOR,
         };
 
         const searchJobsHandler = (req: Request, res: Response) => {
@@ -316,10 +316,10 @@ describe("Job Application Backend API", () => {
         expect(mockJson).toHaveBeenCalledWith({
           success: true,
           message:
-            "Jobs retrieved successfully with filters (capability: Data, band: E2)",
-          data: [sampleJobs[1]], // Only the Data E2 job
+            "Jobs retrieved successfully with filters (capability: Data, band: Junior)",
+          data: [sampleJobs[1]], // Only the Data Junior job
           count: 1,
-          filters: { capability: Capability.DATA, band: Band.E2 },
+          filters: { capability: Capability.DATA, band: Band.JUNIOR },
         });
       });
 
@@ -359,7 +359,11 @@ describe("Job Application Backend API", () => {
           const sevenDaysFromNow = new Date(
             now.getTime() + 7 * 24 * 60 * 60 * 1000
           );
-          return job.closingDate <= sevenDaysFromNow && job.closingDate >= now;
+          return (
+            job.closingDate &&
+            job.closingDate <= sevenDaysFromNow &&
+            job.closingDate >= now
+          );
         });
 
         const getJobsClosingSoonHandler = (_req: Request, res: Response) => {
@@ -439,11 +443,10 @@ describe("Job Application Backend API", () => {
       expect(Object.values(Capability)).toContain(Capability.WORKDAY);
       expect(Object.values(Capability)).toContain(Capability.ENGINEERING);
 
-      expect(Object.values(Band)).toContain(Band.E1);
-      expect(Object.values(Band)).toContain(Band.E2);
-      expect(Object.values(Band)).toContain(Band.E3);
-      expect(Object.values(Band)).toContain(Band.E4);
-      expect(Object.values(Band)).toContain(Band.E5);
+      expect(Object.values(Band)).toContain(Band.JUNIOR);
+      expect(Object.values(Band)).toContain(Band.MID);
+      expect(Object.values(Band)).toContain(Band.SENIOR);
+      expect(Object.values(Band)).toContain(Band.PRINCIPAL);
 
       expect(Object.values(JobStatus)).toContain(JobStatus.OPEN);
       expect(Object.values(JobStatus)).toContain(JobStatus.CLOSED);

@@ -29,7 +29,7 @@ app.get("/", (_req: Request, res: Response) => {
       description: "Server-side filtering with query parameters",
       queryParameters: {
         capability: "Filter by capability (DATA, WORKDAY, ENGINEERING)",
-        band: "Filter by band (E1, E2, E3, E4, E5)",
+        band: "Filter by band (Junior, Mid, Senior, Principal)",
         location: "Filter by location (partial match)",
         status: "Filter by status (open, closed, draft)",
         search:
@@ -41,7 +41,7 @@ app.get("/", (_req: Request, res: Response) => {
         sortOrder: "Sort direction (asc, desc, default: asc)",
       },
       examples: [
-        "/api/jobs/search?capability=DATA&band=E3",
+        "/api/jobs/search?capability=DATA&band=Senior",
         "/api/jobs/search?search=engineer&sortBy=closingDate&sortOrder=desc",
         "/api/jobs/search?location=London&page=1&limit=5",
       ],

@@ -1,10 +1,9 @@
 // Enums for structured data
 export enum Band {
-  E1 = "E1",
-  E2 = "E2",
-  E3 = "E3",
-  E4 = "E4",
-  E5 = "E5",
+  JUNIOR = "Junior",
+  MID = "Mid",
+  SENIOR = "Senior",
+  PRINCIPAL = "Principal",
 }
 
 export enum Capability {

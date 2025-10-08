@@ -60,7 +60,7 @@ describe("JobController", () => {
       jobSpecLink: "https://sharepoint.example.com/job-spec-1",
       location: "London",
       capability: "Engineering",
-      band: "E4",
+      band: "Senior",
       closingDate: "2025-12-31",
       numberOfOpenPositions: 2,
     };
@@ -75,7 +75,7 @@ describe("JobController", () => {
       jobSpecLink: "https://sharepoint.example.com/job-spec-1",
       location: "London",
       capability: Capability.ENGINEERING,
-      band: Band.E4,
+      band: Band.SENIOR,
       closingDate: new Date("2025-12-31"),
       numberOfOpenPositions: 2,
     };
@@ -185,7 +185,7 @@ describe("JobController", () => {
       jobSpecLink: "https://sharepoint.example.com/updated-job-spec-1",
       location: "Updated London",
       capability: "Engineering",
-      band: "E5",
+      band: "Principal",
       closingDate: "2025-12-31",
       numberOfOpenPositions: 3,
       status: "open",
@@ -202,7 +202,7 @@ describe("JobController", () => {
       jobSpecLink: "https://sharepoint.example.com/updated-job-spec-1",
       location: "Updated London",
       capability: Capability.ENGINEERING,
-      band: Band.E5,
+      band: Band.PRINCIPAL,
       closingDate: new Date("2025-12-31"),
       numberOfOpenPositions: 3,
       status: JobStatus.OPEN,
@@ -323,7 +323,7 @@ describe("JobController", () => {
     it("should return filtered jobs successfully", async () => {
       const queryParams = {
         capability: "DATA",
-        band: "E3",
+        band: "Mid",
         page: "1",
         limit: "10",
       };
@@ -334,7 +334,7 @@ describe("JobController", () => {
             id: "1",
             jobRoleName: "Senior Data Engineer",
             capability: Capability.DATA,
-            band: Band.E3,
+            band: Band.MID,
           },
         ],
         pagination: {
@@ -347,7 +347,7 @@ describe("JobController", () => {
         },
         filters: {
           capability: Capability.DATA,
-          band: Band.E3,
+          band: Band.MID,
           page: 1,
           limit: 10,
         },
@@ -363,7 +363,7 @@ describe("JobController", () => {
 
       expect(mockJobService.getFilteredJobs).toHaveBeenCalledWith({
         capability: Capability.DATA,
-        band: Band.E3,
+        band: Band.MID,
         page: 1,
         limit: 10,
         sortOrder: "asc",
