@@ -106,7 +106,7 @@ npm run check:fix
 
 ### Base URL
 ```
-http://localhost:3001
+http://localhost:3000
 ```
 
 ### Endpoints
