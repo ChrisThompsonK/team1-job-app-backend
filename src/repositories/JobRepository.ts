@@ -210,6 +210,12 @@ class DatabaseJobStore {
       .set(this.mapJobToDbValues(job))
       .where(eq(jobsTable.id, Number.parseInt(job.id, 10)));
   }
+
+  async deleteJobRole(id: string): Promise<void> {
+    await this.db
+      .delete(jobsTable)
+      .where(eq(jobsTable.id, Number.parseInt(id, 10)));
+  }
 }
 
 // Singleton instance for the database job store
@@ -234,5 +240,9 @@ export class JobRepository {
 
   async editJobRole(job: Job): Promise<void> {
     await jobStore.editJobRole(job);
+  }
+
+  async deleteJobRole(id: string): Promise<void> {
+    await jobStore.deleteJobRole(id);
   }
 }

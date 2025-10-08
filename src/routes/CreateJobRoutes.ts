@@ -26,6 +26,10 @@ export const createJobRoutes = (jobController: JobController) => {
     "/jobs/search",
     asyncHandler(jobController.getFilteredJobs.bind(jobController))
   );
+  router.delete(
+    "/jobs/:id",
+    asyncHandler(jobController.deleteJob.bind(jobController))
+  )
 
   return router;
 };

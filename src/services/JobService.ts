@@ -54,4 +54,9 @@ export class JobService {
     this.jobValidator.validateBandAndCapability(job);
     await this.jobRepository.editJobRole(job);
   }
+
+  //Delete job-role
+  async deleteJobRole(id: string): Promise<void> {
+    await this.jobRepository.deleteJobRole(id);
+  } 
 }

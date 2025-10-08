@@ -21,6 +21,7 @@ app.get("/", (_req: Request, res: Response) => {
       jobById: "/api/jobs/:id",
       createJob: "/api/jobs [POST]",
       editJob: "/api/jobs/:id [PUT]",
+      deleteJob: "/api/jobs/:id [DELETE]",
       filteredJobs: "/api/jobs/search",
     },
     filtering: {
