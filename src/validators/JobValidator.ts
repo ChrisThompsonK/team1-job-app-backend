@@ -123,8 +123,9 @@ export class JobValidator {
     if (!description || typeof description !== "string") {
       throw new Error("Description is required and must be a string");
     }
-    if (!jobSpecLink || typeof jobSpecLink !== "string") {
-      throw new Error("Job spec link is required and must be a string");
+    // Job spec link is now optional
+    if (jobSpecLink && typeof jobSpecLink !== "string") {
+      throw new Error("Job spec link must be a string if provided");
     }
     if (!responsibilities || !Array.isArray(responsibilities)) {
       throw new Error("Responsibilities are required and must be an array");
@@ -170,14 +171,13 @@ export class JobValidator {
       jobRoleName,
       description,
       responsibilities,
-      jobSpecLink,
       location,
       capability: validatedCapability,
       band: validatedBand,
       closingDate: new Date(closingDate),
       numberOfOpenPositions,
+      jobSpecLink, // always include, will be undefined if not provided
     };
-
     // Add optional fields if provided
     if (id) {
       job.id = id;
