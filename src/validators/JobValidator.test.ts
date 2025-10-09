@@ -216,10 +216,15 @@ describe("JobValidator", () => {
         );
       });
 
-      it("should throw error for missing jobSpecLink", () => {
-        const invalidData = { ...validJobData, jobSpecLink: undefined };
+      it("should not throw error for missing jobSpecLink (now optional)", () => {
+        const validDataWithoutJobSpecLink = { ...validJobData, jobSpecLink: undefined };
+        expect(() => jobValidator.createValidatedJob(validDataWithoutJobSpecLink)).not.toThrow();
+      });
+
+      it("should throw error for invalid jobSpecLink type", () => {
+        const invalidData = { ...validJobData, jobSpecLink: 123 as any };
         expect(() => jobValidator.createValidatedJob(invalidData)).toThrow(
-          "Job spec link is required and must be a string"
+          "Job spec link must be a string if provided"
         );
       });
 
