@@ -12,7 +12,7 @@ export const jobRolesSeeds: (typeof jobsTable.$inferInsert)[] = [
     capability: "Engineering",
     band: "Senior",
     closingDate: "2025-11-15",
-    status: "Open",
+    status: "open",
     numberOfOpenPositions: 3,
   },
   {
@@ -26,7 +26,7 @@ export const jobRolesSeeds: (typeof jobsTable.$inferInsert)[] = [
     capability: "Product",
     band: "Mid",
     closingDate: "2025-10-30",
-    status: "Open",
+    status: "open",
     numberOfOpenPositions: 2,
   },
   {
@@ -40,7 +40,7 @@ export const jobRolesSeeds: (typeof jobsTable.$inferInsert)[] = [
     capability: "Data & Analytics",
     band: "Mid",
     closingDate: "2025-12-01",
-    status: "Open",
+    status: "open",
     numberOfOpenPositions: 1,
   },
   {
@@ -54,7 +54,7 @@ export const jobRolesSeeds: (typeof jobsTable.$inferInsert)[] = [
     capability: "Design",
     band: "Junior",
     closingDate: "2025-11-20",
-    status: "Open",
+    status: "open",
     numberOfOpenPositions: 2,
   },
   {
@@ -68,7 +68,7 @@ export const jobRolesSeeds: (typeof jobsTable.$inferInsert)[] = [
     capability: "Platform",
     band: "Senior",
     closingDate: "2025-10-25",
-    status: "Open",
+    status: "open",
     numberOfOpenPositions: 1,
   },
   {
@@ -82,7 +82,7 @@ export const jobRolesSeeds: (typeof jobsTable.$inferInsert)[] = [
     capability: "Engineering",
     band: "Mid",
     closingDate: "2025-11-10",
-    status: "Open",
+    status: "open",
     numberOfOpenPositions: 4,
   },
   {
@@ -96,7 +96,7 @@ export const jobRolesSeeds: (typeof jobsTable.$inferInsert)[] = [
     capability: "Quality",
     band: "Junior",
     closingDate: "2025-11-05",
-    status: "Open",
+    status: "open",
     numberOfOpenPositions: 2,
   },
   {
@@ -110,7 +110,7 @@ export const jobRolesSeeds: (typeof jobsTable.$inferInsert)[] = [
     capability: "Architecture",
     band: "Principal",
     closingDate: "2025-12-15",
-    status: "Open",
+    status: "open",
     numberOfOpenPositions: 1,
   },
   {
@@ -124,7 +124,7 @@ export const jobRolesSeeds: (typeof jobsTable.$inferInsert)[] = [
     capability: "Business Analysis",
     band: "Mid",
     closingDate: "2025-10-28",
-    status: "Closed",
+    status: "closed",
     numberOfOpenPositions: 0,
   },
   {
@@ -138,7 +138,7 @@ export const jobRolesSeeds: (typeof jobsTable.$inferInsert)[] = [
     capability: "Security",
     band: "Senior",
     closingDate: "2025-11-30",
-    status: "Open",
+    status: "open",
     numberOfOpenPositions: 2,
   },
 ];
