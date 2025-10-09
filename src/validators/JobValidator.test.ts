@@ -225,7 +225,10 @@ describe("JobValidator", () => {
       });
 
       it("should throw error for invalid jobSpecLink type", () => {
-        const invalidData = { ...validJobData, jobSpecLink: 123 as any };
+        const invalidData = {
+          ...validJobData,
+          jobSpecLink: 123 as unknown as string,
+        };
         expect(() => jobValidator.createValidatedJob(invalidData)).toThrow(
           "Job spec link must be a string if provided"
         );

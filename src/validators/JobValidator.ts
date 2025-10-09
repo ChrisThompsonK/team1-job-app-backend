@@ -176,14 +176,17 @@ export class JobValidator {
       band: validatedBand,
       closingDate: new Date(closingDate),
       numberOfOpenPositions,
-      jobSpecLink, // always include, will be undefined if not provided
     };
+
     // Add optional fields if provided
     if (id) {
       job.id = id;
     }
     if (validatedStatus) {
       job.status = validatedStatus;
+    }
+    if (jobSpecLink) {
+      job.jobSpecLink = jobSpecLink;
     }
 
     return job;
