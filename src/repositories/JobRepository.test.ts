@@ -71,7 +71,7 @@ describe("JobRepository - Database Tests", () => {
             closingDate:
               originalJob.closingDate?.toISOString() ??
               new Date().toISOString(),
-            status: originalJob.status ?? JobStatus.DRAFT,
+            status: originalJob.status ?? JobStatus.OPEN,
             numberOfOpenPositions: originalJob.numberOfOpenPositions ?? 0,
           })
           .where(eq(jobsTable.id, Number.parseInt(originalJob.id ?? "0", 10)));
@@ -332,7 +332,7 @@ describe("JobRepository - Database Tests", () => {
         capability: Capability.ENGINEERING,
         band: Band.JUNIOR,
         closingDate: new Date("2025-12-31"),
-        status: JobStatus.DRAFT,
+        status: JobStatus.OPEN,
         numberOfOpenPositions: 1,
       };
 
@@ -355,7 +355,7 @@ describe("JobRepository - Database Tests", () => {
         capability: Capability.DATA,
         band: Band.JUNIOR,
         closingDate: new Date("2025-12-31"),
-        status: JobStatus.DRAFT,
+        status: JobStatus.OPEN,
         numberOfOpenPositions: 1,
       };
 
@@ -408,7 +408,7 @@ describe("JobRepository - Database Tests", () => {
         capability: Capability.ENGINEERING,
         band: Band.JUNIOR,
         closingDate: new Date(),
-        status: JobStatus.DRAFT,
+        status: JobStatus.OPEN,
         numberOfOpenPositions: 1,
       };
 

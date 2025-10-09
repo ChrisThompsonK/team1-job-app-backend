@@ -7,11 +7,10 @@ export enum Band {
 }
 
 export enum Capability {
-  DATA = "Data",
+  DATA = "Data & Analytics",
   WORKDAY = "Workday",
   ENGINEERING = "Engineering",
   PRODUCT = "Product",
-  DATA_ANALYTICS = "Data & Analytics",
   DESIGN = "Design",
   PLATFORM = "Platform",
   QUALITY = "Quality",
@@ -23,7 +22,6 @@ export enum Capability {
 export enum JobStatus {
   OPEN = "open",
   CLOSED = "closed",
-  DRAFT = "draft",
 }
 
 // Job model representing a job posting with all required fields
