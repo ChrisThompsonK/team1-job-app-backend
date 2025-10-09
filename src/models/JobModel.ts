@@ -10,6 +10,14 @@ export enum Capability {
   DATA = "Data",
   WORKDAY = "Workday",
   ENGINEERING = "Engineering",
+  PRODUCT = "Product",
+  DATA_ANALYTICS = "Data & Analytics",
+  DESIGN = "Design",
+  PLATFORM = "Platform",
+  QUALITY = "Quality",
+  ARCHITECTURE = "Architecture",
+  BUSINESS_ANALYSIS = "Business Analysis",
+  SECURITY = "Security",
 }
 
 export enum JobStatus {
