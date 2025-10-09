@@ -794,16 +794,4 @@ export const comprehensiveJobSeeds: (typeof jobsTable.$inferInsert)[] = [
     status: "open",
     numberOfOpenPositions: 20,
   },
-  {
-    jobRoleName: "VP of Engineering",
-    description: "Executive leadership for all engineering functions.",
-    responsibilities: "Executive leadership, strategic planning, budget management",
-    jobSpecLink: "https://company.com/careers/vp-engineering",
-    location: "London, UK",
-    capability: "Engineering",
-    band: "Principal",
-    closingDate: "2026-03-01",
-    status: "draft",
-    numberOfOpenPositions: 1,
-  },
 ];
