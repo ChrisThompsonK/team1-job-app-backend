@@ -217,8 +217,13 @@ describe("JobValidator", () => {
       });
 
       it("should not throw error for missing jobSpecLink (now optional)", () => {
-        const validDataWithoutJobSpecLink = { ...validJobData, jobSpecLink: undefined };
-        expect(() => jobValidator.createValidatedJob(validDataWithoutJobSpecLink)).not.toThrow();
+        const validDataWithoutJobSpecLink = {
+          ...validJobData,
+          jobSpecLink: undefined,
+        };
+        expect(() =>
+          jobValidator.createValidatedJob(validDataWithoutJobSpecLink)
+        ).not.toThrow();
       });
 
       it("should throw error for invalid jobSpecLink type", () => {
