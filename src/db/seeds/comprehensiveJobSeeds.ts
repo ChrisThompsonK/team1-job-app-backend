@@ -21,7 +21,8 @@ export const comprehensiveJobSeeds: (typeof jobsTable.$inferInsert)[] = [
   {
     jobRoleName: "Software Engineer",
     description: "Build and maintain critical software systems.",
-    responsibilities: "Feature development, testing, code reviews, documentation",
+    responsibilities:
+      "Feature development, testing, code reviews, documentation",
     jobSpecLink: "https://company.com/careers/software-engineer",
     location: "Gdansk, Poland",
     capability: "Engineering",
@@ -33,7 +34,8 @@ export const comprehensiveJobSeeds: (typeof jobsTable.$inferInsert)[] = [
   {
     jobRoleName: "Senior Software Engineer",
     description: "Lead technical initiatives and architecture decisions.",
-    responsibilities: "System design, technical leadership, mentoring, standards",
+    responsibilities:
+      "System design, technical leadership, mentoring, standards",
     jobSpecLink: "https://company.com/careers/senior-software-engineer",
     location: "Bucharest, Romania",
     capability: "Engineering",
@@ -57,7 +59,8 @@ export const comprehensiveJobSeeds: (typeof jobsTable.$inferInsert)[] = [
   {
     jobRoleName: "Frontend Engineer (React & TypeScript)",
     description: "Create beautiful UIs using React & TypeScript.",
-    responsibilities: "React development, TypeScript, accessibility, performance",
+    responsibilities:
+      "React development, TypeScript, accessibility, performance",
     jobSpecLink: "https://company.com/careers/frontend-engineer",
     location: "Bristol, UK",
     capability: "Engineering",
@@ -69,7 +72,8 @@ export const comprehensiveJobSeeds: (typeof jobsTable.$inferInsert)[] = [
   {
     jobRoleName: "Backend Engineer",
     description: "Build scalable backend services and APIs.",
-    responsibilities: "API development, database design, microservices, monitoring",
+    responsibilities:
+      "API development, database design, microservices, monitoring",
     jobSpecLink: "https://company.com/careers/backend-engineer",
     location: "Remote, UK",
     capability: "Engineering",
@@ -217,7 +221,8 @@ export const comprehensiveJobSeeds: (typeof jobsTable.$inferInsert)[] = [
   {
     jobRoleName: "Principal Workday Architect",
     description: "Lead Workday architecture for enterprise implementations.",
-    responsibilities: "Solution architecture, technical strategy, team leadership",
+    responsibilities:
+      "Solution architecture, technical strategy, team leadership",
     jobSpecLink: "https://company.com/careers/principal-workday-architect",
     location: "London, UK",
     capability: "Workday",
@@ -291,7 +296,8 @@ export const comprehensiveJobSeeds: (typeof jobsTable.$inferInsert)[] = [
   {
     jobRoleName: "Senior Product Manager",
     description: "Lead product initiatives and define strategy.",
-    responsibilities: "Product strategy, team leadership, executive presentations",
+    responsibilities:
+      "Product strategy, team leadership, executive presentations",
     jobSpecLink: "https://company.com/careers/senior-product-manager",
     location: "Bristol, UK",
     capability: "Product",
@@ -303,7 +309,8 @@ export const comprehensiveJobSeeds: (typeof jobsTable.$inferInsert)[] = [
   {
     jobRoleName: "Principal Product Manager",
     description: "Define product vision across multiple product lines.",
-    responsibilities: "Strategic planning, portfolio management, team leadership",
+    responsibilities:
+      "Strategic planning, portfolio management, team leadership",
     jobSpecLink: "https://company.com/careers/principal-product-manager",
     location: "London, UK",
     capability: "Product",
@@ -315,7 +322,8 @@ export const comprehensiveJobSeeds: (typeof jobsTable.$inferInsert)[] = [
   {
     jobRoleName: "Product Manager - Data Platform",
     description: "Manage data platform products and tools.",
-    responsibilities: "Product strategy, roadmap planning, feature prioritization",
+    responsibilities:
+      "Product strategy, roadmap planning, feature prioritization",
     jobSpecLink: "https://company.com/careers/pm-data-platform",
     location: "Munich, Germany",
     capability: "Product",
@@ -341,7 +349,8 @@ export const comprehensiveJobSeeds: (typeof jobsTable.$inferInsert)[] = [
   {
     jobRoleName: "UX Designer",
     description: "Create intuitive user experiences for digital products.",
-    responsibilities: "User research, wireframing, usability testing, design systems",
+    responsibilities:
+      "User research, wireframing, usability testing, design systems",
     jobSpecLink: "https://company.com/careers/ux-designer",
     location: "Bristol, UK",
     capability: "Design",
@@ -353,7 +362,8 @@ export const comprehensiveJobSeeds: (typeof jobsTable.$inferInsert)[] = [
   {
     jobRoleName: "Senior UX Designer",
     description: "Lead design initiatives and mentor designers.",
-    responsibilities: "Design leadership, user research, design strategy, mentoring",
+    responsibilities:
+      "Design leadership, user research, design strategy, mentoring",
     jobSpecLink: "https://company.com/careers/senior-ux-designer",
     location: "Bucharest, Romania",
     capability: "Design",
@@ -365,7 +375,8 @@ export const comprehensiveJobSeeds: (typeof jobsTable.$inferInsert)[] = [
   {
     jobRoleName: "Principal Design Lead",
     description: "Define design vision and strategy.",
-    responsibilities: "Design strategy, team leadership, design system governance",
+    responsibilities:
+      "Design strategy, team leadership, design system governance",
     jobSpecLink: "https://company.com/careers/principal-design-lead",
     location: "London, UK",
     capability: "Design",
@@ -403,7 +414,8 @@ export const comprehensiveJobSeeds: (typeof jobsTable.$inferInsert)[] = [
   {
     jobRoleName: "Platform Engineer",
     description: "Build platform infrastructure and CI/CD pipelines.",
-    responsibilities: "Infrastructure management, CI/CD, automation, monitoring",
+    responsibilities:
+      "Infrastructure management, CI/CD, automation, monitoring",
     jobSpecLink: "https://company.com/careers/platform-engineer",
     location: "Manchester, UK",
     capability: "Platform",
@@ -415,7 +427,8 @@ export const comprehensiveJobSeeds: (typeof jobsTable.$inferInsert)[] = [
   {
     jobRoleName: "Senior Platform Engineer",
     description: "Lead platform initiatives and architect solutions.",
-    responsibilities: "Platform architecture, team leadership, infrastructure as code",
+    responsibilities:
+      "Platform architecture, team leadership, infrastructure as code",
     jobSpecLink: "https://company.com/careers/senior-platform-engineer",
     location: "Toronto, Canada",
     capability: "Platform",
@@ -453,7 +466,8 @@ export const comprehensiveJobSeeds: (typeof jobsTable.$inferInsert)[] = [
   {
     jobRoleName: "Junior QA Engineer",
     description: "Learn testing methodologies and automation.",
-    responsibilities: "Manual testing, test cases, bug reporting, automation learning",
+    responsibilities:
+      "Manual testing, test cases, bug reporting, automation learning",
     jobSpecLink: "https://company.com/careers/junior-qa-engineer",
     location: "London, UK",
     capability: "Quality",
@@ -477,7 +491,8 @@ export const comprehensiveJobSeeds: (typeof jobsTable.$inferInsert)[] = [
   {
     jobRoleName: "Senior QA Engineer",
     description: "Lead quality initiatives and mentor QA team.",
-    responsibilities: "Testing strategy, automation frameworks, team leadership",
+    responsibilities:
+      "Testing strategy, automation frameworks, team leadership",
     jobSpecLink: "https://company.com/careers/senior-qa-engineer",
     location: "Manchester, UK",
     capability: "Quality",
@@ -515,7 +530,8 @@ export const comprehensiveJobSeeds: (typeof jobsTable.$inferInsert)[] = [
   {
     jobRoleName: "Solutions Architect",
     description: "Design enterprise technical solutions.",
-    responsibilities: "Architecture design, technical documentation, consultation",
+    responsibilities:
+      "Architecture design, technical documentation, consultation",
     jobSpecLink: "https://company.com/careers/solutions-architect",
     location: "London, UK",
     capability: "Architecture",
@@ -527,7 +543,8 @@ export const comprehensiveJobSeeds: (typeof jobsTable.$inferInsert)[] = [
   {
     jobRoleName: "Cloud Architect",
     description: "Design cloud solutions on AWS, Azure, and GCP.",
-    responsibilities: "Cloud architecture, migration planning, cost optimization",
+    responsibilities:
+      "Cloud architecture, migration planning, cost optimization",
     jobSpecLink: "https://company.com/careers/cloud-architect",
     location: "London, UK",
     capability: "Architecture",
@@ -563,7 +580,8 @@ export const comprehensiveJobSeeds: (typeof jobsTable.$inferInsert)[] = [
   {
     jobRoleName: "Integration Architect",
     description: "Design integration patterns and system integration.",
-    responsibilities: "Integration architecture, API design, technical guidance",
+    responsibilities:
+      "Integration architecture, API design, technical guidance",
     jobSpecLink: "https://company.com/careers/integration-architect",
     location: "Remote, UK",
     capability: "Architecture",
@@ -613,7 +631,8 @@ export const comprehensiveJobSeeds: (typeof jobsTable.$inferInsert)[] = [
   {
     jobRoleName: "Principal Business Analyst",
     description: "Define business analysis strategy.",
-    responsibilities: "Strategic analysis, transformation leadership, team leadership",
+    responsibilities:
+      "Strategic analysis, transformation leadership, team leadership",
     jobSpecLink: "https://company.com/careers/principal-business-analyst",
     location: "London, UK",
     capability: "Business Analysis",
@@ -625,7 +644,8 @@ export const comprehensiveJobSeeds: (typeof jobsTable.$inferInsert)[] = [
   {
     jobRoleName: "Business Systems Analyst",
     description: "Analyze and optimize business systems.",
-    responsibilities: "Systems analysis, process optimization, requirements management",
+    responsibilities:
+      "Systems analysis, process optimization, requirements management",
     jobSpecLink: "https://company.com/careers/business-systems-analyst",
     location: "Bristol, UK",
     capability: "Business Analysis",
@@ -639,7 +659,8 @@ export const comprehensiveJobSeeds: (typeof jobsTable.$inferInsert)[] = [
   {
     jobRoleName: "Junior Security Analyst",
     description: "Start your cybersecurity career.",
-    responsibilities: "Security monitoring, incident response support, log analysis",
+    responsibilities:
+      "Security monitoring, incident response support, log analysis",
     jobSpecLink: "https://company.com/careers/junior-security-analyst",
     location: "London, UK",
     capability: "Security",
@@ -651,7 +672,8 @@ export const comprehensiveJobSeeds: (typeof jobsTable.$inferInsert)[] = [
   {
     jobRoleName: "Security Engineer",
     description: "Implement and maintain security controls.",
-    responsibilities: "Security monitoring, vulnerability management, incident response",
+    responsibilities:
+      "Security monitoring, vulnerability management, incident response",
     jobSpecLink: "https://company.com/careers/security-engineer",
     location: "Munich, Germany",
     capability: "Security",
@@ -663,7 +685,8 @@ export const comprehensiveJobSeeds: (typeof jobsTable.$inferInsert)[] = [
   {
     jobRoleName: "Senior Security Engineer",
     description: "Lead security initiatives and protect assets.",
-    responsibilities: "Security strategy, threat analysis, incident response leadership",
+    responsibilities:
+      "Security strategy, threat analysis, incident response leadership",
     jobSpecLink: "https://company.com/careers/senior-security-engineer",
     location: "Glasgow, UK",
     capability: "Security",
@@ -675,7 +698,8 @@ export const comprehensiveJobSeeds: (typeof jobsTable.$inferInsert)[] = [
   {
     jobRoleName: "Cybersecurity Specialist",
     description: "Protect assets through security monitoring.",
-    responsibilities: "Security monitoring, vulnerability assessment, threat intelligence",
+    responsibilities:
+      "Security monitoring, vulnerability assessment, threat intelligence",
     jobSpecLink: "https://company.com/careers/cybersecurity-specialist",
     location: "Edinburgh, UK",
     capability: "Security",
@@ -687,7 +711,8 @@ export const comprehensiveJobSeeds: (typeof jobsTable.$inferInsert)[] = [
   {
     jobRoleName: "Principal Security Officer",
     description: "Define security strategy organization-wide.",
-    responsibilities: "Security strategy, governance, compliance, risk management",
+    responsibilities:
+      "Security strategy, governance, compliance, risk management",
     jobSpecLink: "https://company.com/careers/principal-security-officer",
     location: "London, UK",
     capability: "Security",
@@ -713,7 +738,8 @@ export const comprehensiveJobSeeds: (typeof jobsTable.$inferInsert)[] = [
   {
     jobRoleName: "Graduate Software Engineer (2026 Intake)",
     description: "Join our 2026 graduate program.",
-    responsibilities: "Learning, project work, mentorship, professional development",
+    responsibilities:
+      "Learning, project work, mentorship, professional development",
     jobSpecLink: "https://company.com/careers/graduate-2026",
     location: "Belfast, UK",
     capability: "Engineering",
@@ -737,7 +763,8 @@ export const comprehensiveJobSeeds: (typeof jobsTable.$inferInsert)[] = [
   {
     jobRoleName: "Software Engineering Apprentice",
     description: "Level 4 apprenticeship with training.",
-    responsibilities: "Learning fundamentals, projects, training, certification",
+    responsibilities:
+      "Learning fundamentals, projects, training, certification",
     jobSpecLink: "https://company.com/careers/apprentice",
     location: "Manchester, UK",
     capability: "Engineering",
@@ -773,7 +800,8 @@ export const comprehensiveJobSeeds: (typeof jobsTable.$inferInsert)[] = [
   {
     jobRoleName: "Workday Analyst (Part-Time)",
     description: "Part-time Workday administration and reporting.",
-    responsibilities: "Report creation, system admin, user support, documentation",
+    responsibilities:
+      "Report creation, system admin, user support, documentation",
     jobSpecLink: "https://company.com/careers/workday-analyst-pt",
     location: "Remote, UK",
     capability: "Workday",
