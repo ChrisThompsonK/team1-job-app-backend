@@ -100,9 +100,13 @@ export class JobController {
       const updatedJobRole = this.jobValidator.createValidatedJob(req.body, id);
       await this.jobService.editJobRole(updatedJobRole);
 
+      // Fetch the updated job to return it
+      const savedJob = await this.jobService.getJobById(id);
+
       res.status(200).json({
         success: true,
         message: `Job ${updatedJobRole.jobRoleName} edited successfully`,
+        data: savedJob,
       });
     } catch (error) {
       throw new BusinessError(
