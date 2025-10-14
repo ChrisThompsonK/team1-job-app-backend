@@ -1,5 +1,6 @@
 // Better Auth seeding - Create users directly with Better Auth
 import { createClient } from "@libsql/client";
+import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/libsql";
 import { env } from "../../config/env.js";
 import { auth } from "../../utils/auth.js";
@@ -35,8 +36,7 @@ export async function runAuthSeeds(): Promise<void> {
   try {
     console.log("🔐 Starting auth seeding with Better Auth...");
 
-    // Clear existing auth data first (no sessions needed for JWT-only mode)
-
+    // Clear existing auth data first
     console.log("🗑️  Clearing existing accounts...");
     await db.delete(account);
 
@@ -59,6 +59,15 @@ export async function runAuthSeeds(): Promise<void> {
           },
         });
 
+        // Set admin flag for admin user
+        if (testUser.email === "admin@jobapp.com") {
+          await db
+            .update(user)
+            .set({ isAdmin: true })
+            .where(eq(user.email, testUser.email));
+          console.log(`   🔑 Set admin privileges for ${testUser.email}`);
+        }
+
         console.log(`   ✅ Created: ${testUser.email}`);
       } catch (error) {
         console.error(`   ❌ Failed to create ${testUser.email}:`, error);
@@ -72,25 +81,6 @@ export async function runAuthSeeds(): Promise<void> {
     console.log("   - Test login with admin@jobapp.com / password123");
   } catch (error) {
     console.error("❌ Error during auth seeding:", error);
-    // Insert user data
-    console.log("👤 Inserting users...");
-    await db.insert(user).values(userSeeds);
-
-    // Insert account data with hashed passwords
-    console.log("🔑 Inserting accounts with hashed passwords...");
-    const accountSeeds = await createAccountSeeds();
-    await db.insert(account).values(accountSeeds);
-
-    console.log(
-      `✅ Successfully seeded ${userSeeds.length} users and accounts`
-    );
-    console.log("   - Admin user: admin@jobapp.com (password: password123)");
-    console.log(
-      "   - Regular users: john.doe@example.com, jane.smith@example.com, etc."
-    );
-    console.log("   - All users have password: password123");
-    console.log("   - Passwords are properly hashed using scrypt");
-  } catch (error) {
-    console.error("❌ Error seeding auth data:", error);
+    throw error;
   }
 }

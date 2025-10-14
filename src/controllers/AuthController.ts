@@ -51,6 +51,9 @@ export class AuthController {
       }
 
       const userData = fullUserData[0];
+      if (!userData) {
+        throw new BusinessError("User data not found", 500);
+      }
 
       // Create JWT token manually since Better Auth might be returning session token
       const jwtPayload = {
