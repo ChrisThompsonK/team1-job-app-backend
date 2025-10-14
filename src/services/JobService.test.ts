@@ -176,14 +176,15 @@ describe("JobService", () => {
 
     it("should create job successfully with valid data", async () => {
       mockJobValidator.validateBandAndCapability.mockImplementation(() => {});
-      mockJobRepository.createJobRole.mockResolvedValue(undefined);
+      mockJobRepository.createJobRole.mockResolvedValue(validJob);
 
-      await jobService.createJobRole(validJob);
+      const result = await jobService.createJobRole(validJob);
 
       expect(mockJobValidator.validateBandAndCapability).toHaveBeenCalledWith(
         validJob
       );
       expect(mockJobRepository.createJobRole).toHaveBeenCalledWith(validJob);
+      expect(result).toEqual(validJob);
     });
 
     it("should throw error when validation fails", async () => {
