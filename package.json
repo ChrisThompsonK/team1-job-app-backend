@@ -49,6 +49,7 @@
   },
   "dependencies": {
     "@libsql/client": "^0.15.15",
+    "better-auth": "^1.3.27",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "drizzle-orm": "^0.44.6",

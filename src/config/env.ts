@@ -7,6 +7,8 @@ interface EnvironmentConfig {
   databaseUrl: string;
   nodeEnv: NodeEnvironment;
   corsOrigin: string;
+  betterAuthSecret: string;
+  betterAuthUrl: string;
 }
 
 const getEnvVariable = (key: string, defaultValue?: string): string => {
@@ -58,6 +60,35 @@ const validateDatabaseUrl = (url: string): string => {
   return url;
 };
 
+const validateBetterAuthSecret = (secret: string): string => {
+  if (!secret || secret.trim() === "") {
+    throw new Error("BETTER_AUTH_SECRET cannot be empty");
+  }
+  if (secret.length < 32) {
+    throw new Error(
+      "BETTER_AUTH_SECRET must be at least 32 characters long for security"
+    );
+  }
+  return secret;
+};
+
+const validateBetterAuthUrl = (url: string): string => {
+  if (!url || url.trim() === "") {
+    throw new Error("BETTER_AUTH_URL cannot be empty");
+  }
+  if (!url.startsWith("http://") && !url.startsWith("https://")) {
+    throw new Error(
+      "BETTER_AUTH_URL must be a valid URL starting with http:// or https://"
+    );
+  }
+  try {
+    new URL(url);
+  } catch {
+    throw new Error("BETTER_AUTH_URL must be a valid URL format");
+  }
+  return url;
+};
+
 const loadEnvironmentConfig = (): EnvironmentConfig => {
   try {
     const port = validatePort(getEnvVariable("PORT", "3001"));
@@ -66,12 +97,20 @@ const loadEnvironmentConfig = (): EnvironmentConfig => {
     );
     const nodeEnv = validateNodeEnv(getEnvVariable("NODE_ENV", "development"));
     const corsOrigin = getEnvVariable("CORS_ORIGIN", "*");
+    const betterAuthSecret = validateBetterAuthSecret(
+      getEnvVariable("BETTER_AUTH_SECRET")
+    );
+    const betterAuthUrl = validateBetterAuthUrl(
+      getEnvVariable("BETTER_AUTH_URL")
+    );
 
     return {
       port,
       databaseUrl,
       nodeEnv,
       corsOrigin,
+      betterAuthSecret,
+      betterAuthUrl,
     };
   } catch (error) {
     console.error("❌ Environment configuration error:");
