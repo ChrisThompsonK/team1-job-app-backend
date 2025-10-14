@@ -70,7 +70,7 @@ export async function createAccountSeeds() {
 
     accountSeeds.push({
       id: randomUUID(),
-      accountId: userData.id,
+      accountId: randomUUID(),
       providerId: "credential", // Better Auth uses "credential" for email/password
       userId: userData.id,
       password: hashedPassword,
