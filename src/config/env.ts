@@ -65,7 +65,9 @@ const validateBetterAuthSecret = (secret: string): string => {
     throw new Error("BETTER_AUTH_SECRET cannot be empty");
   }
   if (secret.length < 32) {
-    throw new Error("BETTER_AUTH_SECRET must be at least 32 characters long for security");
+    throw new Error(
+      "BETTER_AUTH_SECRET must be at least 32 characters long for security"
+    );
   }
   return secret;
 };
@@ -75,7 +77,9 @@ const validateBetterAuthUrl = (url: string): string => {
     throw new Error("BETTER_AUTH_URL cannot be empty");
   }
   if (!url.startsWith("http://") && !url.startsWith("https://")) {
-    throw new Error("BETTER_AUTH_URL must be a valid URL starting with http:// or https://");
+    throw new Error(
+      "BETTER_AUTH_URL must be a valid URL starting with http:// or https://"
+    );
   }
   try {
     new URL(url);
