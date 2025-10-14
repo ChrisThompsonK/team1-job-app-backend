@@ -75,11 +75,12 @@ export class JobController {
   async createJob(req: Request, res: Response): Promise<void> {
     try {
       const newJobRole = this.jobValidator.createValidatedJob(req.body);
-      await this.jobService.createJobRole(newJobRole);
+      const createdJob = await this.jobService.createJobRole(newJobRole);
 
       res.status(201).json({
         success: true,
         message: `Job ${newJobRole.jobRoleName} created successfully`,
+        data: createdJob,
       });
     } catch (error) {
       throw new BusinessError(

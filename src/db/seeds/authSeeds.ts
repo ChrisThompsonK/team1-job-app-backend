@@ -36,6 +36,7 @@ export async function runAuthSeeds(): Promise<void> {
     console.log("🔐 Starting auth seeding with Better Auth...");
 
     // Clear existing auth data first (no sessions needed for JWT-only mode)
+
     console.log("🗑️  Clearing existing accounts...");
     await db.delete(account);
 
@@ -71,6 +72,25 @@ export async function runAuthSeeds(): Promise<void> {
     console.log("   - Test login with admin@jobapp.com / password123");
   } catch (error) {
     console.error("❌ Error during auth seeding:", error);
-    throw error;
+    // Insert user data
+    console.log("👤 Inserting users...");
+    await db.insert(user).values(userSeeds);
+
+    // Insert account data with hashed passwords
+    console.log("🔑 Inserting accounts with hashed passwords...");
+    const accountSeeds = await createAccountSeeds();
+    await db.insert(account).values(accountSeeds);
+
+    console.log(
+      `✅ Successfully seeded ${userSeeds.length} users and accounts`
+    );
+    console.log("   - Admin user: admin@jobapp.com (password: password123)");
+    console.log(
+      "   - Regular users: john.doe@example.com, jane.smith@example.com, etc."
+    );
+    console.log("   - All users have password: password123");
+    console.log("   - Passwords are properly hashed using scrypt");
+  } catch (error) {
+    console.error("❌ Error seeding auth data:", error);
   }
 }

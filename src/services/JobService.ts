@@ -41,9 +41,10 @@ export class JobService {
   }
 
   //Create new job-role
-  async createJobRole(job: Job): Promise<void> {
+  async createJobRole(job: Job): Promise<Job> {
     this.jobValidator.validateBandAndCapability(job);
-    await this.jobRepository.createJobRole(job);
+    const createdJob = await this.jobRepository.createJobRole(job);
+    return createdJob;
   }
 
   //Edit job-role

@@ -10,6 +10,17 @@ export default defineConfig({
     include: ["src/**/*.{test,spec}.{js,ts}"],
     exclude: ["dist/**", "node_modules/**"],
 
+    // Environment variables for tests
+    env: {
+      NODE_ENV: "test",
+      VITEST: "true",
+      DATABASE_URL: "file:test.db",
+      PORT: "3001",
+      CORS_ORIGIN: "*",
+      BETTER_AUTH_SECRET: "test-secret-with-at-least-32-characters-for-testing",
+      BETTER_AUTH_URL: "http://localhost:3001",
+    },
+
     // Enable TypeScript support
     typecheck: {
       enabled: false, // Set to true if you want to type-check tests
