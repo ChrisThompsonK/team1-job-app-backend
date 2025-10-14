@@ -198,7 +198,10 @@ class DatabaseJobStore {
   }
 
   async createJobRole(job: Job): Promise<Job> {
-    const result = await this.db.insert(jobsTable).values(this.mapJobToDbValues(job)).returning();
+    const result = await this.db
+      .insert(jobsTable)
+      .values(this.mapJobToDbValues(job))
+      .returning();
     const createdRow = result[0];
     if (!createdRow) {
       throw new Error("Failed to create job role");
