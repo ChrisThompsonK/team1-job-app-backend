@@ -146,17 +146,17 @@ class DatabaseJobStore {
 
     // Apply sorting based on sortBy field
     if (sortBy === "jobRoleName") {
-      query = (
-        sortOrder === "desc"
-          ? query.orderBy(desc(jobsTable.jobRoleName))
-          : query.orderBy(asc(jobsTable.jobRoleName))
-      ) as typeof query;
+      if (sortOrder === "desc") {
+        query = query.orderBy(desc(jobsTable.jobRoleName)) as typeof query;
+      } else {
+        query = query.orderBy(asc(jobsTable.jobRoleName)) as typeof query;
+      }
     } else if (sortBy === "closingDate") {
-      query = (
-        sortOrder === "desc"
-          ? query.orderBy(desc(jobsTable.closingDate))
-          : query.orderBy(asc(jobsTable.closingDate))
-      ) as typeof query;
+      if (sortOrder === "desc") {
+        query = query.orderBy(desc(jobsTable.closingDate)) as typeof query;
+      } else {
+        query = query.orderBy(asc(jobsTable.closingDate)) as typeof query;
+      }
     } else if (sortBy === "band") {
       query = (
         sortOrder === "desc"
