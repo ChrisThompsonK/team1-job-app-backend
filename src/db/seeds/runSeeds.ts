@@ -1,7 +1,7 @@
 import { createClient } from "@libsql/client";
 import { drizzle } from "drizzle-orm/libsql";
 import { env } from "../../config/env.js";
-import { comprehensiveJobSeeds, jobRolesTable } from "./index";
+import { comprehensiveJobSeeds, jobRolesTable, runAuthSeeds } from "./index";
 
 const client = createClient({
   url: env.databaseUrl,
@@ -12,6 +12,9 @@ const db = drizzle(client);
 export async function runSeeds(): Promise<void> {
   try {
     console.log("🌱 Starting database seeding...");
+
+    // Seed auth data first (users and accounts)
+    await runAuthSeeds();
 
     // Clear existing data (optional - remove if you want to append)
     console.log("🗑️  Clearing existing job roles...");
