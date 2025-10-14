@@ -176,9 +176,7 @@ describe("JobService", () => {
 
     it("should create job successfully with valid data", async () => {
       mockJobValidator.validateBandAndCapability.mockImplementation(() => {});
-      mockJobRepository.createJobRole.mockResolvedValue(undefined);
-      // Mock getAllJobs to return the created job so it can be found
-      mockJobRepository.getAllJobs.mockResolvedValue([validJob]);
+      mockJobRepository.createJobRole.mockResolvedValue(validJob);
 
       const result = await jobService.createJobRole(validJob);
 
@@ -186,7 +184,6 @@ describe("JobService", () => {
         validJob
       );
       expect(mockJobRepository.createJobRole).toHaveBeenCalledWith(validJob);
-      expect(mockJobRepository.getAllJobs).toHaveBeenCalled();
       expect(result).toEqual(validJob);
     });
 

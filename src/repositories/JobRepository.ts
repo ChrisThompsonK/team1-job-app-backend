@@ -197,8 +197,13 @@ class DatabaseJobStore {
     };
   }
 
-  async createJobRole(job: Job): Promise<void> {
-    await this.db.insert(jobsTable).values(this.mapJobToDbValues(job)).run();
+  async createJobRole(job: Job): Promise<Job> {
+    const result = await this.db.insert(jobsTable).values(this.mapJobToDbValues(job)).returning();
+    const createdRow = result[0];
+    if (!createdRow) {
+      throw new Error("Failed to create job role");
+    }
+    return mapJobRowToJob(createdRow);
   }
 
   async editJobRole(job: Job): Promise<void> {
@@ -248,8 +253,8 @@ export class JobRepository {
     return jobStore.getFilteredJobs(filters);
   }
 
-  async createJobRole(job: Job): Promise<void> {
-    await jobStore.createJobRole(job);
+  async createJobRole(job: Job): Promise<Job> {
+    return await jobStore.createJobRole(job);
   }
 
   async editJobRole(job: Job): Promise<void> {
