@@ -43,19 +43,7 @@ export class JobService {
   //Create new job-role
   async createJobRole(job: Job): Promise<Job> {
     this.jobValidator.validateBandAndCapability(job);
-    await this.jobRepository.createJobRole(job);
-
-    // Return the job with generated ID if available, or fetch from repository
-    if (job.id) {
-      return job;
-    }
-
-    // If no ID, try to find the job by name (assuming unique names)
-    const allJobs = await this.jobRepository.getAllJobs();
-    const createdJob = allJobs.find((j) => j.jobRoleName === job.jobRoleName);
-    if (!createdJob) {
-      throw new Error("Failed to retrieve created job");
-    }
+    const createdJob = await this.jobRepository.createJobRole(job);
     return createdJob;
   }
 
