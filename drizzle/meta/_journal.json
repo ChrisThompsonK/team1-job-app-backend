@@ -15,6 +15,13 @@
       "when": 1728904920000,
       "tag": "0001_fat_satana",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1760451473724,
+      "tag": "0002_strong_mole_man",
+      "breakpoints": true
     }
   ]
 }

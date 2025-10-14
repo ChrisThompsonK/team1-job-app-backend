@@ -1,17 +1,38 @@
 import { sql } from "drizzle-orm";
 import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
-// Simple user table with password for email/password auth only
+// Better Auth minimal schema for JWT-only email/password authentication
+
+// User table - stores user information
 export const user = sqliteTable("user", {
   id: text("id").primaryKey(),
-  name: text("name").notNull(),
+  name: text("name"),
   email: text("email").notNull().unique(),
-  password: text("password").notNull(), // Hashed password stored directly
-  createdAt: integer("created_at", { mode: "timestamp_ms" })
-    .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+  emailVerified: integer("emailVerified", { mode: "boolean" }).default(false),
+  isAdmin: integer("isAdmin", { mode: "boolean" }).default(false),
+  createdAt: integer("createdAt", { mode: "timestamp" })
+    .default(sql`(cast(unixepoch() as integer))`)
     .notNull(),
-  updatedAt: integer("updated_at", { mode: "timestamp_ms" })
-    .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+  updatedAt: integer("updatedAt", { mode: "timestamp" })
+    .default(sql`(cast(unixepoch() as integer))`)
+    .$onUpdate(() => new Date())
+    .notNull(),
+});
+
+// Account table - stores authentication credentials
+export const account = sqliteTable("account", {
+  id: text("id").primaryKey(),
+  accountId: text("accountId").notNull(),
+  providerId: text("providerId").notNull(),
+  userId: text("userId")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  password: text("password"), // For credential accounts
+  createdAt: integer("createdAt", { mode: "timestamp" })
+    .default(sql`(cast(unixepoch() as integer))`)
+    .notNull(),
+  updatedAt: integer("updatedAt", { mode: "timestamp" })
+    .default(sql`(cast(unixepoch() as integer))`)
     .$onUpdate(() => new Date())
     .notNull(),
 });
