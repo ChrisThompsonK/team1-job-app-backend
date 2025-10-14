@@ -1,12 +1,10 @@
-import { randomUUID } from "crypto";
+// Import scrypt for password hashing (same as Better Auth uses)
+import { randomUUID, scrypt } from "node:crypto";
+import { promisify } from "node:util";
 import { createClient } from "@libsql/client";
 import { drizzle } from "drizzle-orm/libsql";
-import { account, user } from "../schemas/auth.js";
 import { env } from "../../config/env.js";
-
-// Import scrypt for password hashing (same as Better Auth uses)
-import { scrypt } from "crypto";
-import { promisify } from "util";
+import { account, user } from "../schemas/auth.js";
 
 const scryptAsync = promisify(scrypt);
 
@@ -65,11 +63,11 @@ export const userSeeds = [
 // Function to create account seeds with hashed passwords
 export async function createAccountSeeds() {
   const accountSeeds = [];
-  
+
   for (const userData of userSeeds) {
     // Default password for all users is "password123"
     const hashedPassword = await hashPassword("password123");
-    
+
     accountSeeds.push({
       id: randomUUID(),
       accountId: userData.id,
@@ -78,7 +76,7 @@ export async function createAccountSeeds() {
       password: hashedPassword,
     });
   }
-  
+
   return accountSeeds;
 }
 
@@ -89,7 +87,7 @@ export async function runAuthSeeds(): Promise<void> {
     // Clear existing auth data
     console.log("🗑️  Clearing existing accounts...");
     await db.delete(account);
-    
+
     console.log("🗑️  Clearing existing users...");
     await db.delete(user);
 
@@ -102,9 +100,13 @@ export async function runAuthSeeds(): Promise<void> {
     const accountSeeds = await createAccountSeeds();
     await db.insert(account).values(accountSeeds);
 
-    console.log(`✅ Successfully seeded ${userSeeds.length} users and accounts`);
+    console.log(
+      `✅ Successfully seeded ${userSeeds.length} users and accounts`
+    );
     console.log("   - Admin user: admin@jobapp.com (password: password123)");
-    console.log("   - Regular users: john.doe@example.com, jane.smith@example.com, etc.");
+    console.log(
+      "   - Regular users: john.doe@example.com, jane.smith@example.com, etc."
+    );
     console.log("   - All users have password: password123");
     console.log("   - Passwords are properly hashed using scrypt");
   } catch (error) {
