@@ -1,19 +1,9 @@
-// Import scrypt for password hashing (same as Better Auth uses)
-import { randomUUID, scrypt } from "node:crypto";
-import { promisify } from "node:util";
+// Better Auth seeding - Create users directly with Better Auth
 import { createClient } from "@libsql/client";
 import { drizzle } from "drizzle-orm/libsql";
 import { env } from "../../config/env.js";
+import { auth } from "../../utils/auth.js";
 import { account, user } from "../schemas/auth.js";
-
-const scryptAsync = promisify(scrypt);
-
-// Helper function to hash passwords using scrypt (Better Auth's default)
-async function hashPassword(password: string): Promise<string> {
-  const salt = randomUUID();
-  const derivedKey = (await scryptAsync(password, salt, 64)) as Buffer;
-  return `scrypt:${salt}:${derivedKey.toString("hex")}`;
-}
 
 const client = createClient({
   url: env.databaseUrl,
@@ -21,96 +11,66 @@ const client = createClient({
 
 const db = drizzle(client);
 
-// Seed data for users
-export const userSeeds = [
+export const testUsers = [
+  { name: "Admin User", email: "admin@jobapp.com", password: "password123" },
+  { name: "John Doe", email: "john.doe@example.com", password: "password123" },
   {
-    id: randomUUID(),
-    name: "Admin User",
-    email: "admin@jobapp.com",
-    emailVerified: true,
-    isAdmin: true,
-  },
-  {
-    id: randomUUID(),
-    name: "John Doe",
-    email: "john.doe@example.com",
-    emailVerified: true,
-    isAdmin: false,
-  },
-  {
-    id: randomUUID(),
     name: "Jane Smith",
     email: "jane.smith@example.com",
-    emailVerified: true,
-    isAdmin: false,
+    password: "password123",
   },
   {
-    id: randomUUID(),
     name: "Bob Johnson",
     email: "bob.johnson@example.com",
-    emailVerified: false,
-    isAdmin: false,
+    password: "password123",
   },
   {
-    id: randomUUID(),
     name: "Alice Brown",
     email: "alice.brown@example.com",
-    emailVerified: true,
-    isAdmin: false,
+    password: "password123",
   },
 ];
 
-// Function to create account seeds with hashed passwords
-export async function createAccountSeeds() {
-  const accountSeeds = [];
-
-  for (const userData of userSeeds) {
-    // Default password for all users is "password123"
-    const hashedPassword = await hashPassword("password123");
-
-    accountSeeds.push({
-      id: randomUUID(),
-      accountId: userData.id,
-      providerId: "credential", // Better Auth uses "credential" for email/password
-      userId: userData.id,
-      password: hashedPassword,
-    });
-  }
-
-  return accountSeeds;
-}
-
 export async function runAuthSeeds(): Promise<void> {
   try {
-    console.log("🔐 Starting auth seeding...");
+    console.log("🔐 Starting auth seeding with Better Auth...");
 
-    // Clear existing auth data
+    // Clear existing auth data first (no sessions needed for JWT-only mode)
     console.log("🗑️  Clearing existing accounts...");
     await db.delete(account);
 
     console.log("🗑️  Clearing existing users...");
     await db.delete(user);
 
-    // Insert user data
-    console.log("👤 Inserting users...");
-    await db.insert(user).values(userSeeds);
+    console.log("👤 Creating users with Better Auth...");
 
-    // Insert account data with hashed passwords
-    console.log("🔑 Inserting accounts with hashed passwords...");
-    const accountSeeds = await createAccountSeeds();
-    await db.insert(account).values(accountSeeds);
+    // Create users using Better Auth's signUp method for proper password hashing
+    for (const testUser of testUsers) {
+      try {
+        console.log(`   Creating: ${testUser.email}`);
 
-    console.log(
-      `✅ Successfully seeded ${userSeeds.length} users and accounts`
-    );
-    console.log("   - Admin user: admin@jobapp.com (password: password123)");
-    console.log(
-      "   - Regular users: john.doe@example.com, jane.smith@example.com, etc."
-    );
+        // Use Better Auth's internal signUp to ensure proper password hashing
+        await auth.api.signUpEmail({
+          body: {
+            name: testUser.name,
+            email: testUser.email,
+            password: testUser.password,
+          },
+        });
+
+        console.log(`   ✅ Created: ${testUser.email}`);
+      } catch (error) {
+        console.error(`   ❌ Failed to create ${testUser.email}:`, error);
+      }
+    }
+
+    console.log("");
+    console.log("✅ Auth seeding completed!");
     console.log("   - All users have password: password123");
-    console.log("   - Passwords are properly hashed using scrypt");
+    console.log("   - Passwords are properly hashed by Better Auth");
+    console.log("   - Test login with admin@jobapp.com / password123");
   } catch (error) {
-    console.error("❌ Error seeding auth data:", error);
+    console.error("❌ Error during auth seeding:", error);
     throw error;
   }
 }

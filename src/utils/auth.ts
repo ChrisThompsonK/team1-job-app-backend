@@ -18,6 +18,7 @@ export const auth = betterAuth({
     schema: {
       user: schema.user,
       account: schema.account,
+      session: schema.session, // Required even in JWT-only mode
     },
   }),
   secret: env.betterAuthSecret,
@@ -30,5 +31,6 @@ export const auth = betterAuth({
   session: {
     expiresIn: 60 * 60, // 1 hour in seconds
     updateAge: 60 * 60, // Don't refresh session - same as expiresIn for no refresh behavior
+    storeSessionInCookie: false, // Use JWT only, no session storage
   },
 });
