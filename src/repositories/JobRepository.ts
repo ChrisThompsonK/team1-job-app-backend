@@ -250,12 +250,12 @@ class DatabaseJobStore {
         and(
           eq(jobsTable.status, JobStatus.OPEN),
           or(
-            sql`date(${jobsTable.closingDate}) < date(${today})`,
+            sql`date(${jobsTable.closingDate}) < date(${sql.placeholder("today")})`,
             eq(jobsTable.numberOfOpenPositions, 0)
           )
         )
       )
-      .run();
+      .run({ today });
 
     return { updatedCount: result.rowsAffected };
   }
