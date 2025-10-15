@@ -1,7 +1,7 @@
 import { sql } from "drizzle-orm";
 import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
-// Better Auth minimal schema for JWT-only email/password authentication
+// Better Auth schema for session-based email/password authentication
 
 // User table - stores user information
 export const user = sqliteTable("user", {
@@ -37,7 +37,7 @@ export const account = sqliteTable("account", {
     .notNull(),
 });
 
-// Session table - required by Better Auth even in JWT-only mode (won't be used)
+// Session table - stores active user sessions
 export const session = sqliteTable("session", {
   id: text("id").primaryKey(),
   userId: text("userId")

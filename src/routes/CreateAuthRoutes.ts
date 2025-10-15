@@ -6,9 +6,11 @@ export const createAuthRoutes = (authController: AuthController) => {
   const router = Router();
 
   // Authentication routes - all wrapped with asyncHandler for error handling
-  router.post(
-    "/auth/login",
-    asyncHandler(authController.login.bind(authController))
+  // Note: Login is now handled by Better Auth directly at /api/auth/sign-in/email
+
+  router.get(
+    "/auth/me",
+    asyncHandler(authController.getCurrentUser.bind(authController))
   );
 
   return router;

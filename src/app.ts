@@ -1,15 +1,20 @@
 import type { Request, Response } from "express";
 import express from "express";
+import { toNodeHandler } from "better-auth/node";
 import { authController, jobController } from "./di/container.js";
 import { errorHandler, notFoundHandler } from "./middleware/errorHandler.js";
 import { configureMiddleware } from "./middleware/middlewareConfig.js";
 import { createAuthRoutes } from "./routes/CreateAuthRoutes.js";
 import { createJobRoutes } from "./routes/CreateJobRoutes.js";
+import { auth } from "./utils/auth.js";
 
 const app = express();
 
-// Configure middleware
+// Configure middleware BEFORE Better Auth handler
 configureMiddleware(app);
+
+// Mount Better Auth handler - use the correct pattern
+app.use("/api/auth", toNodeHandler(auth));
 
 // Hello World endpoint
 app.get("/", (_req: Request, res: Response) => {
@@ -24,7 +29,8 @@ app.get("/", (_req: Request, res: Response) => {
       editJob: "/api/jobs/:id [PUT]",
       deleteJob: "/api/jobs/:id [DELETE]",
       filteredJobs: "/api/jobs/search",
-      login: "/api/auth/login [POST]",
+      login: "/api/auth/sign-in/email [POST]",
+      currentUser: "/api/auth/me [GET]",
     },
     filtering: {
       endpoint: "/api/jobs/search",

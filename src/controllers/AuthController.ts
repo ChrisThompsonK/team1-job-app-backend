@@ -2,7 +2,6 @@ import { createClient } from "@libsql/client";
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/libsql";
 import type { Request, Response } from "express";
-import jwt from "jsonwebtoken";
 import { env } from "../config/env.js";
 import { user } from "../db/schemas/auth.js";
 import { BusinessError } from "../middleware/errorHandler.js";
@@ -18,32 +17,25 @@ export class AuthController {
     this.db = drizzle(client);
   }
 
-  // POST /auth/login - User login
-  async login(req: Request, res: Response): Promise<void> {
+  // GET /auth/me - Get current user session
+  async getCurrentUser(req: Request, res: Response): Promise<void> {
     try {
-      const { email, password } = req.body;
-
-      if (!email || !password) {
-        throw new BusinessError("Email and password are required", 400);
-      }
-
-      // Use Better Auth to sign in
-      const result = await auth.api.signInEmail({
-        body: {
-          email,
-          password,
+      // Get session from cookie
+      const session = await auth.api.getSession({
+        headers: {
+          cookie: req.headers.cookie || "",
         },
       });
 
-      if (!result || !result.user) {
-        throw new BusinessError("Invalid email or password", 401);
+      if (!session || !session.user) {
+        throw new BusinessError("Not authenticated", 401);
       }
 
       // Fetch complete user data including isAdmin field
       const fullUserData = await this.db
         .select()
         .from(user)
-        .where(eq(user.id, result.user.id))
+        .where(eq(user.id, session.user.id))
         .limit(1);
 
       if (!fullUserData || fullUserData.length === 0) {
@@ -55,23 +47,8 @@ export class AuthController {
         throw new BusinessError("User data not found", 500);
       }
 
-      // Create JWT token manually since Better Auth might be returning session token
-      const jwtPayload = {
-        sub: userData.id,
-        email: userData.email,
-        name: userData.name,
-        isAdmin: userData.isAdmin || false,
-        iat: Math.floor(Date.now() / 1000),
-        exp: Math.floor(Date.now() / 1000) + 60 * 60, // 1 hour
-      };
-
-      const jwtToken = jwt.sign(jwtPayload, env.betterAuthSecret, {
-        algorithm: "HS256",
-      });
-
       res.status(200).json({
         success: true,
-        message: "Login successful",
         data: {
           user: {
             id: userData.id,
@@ -80,7 +57,6 @@ export class AuthController {
             emailVerified: userData.emailVerified,
             isAdmin: userData.isAdmin || false,
           },
-          token: jwtToken,
         },
       });
     } catch (error) {
@@ -88,7 +64,7 @@ export class AuthController {
         throw error;
       }
       throw new BusinessError(
-        error instanceof Error ? error.message : "Login failed",
+        error instanceof Error ? error.message : "Authentication failed",
         401
       );
     }

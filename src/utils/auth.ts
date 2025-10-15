@@ -1,7 +1,6 @@
 import { createClient } from "@libsql/client";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { jwt } from "better-auth/plugins";
 import { drizzle } from "drizzle-orm/libsql";
 import { env } from "../config/env.js";
 import * as schema from "../db/schemas.js";
@@ -18,19 +17,26 @@ export const auth = betterAuth({
     schema: {
       user: schema.user,
       account: schema.account,
-      session: schema.session, // Required even in JWT-only mode
+      session: schema.session,
     },
   }),
   secret: env.betterAuthSecret,
   baseURL: env.betterAuthUrl,
   emailAndPassword: {
     enabled: true,
-    requireEmailVerification: false, // No email verification
+    requireEmailVerification: false, // No email verification for now
   },
-  plugins: [jwt()],
   session: {
-    expiresIn: 60 * 60, // 1 hour in seconds
-    updateAge: 60 * 60, // Don't refresh session - same as expiresIn for no refresh behavior
-    storeSessionInCookie: false, // Use JWT only, no session storage
+    expiresIn: 60 * 60 * 24, // 24 hours
+    updateAge: 60 * 60, // Update session every hour
+    cookieCache: {
+      enabled: true,
+      maxAge: 60 * 5, // Cache for 5 minutes
+    },
+  },
+  advanced: {
+    crossSubDomainCookies: {
+      enabled: false, // Set to true if frontend is on different subdomain
+    },
   },
 });
