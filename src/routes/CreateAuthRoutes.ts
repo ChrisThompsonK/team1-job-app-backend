@@ -10,7 +10,7 @@ export const createAuthRoutes = (authController: AuthController) => {
   // Note: Login is now handled by Better Auth directly at /api/auth/sign-in/email
 
   router.get(
-    "/auth/me",
+    "/profile",
     requireAuth, // Require authentication to get current user
     asyncHandler(authController.getCurrentUser.bind(authController))
   );
