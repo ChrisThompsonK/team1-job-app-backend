@@ -1,6 +1,7 @@
 import { Router } from "express";
 import type { AuthController } from "../controllers/AuthController.js";
 import { asyncHandler } from "../middleware/errorHandler.js";
+import { requireAuth } from "../middleware/authMiddleware.js";
 
 export const createAuthRoutes = (authController: AuthController) => {
   const router = Router();
@@ -9,7 +10,8 @@ export const createAuthRoutes = (authController: AuthController) => {
   // Note: Login is now handled by Better Auth directly at /api/auth/sign-in/email
 
   router.get(
-    "/auth/me",
+    "/api/profile",
+    requireAuth, // Require authentication to get current user
     asyncHandler(authController.getCurrentUser.bind(authController))
   );
 
