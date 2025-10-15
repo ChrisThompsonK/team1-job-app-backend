@@ -1,7 +1,7 @@
 import { sql } from "drizzle-orm";
 import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
-// Better Auth minimal schema for JWT-only email/password authentication
+// Better Auth schema for session-based email/password authentication
 
 // User table - stores user information
 export const user = sqliteTable("user", {
@@ -28,6 +28,25 @@ export const account = sqliteTable("account", {
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
   password: text("password"), // For credential accounts
+  createdAt: integer("createdAt", { mode: "timestamp" })
+    .default(sql`(cast(unixepoch() as integer))`)
+    .notNull(),
+  updatedAt: integer("updatedAt", { mode: "timestamp" })
+    .default(sql`(cast(unixepoch() as integer))`)
+    .$onUpdate(() => new Date())
+    .notNull(),
+});
+
+// Session table - stores active user sessions
+export const session = sqliteTable("session", {
+  id: text("id").primaryKey(),
+  userId: text("userId")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  token: text("token").notNull().unique(),
+  expiresAt: integer("expiresAt", { mode: "timestamp" }).notNull(),
+  ipAddress: text("ipAddress"),
+  userAgent: text("userAgent"),
   createdAt: integer("createdAt", { mode: "timestamp" })
     .default(sql`(cast(unixepoch() as integer))`)
     .notNull(),

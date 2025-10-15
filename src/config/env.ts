@@ -103,7 +103,7 @@ const loadEnvironmentConfig = (): EnvironmentConfig => {
       nodeEnv === "test" ||
       process.env.NODE_ENV === "test" ||
       process.env.VITEST === "true" ||
-      typeof (globalThis as any).it === "function";
+      typeof (globalThis as { it?: unknown }).it === "function";
 
     let betterAuthSecret: string;
     let betterAuthUrl: string;
@@ -137,7 +137,7 @@ const loadEnvironmentConfig = (): EnvironmentConfig => {
     const isTestEnv =
       process.env.NODE_ENV === "test" ||
       process.env.VITEST === "true" ||
-      typeof (globalThis as any).it === "function";
+      typeof (globalThis as { it?: unknown }).it === "function";
 
     if (isTestEnv) {
       // In test environment, throw the error instead of calling process.exit

@@ -1,3 +1,4 @@
+import { AuthController } from "../controllers/AuthController.js";
 import { JobController } from "../controllers/JobController.js";
 import { JobRepository } from "../repositories/JobRepository.js";
 import { JobService } from "../services/JobService.js";
@@ -9,4 +10,7 @@ const jobValidator = new JobValidator();
 const jobService = new JobService(jobRepository, jobValidator);
 const jobController = new JobController(jobService, jobValidator);
 
-export { jobController };
+// Auth controller
+const authController = new AuthController();
+
+export { authController, jobController };
