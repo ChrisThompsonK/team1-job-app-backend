@@ -58,6 +58,15 @@ app.get("/", (_req: Request, res: Response) => {
   });
 });
 
+// Health check endpoint
+app.get("/health", (_req: Request, res: Response) => {
+  res.status(200).json({
+    status: "healthy",
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime()
+  });
+});
+
 // API routes
 app.use("/api", createJobRoutes(jobController));
 app.use("/api", createAuthRoutes(authController));
