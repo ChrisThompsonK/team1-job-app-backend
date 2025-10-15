@@ -93,7 +93,7 @@ describe("JobStatusScheduler", () => {
       expect(scheduler.isRunning()).toBe(true);
       expect(mockJobService.updateExpiredJobRoles).toHaveBeenCalledOnce();
       expect(console.log).toHaveBeenCalledWith(
-        "Starting JobStatusScheduler - will run every 24 hours"
+        "Starting JobStatusScheduler - will run every 86400 seconds"
       );
 
       // Clean up - stop the scheduler to prevent interval from running

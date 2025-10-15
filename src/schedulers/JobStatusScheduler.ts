@@ -1,9 +1,10 @@
+import { env } from "../config/env.js";
 import type { JobService } from "../services/JobService.js";
 
 export class JobStatusScheduler {
   private jobService: JobService;
   private intervalId: NodeJS.Timeout | null = null;
-  private readonly INTERVAL_MS = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+  private readonly INTERVAL_MS = env.jobSchedulerIntervalMs;
 
   constructor(jobService: JobService) {
     this.jobService = jobService;
@@ -11,7 +12,7 @@ export class JobStatusScheduler {
 
   /**
    * Start the scheduler to automatically update expired job roles
-   * Runs once every 24 hours
+   * Runs at intervals configured by JOB_SCHEDULER_INTERVAL_MS environment variable (default: 24 hours)
    * @param runImmediately - Whether to run the update immediately on start (default: true)
    */
   start(runImmediately: boolean = true): void {
@@ -20,7 +21,9 @@ export class JobStatusScheduler {
       return;
     }
 
-    console.log("Starting JobStatusScheduler - will run every 24 hours");
+    console.log(
+      `Starting JobStatusScheduler - will run every ${this.INTERVAL_MS / 1000} seconds`
+    );
 
     // Run immediately on start if requested
     if (runImmediately) {
@@ -30,7 +33,7 @@ export class JobStatusScheduler {
       });
     }
 
-    // Then run every 24 hours
+    // Then run at configured intervals
     this.intervalId = setInterval(() => {
       this.updateExpiredJobs().catch((error) => {
         console.error("Error in scheduled job status update:", error);

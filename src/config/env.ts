@@ -9,6 +9,7 @@ interface EnvironmentConfig {
   corsOrigin: string;
   betterAuthSecret: string;
   betterAuthUrl: string;
+  jobSchedulerIntervalMs: number;
 }
 
 const getEnvVariable = (key: string, defaultValue?: string): string => {
@@ -89,6 +90,16 @@ const validateBetterAuthUrl = (url: string): string => {
   return url;
 };
 
+const validateJobSchedulerInterval = (intervalString: string): number => {
+  const interval = Number.parseInt(intervalString, 10);
+  if (Number.isNaN(interval) || interval < 1000) {
+    throw new Error(
+      `Invalid JOB_SCHEDULER_INTERVAL_MS value: ${intervalString}. Must be a number >= 1000 (minimum 1 second).`
+    );
+  }
+  return interval;
+};
+
 const loadEnvironmentConfig = (): EnvironmentConfig => {
   try {
     const port = validatePort(getEnvVariable("PORT", "3001"));
@@ -97,6 +108,12 @@ const loadEnvironmentConfig = (): EnvironmentConfig => {
     );
     const nodeEnv = validateNodeEnv(getEnvVariable("NODE_ENV", "development"));
     const corsOrigin = getEnvVariable("CORS_ORIGIN", "*");
+
+    // Default to 24 hours (24 * 60 * 60 * 1000 = 86400000ms) for production
+    // For testing/demos, you can set JOB_SCHEDULER_INTERVAL_MS to a smaller value like 30000 (30 seconds)
+    const jobSchedulerIntervalMs = validateJobSchedulerInterval(
+      getEnvVariable("JOB_SCHEDULER_INTERVAL_MS", "86400000")
+    );
 
     // For test environment, provide default values to avoid process.exit
     const isTestEnv =
@@ -132,6 +149,7 @@ const loadEnvironmentConfig = (): EnvironmentConfig => {
       corsOrigin,
       betterAuthSecret,
       betterAuthUrl,
+      jobSchedulerIntervalMs,
     };
   } catch (error) {
     const isTestEnv =
