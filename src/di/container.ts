@@ -1,6 +1,7 @@
 import { AuthController } from "../controllers/AuthController.js";
 import { JobController } from "../controllers/JobController.js";
 import { JobRepository } from "../repositories/JobRepository.js";
+import { JobStatusScheduler } from "../schedulers/JobStatusScheduler.js";
 import { JobService } from "../services/JobService.js";
 import { JobValidator } from "../validators/JobValidator.js";
 
@@ -13,4 +14,7 @@ const jobController = new JobController(jobService, jobValidator);
 // Auth controller
 const authController = new AuthController();
 
-export { authController, jobController };
+// Schedulers
+const jobStatusScheduler = new JobStatusScheduler(jobService);
+
+export { authController, jobController, jobStatusScheduler };

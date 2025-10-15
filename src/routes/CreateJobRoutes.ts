@@ -15,10 +15,6 @@ export const createJobRoutes = (jobController: JobController) => {
     "/jobs/search",
     asyncHandler(jobController.getFilteredJobs.bind(jobController))
   );
-  router.put(
-    "/jobs/update-expired",
-    asyncHandler(jobController.updateExpiredJobRoles.bind(jobController))
-  );
   router.get(
     "/jobs/:id",
     asyncHandler(jobController.getJobById.bind(jobController))
