@@ -1,11 +1,11 @@
 import { Router } from "express";
 import type { JobController } from "../controllers/JobController.js";
-import { asyncHandler } from "../middleware/errorHandler.js";
-import { 
-  requireAuth, 
-  requireAdmin, 
-  optionalAuth 
+import {
+  optionalAuth,
+  requireAdmin,
+  requireAuth,
 } from "../middleware/authMiddleware.js";
+import { asyncHandler } from "../middleware/errorHandler.js";
 
 export const createJobRoutes = (jobController: JobController) => {
   const router = Router();
@@ -41,7 +41,7 @@ export const createJobRoutes = (jobController: JobController) => {
     requireAdmin, // Require admin privileges to edit jobs
     asyncHandler(jobController.editJob.bind(jobController))
   );
-  
+
   // Admin-only routes
   router.delete(
     "/jobs/:id",

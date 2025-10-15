@@ -47,7 +47,9 @@ vi.mock("../utils/auth.js", () => ({
 }));
 
 // Import the middleware after mocking
-const { requireAuth, requireAdmin, optionalAuth } = await import("./authMiddleware.js");
+const { requireAuth, requireAdmin, optionalAuth } = await import(
+  "./authMiddleware.js"
+);
 
 describe("Auth Middleware", () => {
   let mockRequest: Partial<Request>;
@@ -56,7 +58,7 @@ describe("Auth Middleware", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    
+
     mockRequest = {
       headers: {},
     };
@@ -65,7 +67,7 @@ describe("Auth Middleware", () => {
       json: vi.fn(() => mockResponse as Response),
     };
     mockNext = vi.fn();
-    
+
     // Setup database mocking chain
     mockDbSelect.mockReturnValue({
       from: mockDbFrom,
@@ -103,7 +105,7 @@ describe("Auth Middleware", () => {
       await requireAuth(
         mockRequest as Request,
         mockResponse as Response,
-        mockNext,
+        mockNext
       );
 
       expect(mockNext).toHaveBeenCalled();
@@ -118,7 +120,7 @@ describe("Auth Middleware", () => {
       await requireAuth(
         mockRequest as Request,
         mockResponse as Response,
-        mockNext,
+        mockNext
       );
 
       expect(mockResponse.status).toHaveBeenCalledWith(401);
@@ -152,7 +154,7 @@ describe("Auth Middleware", () => {
       await requireAuth(
         mockRequest as Request,
         mockResponse as Response,
-        mockNext,
+        mockNext
       );
 
       expect(mockResponse.status).toHaveBeenCalledWith(401);
@@ -166,7 +168,7 @@ describe("Auth Middleware", () => {
     it("should work with non-admin user", async () => {
       // Mock database to return non-admin user
       mockDbLimit.mockResolvedValueOnce([{ id: "user1", isAdmin: false }]);
-      
+
       mockGetSession.mockResolvedValue({
         user: {
           id: "user1",
@@ -189,7 +191,7 @@ describe("Auth Middleware", () => {
       await requireAuth(
         mockRequest as Request,
         mockResponse as Response,
-        mockNext,
+        mockNext
       );
 
       expect(mockNext).toHaveBeenCalled();
@@ -204,7 +206,7 @@ describe("Auth Middleware", () => {
       await requireAuth(
         mockRequest as Request,
         mockResponse as Response,
-        mockNext,
+        mockNext
       );
 
       expect(mockResponse.status).toHaveBeenCalledWith(401);
@@ -229,7 +231,7 @@ describe("Auth Middleware", () => {
       await requireAdmin(
         mockRequest as Request,
         mockResponse as Response,
-        mockNext,
+        mockNext
       );
 
       expect(mockNext).toHaveBeenCalled();
@@ -239,7 +241,7 @@ describe("Auth Middleware", () => {
       await requireAdmin(
         mockRequest as Request,
         mockResponse as Response,
-        mockNext,
+        mockNext
       );
 
       expect(mockResponse.status).toHaveBeenCalledWith(401);
@@ -262,7 +264,7 @@ describe("Auth Middleware", () => {
       await requireAdmin(
         mockRequest as Request,
         mockResponse as Response,
-        mockNext,
+        mockNext
       );
 
       expect(mockResponse.status).toHaveBeenCalledWith(403);
@@ -298,7 +300,7 @@ describe("Auth Middleware", () => {
       await optionalAuth(
         mockRequest as Request,
         mockResponse as Response,
-        mockNext,
+        mockNext
       );
 
       expect(mockNext).toHaveBeenCalled();
@@ -313,7 +315,7 @@ describe("Auth Middleware", () => {
       await optionalAuth(
         mockRequest as Request,
         mockResponse as Response,
-        mockNext,
+        mockNext
       );
 
       expect(mockNext).toHaveBeenCalled();
@@ -343,7 +345,7 @@ describe("Auth Middleware", () => {
       await optionalAuth(
         mockRequest as Request,
         mockResponse as Response,
-        mockNext,
+        mockNext
       );
 
       expect(mockNext).toHaveBeenCalled();
@@ -356,7 +358,7 @@ describe("Auth Middleware", () => {
       await optionalAuth(
         mockRequest as Request,
         mockResponse as Response,
-        mockNext,
+        mockNext
       );
 
       expect(mockNext).toHaveBeenCalled();

@@ -1,7 +1,7 @@
 import { Router } from "express";
 import type { AuthController } from "../controllers/AuthController.js";
-import { asyncHandler } from "../middleware/errorHandler.js";
 import { requireAuth } from "../middleware/authMiddleware.js";
+import { asyncHandler } from "../middleware/errorHandler.js";
 
 export const createAuthRoutes = (authController: AuthController) => {
   const router = Router();

@@ -1,11 +1,11 @@
 import { createClient } from "@libsql/client";
-import type { NextFunction, Request, Response } from "express";
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/libsql";
+import type { NextFunction, Request, Response } from "express";
 import { env } from "../config/env.js";
 import { user } from "../db/schemas/auth.js";
-import { auth } from "../utils/auth.js";
 import * as schema from "../db/schemas.js";
+import { auth } from "../utils/auth.js";
 
 // Create database connection
 const client = createClient({
@@ -23,7 +23,7 @@ const getUserFromDatabase = async (userId: string) => {
     .from(user)
     .where(eq(user.id, userId))
     .limit(1);
-  
+
   return userRecord;
 };
 
@@ -61,7 +61,7 @@ declare global {
 export const validateSession = async (
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ): Promise<void> => {
   try {
     // Get session from Better Auth
@@ -90,7 +90,7 @@ export const validateSession = async (
 
     // Get full user data from database to include isAdmin field
     const userRecord = await getUserFromDatabase(session.user.id);
-    
+
     // Attach user and session info to request
     req.user = {
       id: session.user.id,
@@ -107,8 +107,12 @@ export const validateSession = async (
       userId: session.session.userId,
       token: session.session.token,
       expiresAt: session.session.expiresAt,
-      ...(session.session.ipAddress && { ipAddress: session.session.ipAddress }),
-      ...(session.session.userAgent && { userAgent: session.session.userAgent }),
+      ...(session.session.ipAddress && {
+        ipAddress: session.session.ipAddress,
+      }),
+      ...(session.session.userAgent && {
+        userAgent: session.session.userAgent,
+      }),
       createdAt: session.session.createdAt,
       updatedAt: session.session.updatedAt,
     };
@@ -136,7 +140,7 @@ export const requireAuth = validateSession;
 export const requireAdmin = async (
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ): Promise<void> => {
   if (!req.user) {
     res.status(401).json({
@@ -164,7 +168,7 @@ export const requireAdmin = async (
 export const optionalAuth = async (
   req: Request,
   _res: Response,
-  next: NextFunction,
+  next: NextFunction
 ): Promise<void> => {
   try {
     // Get session from Better Auth
@@ -179,7 +183,7 @@ export const optionalAuth = async (
       if (now <= expiresAt) {
         // Get full user data from database to include isAdmin field
         const userRecord = await getUserFromDatabase(session.user.id);
-        
+
         // Attach user and session info to request
         req.user = {
           id: session.user.id,
@@ -196,8 +200,12 @@ export const optionalAuth = async (
           userId: session.session.userId,
           token: session.session.token,
           expiresAt: session.session.expiresAt,
-          ...(session.session.ipAddress && { ipAddress: session.session.ipAddress }),
-          ...(session.session.userAgent && { userAgent: session.session.userAgent }),
+          ...(session.session.ipAddress && {
+            ipAddress: session.session.ipAddress,
+          }),
+          ...(session.session.userAgent && {
+            userAgent: session.session.userAgent,
+          }),
           createdAt: session.session.createdAt,
           updatedAt: session.session.updatedAt,
         };
