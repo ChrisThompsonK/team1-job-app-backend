@@ -143,18 +143,20 @@ export class JobController {
   async updateExpiredJobRoles(_req: Request, res: Response): Promise<void> {
     try {
       const result = await this.jobService.updateExpiredJobRoles();
-      
+
       res.status(200).json({
         success: true,
         message: "Expired job roles updated successfully",
         data: {
           updatedCount: result.updatedCount,
-          message: `${result.updatedCount} job role(s) updated to closed status`
-        }
+          message: `${result.updatedCount} job role(s) updated to closed status`,
+        },
       });
     } catch (error) {
       throw new BusinessError(
-        error instanceof Error ? error.message : "Failed to update expired job roles",
+        error instanceof Error
+          ? error.message
+          : "Failed to update expired job roles",
         500
       );
     }

@@ -240,8 +240,8 @@ class DatabaseJobStore {
   }
 
   async updateExpiredJobRoles(): Promise<{ updatedCount: number }> {
-    const today = new Date().toISOString().split('T')[0]; // Get YYYY-MM-DD format
-    
+    const today = new Date().toISOString().split("T")[0]; // Get YYYY-MM-DD format
+
     // Update jobs where status is 'open' and either closing date has passed or no positions available
     const result = await this.db
       .update(jobsTable)
