@@ -1,6 +1,6 @@
+import { toNodeHandler } from "better-auth/node";
 import type { Request, Response } from "express";
 import express from "express";
-import { toNodeHandler } from "better-auth/node";
 import { authController, jobController } from "./di/container.js";
 import { errorHandler, notFoundHandler } from "./middleware/errorHandler.js";
 import { configureMiddleware } from "./middleware/middlewareConfig.js";
