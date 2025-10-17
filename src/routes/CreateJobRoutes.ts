@@ -6,7 +6,7 @@ export const createJobRoutes = (jobController: JobController) => {
   const router = Router();
 
   // Job routes - all wrapped with asyncHandler for error handling
-  // Note: /jobs/search MUST come before /jobs/:id to avoid "search" being treated as an ID
+  // Note: /jobs/search and /jobs/update-expired MUST come before /jobs/:id to avoid being treated as an ID
   router.get(
     "/jobs",
     asyncHandler(jobController.getAllJobs.bind(jobController))
@@ -14,6 +14,10 @@ export const createJobRoutes = (jobController: JobController) => {
   router.get(
     "/jobs/search",
     asyncHandler(jobController.getFilteredJobs.bind(jobController))
+  );
+  router.put(
+    "/jobs/update-expired",
+    asyncHandler(jobController.updateExpiredJobs.bind(jobController))
   );
   router.get(
     "/jobs/:id",

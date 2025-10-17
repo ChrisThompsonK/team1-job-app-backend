@@ -138,4 +138,23 @@ export class JobController {
       );
     }
   }
+
+  // PUT /jobs/update-expired - Update expired job roles
+  async updateExpiredJobs(_req: Request, res: Response): Promise<void> {
+    try {
+      const result = await this.jobService.updateExpiredJobRoles();
+
+      res.status(200).json({
+        success: true,
+        message: `Successfully updated expired job roles`,
+        data: result,
+        updatedCount: result.updatedCount,
+      });
+    } catch (error) {
+      throw new BusinessError(
+        error instanceof Error ? error.message : "Failed to update expired jobs",
+        500
+      );
+    }
+  }
 }
