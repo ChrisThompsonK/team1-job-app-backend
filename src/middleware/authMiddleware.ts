@@ -15,16 +15,17 @@ const client = createClient({
 const db = drizzle(client, { schema });
 
 /**
- * Helper function to get user details from database including isAdmin field
+ * Helper function to get only the isAdmin field from database
+ * Optimized to fetch only what we need since Better Auth already provides user data
  */
-const getUserFromDatabase = async (userId: string) => {
+const getIsAdminStatus = async (userId: string): Promise<boolean> => {
   const [userRecord] = await db
-    .select()
+    .select({ isAdmin: user.isAdmin })
     .from(user)
     .where(eq(user.id, userId))
     .limit(1);
 
-  return userRecord;
+  return userRecord?.isAdmin || false;
 };
 
 // Extend Express Request type to include user information
@@ -64,7 +65,7 @@ export const validateSession = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    // Get session from Better Auth
+    // Get session from Better Auth (this validates the session cookie)
     const session = await auth.api.getSession({
       headers: req.headers as Record<string, string>,
     });
@@ -88,8 +89,9 @@ export const validateSession = async (
       return;
     }
 
-    // Get full user data from database to include isAdmin field
-    const userRecord = await getUserFromDatabase(session.user.id);
+    // Single optimized database query to get only isAdmin status
+    // Better Auth already validated the user exists and provided user data
+    const isAdmin = await getIsAdminStatus(session.user.id);
 
     // Attach user and session info to request
     req.user = {
@@ -97,7 +99,7 @@ export const validateSession = async (
       ...(session.user.name && { name: session.user.name }),
       email: session.user.email,
       emailVerified: session.user.emailVerified || false,
-      isAdmin: userRecord?.isAdmin || false,
+      isAdmin,
       createdAt: session.user.createdAt,
       updatedAt: session.user.updatedAt,
     };
@@ -181,8 +183,8 @@ export const optionalAuth = async (
       const now = new Date();
       const expiresAt = new Date(session.session.expiresAt);
       if (now <= expiresAt) {
-        // Get full user data from database to include isAdmin field
-        const userRecord = await getUserFromDatabase(session.user.id);
+        // Single optimized database query to get only isAdmin status
+        const isAdmin = await getIsAdminStatus(session.user.id);
 
         // Attach user and session info to request
         req.user = {
@@ -190,7 +192,7 @@ export const optionalAuth = async (
           ...(session.user.name && { name: session.user.name }),
           email: session.user.email,
           emailVerified: session.user.emailVerified || false,
-          isAdmin: userRecord?.isAdmin || false,
+          isAdmin,
           createdAt: session.user.createdAt,
           updatedAt: session.user.updatedAt,
         };
