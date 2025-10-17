@@ -152,7 +152,9 @@ export class JobController {
       });
     } catch (error) {
       throw new BusinessError(
-        error instanceof Error ? error.message : "Failed to update expired jobs",
+        error instanceof Error
+          ? error.message
+          : "Failed to update expired jobs",
         500
       );
     }
