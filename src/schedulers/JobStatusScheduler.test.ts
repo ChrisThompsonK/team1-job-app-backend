@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { JobService } from "../services/JobService.js";
 import { JobStatusScheduler } from "./JobStatusScheduler.js";
 
-// Mock node-cron module
+// Mock node-cron module.
 vi.mock("node-cron", () => ({
   schedule: vi.fn(),
 }));
