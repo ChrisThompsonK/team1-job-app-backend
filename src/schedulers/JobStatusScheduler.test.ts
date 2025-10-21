@@ -15,7 +15,7 @@ describe("JobStatusScheduler", () => {
   let mockScheduledTask: Partial<cron.ScheduledTask>;
 
   beforeEach(() => {
-    // Mock the JobService
+    // Mock the JobService.
     mockJobService = {
       updateExpiredJobRoles: vi.fn(),
     } as unknown as JobService;
