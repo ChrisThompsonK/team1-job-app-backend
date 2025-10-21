@@ -6,10 +6,10 @@ export const applicantTable = sqliteTable("Applicants", {
   id: int().primaryKey({ autoIncrement: true }),
   jobRoleID: int()
     .notNull()
-    .references(() => jobsTable.id),
+    .references(() => jobsTable.id, { onDelete: "cascade" }),
   applicantID: text()
     .notNull()
-    .references(() => user.id),
+    .references(() => user.id, { onDelete: "cascade" }),
   applicationStatus: text().default("pending"),
-  appliedAt: text().default(new Date().toISOString()),
+  appliedAt: text().default('sql\CURRENT_TIMESTAMP'),
 });
