@@ -10,11 +10,11 @@ const router = Router();
 router.get("/status", (req, res) => {
   const isRunning = jobScheduler.isRunning();
   const nextRun = jobScheduler.getNextRun();
-  
+
   res.json({
     isRunning,
     nextRun: nextRun ? nextRun.toISOString() : null,
-    message: isRunning ? "Scheduler is running" : "Scheduler is stopped"
+    message: isRunning ? "Scheduler is running" : "Scheduler is stopped",
   });
 });
 
@@ -28,14 +28,14 @@ router.post("/run-now", async (req, res) => {
     res.json({
       success: true,
       message: "Job check completed successfully",
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   } catch (error) {
     console.error("Error running manual job check:", error);
     res.status(500).json({
       success: false,
       message: "Error running job check",
-      error: error instanceof Error ? error.message : "Unknown error"
+      error: error instanceof Error ? error.message : "Unknown error",
     });
   }
 });
