@@ -11,5 +11,5 @@ export const applicantTable = sqliteTable("Applicants", {
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
   applicationStatus: text().default("pending"),
-  appliedAt: text().default('sql\CURRENT_TIMESTAMP'),
+  appliedAt: text().default("sqlCURRENT_TIMESTAMP"),
 });
