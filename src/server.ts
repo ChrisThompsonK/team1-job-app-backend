@@ -9,7 +9,7 @@ app.listen(env.port, () => {
   // Start the job status scheduler
   jobStatusScheduler.start();
   console.log(
-    "Job status scheduler started - will update expired jobs every 24 hours"
+    `Job status scheduler started - using cron expression: ${env.jobSchedulerCronExpression}`
   );
 });
 
