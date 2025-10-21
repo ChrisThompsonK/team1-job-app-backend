@@ -7,7 +7,7 @@ const router = Router();
  * GET /api/scheduler/status
  * Get the current status of the job scheduler
  */
-router.get("/status", (req, res) => {
+router.get("/status", (_req, res) => {
   const isRunning = jobScheduler.isRunning();
   const nextRun = jobScheduler.getNextRun();
 
@@ -22,7 +22,7 @@ router.get("/status", (req, res) => {
  * POST /api/scheduler/run-now
  * Manually trigger a job check (for testing purposes)
  */
-router.post("/run-now", async (req, res) => {
+router.post("/run-now", async (_req, res) => {
   try {
     await jobScheduler.runNow();
     res.json({
