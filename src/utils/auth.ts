@@ -11,6 +11,14 @@ const client = createClient({
 
 const db = drizzle(client, { schema });
 
+const getTrustedOrigins = (): string[] => {
+  if (env.corsOrigin === "*") {
+    // Allow all origins when CORS is set to "*" (development mode)
+    return ["http://localhost:3000", "http://localhost:3001"];
+  }
+  return env.corsOrigin.split(",").map((origin) => origin.trim());
+};
+
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: "sqlite", // LibSQL is SQLite-compatible
@@ -22,7 +30,7 @@ export const auth = betterAuth({
   }),
   secret: env.betterAuthSecret,
   baseURL: env.betterAuthUrl,
-  trustedOrigins: ["http://localhost:3000", "http://localhost:3001"],
+  trustedOrigins: getTrustedOrigins(),
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: false, // No email verification for now
