@@ -30,7 +30,7 @@ app.get("/", (_req: Request, res: Response) => {
       deleteJob: "/api/jobs/:id [DELETE]",
       filteredJobs: "/api/jobs/search",
       login: "/api/auth/sign-in/email [POST]",
-      currentUser: "/api/profile [GET]",
+      currentUser: "/api/auth/me [GET]",
     },
     filtering: {
       endpoint: "/api/jobs/search",

@@ -1,5 +1,6 @@
 import { Router } from "express";
 import type { AuthController } from "../controllers/AuthController.js";
+import { requireAuth } from "../middleware/authMiddleware.js";
 import { asyncHandler } from "../middleware/errorHandler.js";
 
 export const createAuthRoutes = (authController: AuthController) => {
@@ -10,6 +11,7 @@ export const createAuthRoutes = (authController: AuthController) => {
 
   router.get(
     "/profile",
+    requireAuth, // Require authentication to get current user
     asyncHandler(authController.getCurrentUser.bind(authController))
   );
 
