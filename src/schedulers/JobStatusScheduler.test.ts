@@ -1,12 +1,4 @@
-import {
-  afterEach,
-  beforeEach,
-  describe,
-  expect,
-  it,
-  type Mock,
-  vi,
-} from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { JobService } from "../services/JobService.js";
 import { JobStatusScheduler } from "./JobStatusScheduler.js";
 
@@ -20,7 +12,7 @@ import * as cron from "node-cron";
 describe("JobStatusScheduler", () => {
   let mockJobService: JobService;
   let scheduler: JobStatusScheduler;
-  let mockScheduledTask: { stop: Mock };
+  let mockScheduledTask: Partial<cron.ScheduledTask>;
 
   beforeEach(() => {
     // Mock the JobService
@@ -28,13 +20,15 @@ describe("JobStatusScheduler", () => {
       updateExpiredJobRoles: vi.fn(),
     } as unknown as JobService;
 
-    // Mock the scheduled task
+    // Mock the scheduled task with only the methods we need
     mockScheduledTask = {
       stop: vi.fn(),
     };
 
     // Mock cron.schedule to return our mock task
-    vi.mocked(cron.schedule).mockReturnValue(mockScheduledTask as any);
+    vi.mocked(cron.schedule).mockReturnValue(
+      mockScheduledTask as cron.ScheduledTask
+    );
 
     scheduler = new JobStatusScheduler(mockJobService);
 
