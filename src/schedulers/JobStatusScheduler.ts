@@ -1,10 +1,11 @@
-import { env } from "../config/env.js";
+import * as cron from "node-cron";
+import { getJobSchedulerCronExpression } from "../config/env.js";
 import type { JobService } from "../services/JobService.js";
 
 export class JobStatusScheduler {
   private jobService: JobService;
-  private intervalId: NodeJS.Timeout | null = null;
-  private readonly INTERVAL_MS = env.jobSchedulerIntervalMs;
+  private scheduledTask: cron.ScheduledTask | null = null;
+  private readonly CRON_EXPRESSION = getJobSchedulerCronExpression();
 
   constructor(jobService: JobService) {
     this.jobService = jobService;
@@ -12,17 +13,17 @@ export class JobStatusScheduler {
 
   /**
    * Start the scheduler to automatically update expired job roles
-   * Runs at intervals configured by JOB_SCHEDULER_INTERVAL_MS environment variable (default: 24 hours)
+   * Runs at times configured by JOB_SCHEDULER_CRON_EXPRESSION environment variable (default: daily at 1:00 AM)
    * @param runImmediately - Whether to run the update immediately on start (default: true)
    */
   start(runImmediately: boolean = true): void {
-    if (this.intervalId) {
+    if (this.scheduledTask) {
       console.warn("JobStatusScheduler is already running");
       return;
     }
 
     console.log(
-      `Starting JobStatusScheduler - will run every ${this.INTERVAL_MS / 1000} seconds`
+      `Starting JobStatusScheduler with cron expression: ${this.CRON_EXPRESSION}`
     );
 
     // Run immediately on start if requested
@@ -33,21 +34,27 @@ export class JobStatusScheduler {
       });
     }
 
-    // Then run at configured intervals
-    this.intervalId = setInterval(() => {
-      this.updateExpiredJobs().catch((error) => {
-        console.error("Error in scheduled job status update:", error);
-      });
-    }, this.INTERVAL_MS);
+    // Schedule the task using cron
+    this.scheduledTask = cron.schedule(
+      this.CRON_EXPRESSION,
+      () => {
+        this.updateExpiredJobs().catch((error) => {
+          console.error("Error in scheduled job status update:", error);
+        });
+      },
+      {
+        timezone: "UTC",
+      }
+    );
   }
 
   /**
    * Stop the scheduler
    */
   stop(): void {
-    if (this.intervalId) {
-      clearInterval(this.intervalId);
-      this.intervalId = null;
+    if (this.scheduledTask) {
+      this.scheduledTask.stop();
+      this.scheduledTask = null;
       console.log("JobStatusScheduler stopped");
     }
   }
@@ -83,6 +90,6 @@ export class JobStatusScheduler {
    * Check if the scheduler is currently running
    */
   isRunning(): boolean {
-    return this.intervalId !== null;
+    return this.scheduledTask !== null;
   }
 }

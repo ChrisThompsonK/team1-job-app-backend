@@ -1,16 +1,40 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  type Mock,
+  vi,
+} from "vitest";
 import type { JobService } from "../services/JobService.js";
 import { JobStatusScheduler } from "./JobStatusScheduler.js";
+
+// Mock node-cron module
+vi.mock("node-cron", () => ({
+  schedule: vi.fn(),
+}));
+
+import * as cron from "node-cron";
 
 describe("JobStatusScheduler", () => {
   let mockJobService: JobService;
   let scheduler: JobStatusScheduler;
+  let mockScheduledTask: { stop: Mock };
 
   beforeEach(() => {
     // Mock the JobService
     mockJobService = {
       updateExpiredJobRoles: vi.fn(),
     } as unknown as JobService;
+
+    // Mock the scheduled task
+    mockScheduledTask = {
+      stop: vi.fn(),
+    };
+
+    // Mock cron.schedule to return our mock task
+    vi.mocked(cron.schedule).mockReturnValue(mockScheduledTask as any);
 
     scheduler = new JobStatusScheduler(mockJobService);
 
@@ -23,7 +47,6 @@ describe("JobStatusScheduler", () => {
   afterEach(() => {
     scheduler.stop();
     vi.restoreAllMocks();
-    vi.clearAllTimers();
   });
 
   describe("updateExpiredJobs", () => {
@@ -65,18 +88,7 @@ describe("JobStatusScheduler", () => {
   });
 
   describe("start", () => {
-    beforeEach(() => {
-      vi.useFakeTimers();
-    });
-
-    afterEach(() => {
-      vi.useRealTimers();
-    });
-
     it("should start the scheduler and run immediately", async () => {
-      // Use real timers for this test since we need Promise resolution
-      vi.useRealTimers();
-
       // Arrange
       const expectedResult = { updatedCount: 3 };
       vi.mocked(mockJobService.updateExpiredJobRoles).mockResolvedValue(
@@ -92,18 +104,17 @@ describe("JobStatusScheduler", () => {
       // Assert
       expect(scheduler.isRunning()).toBe(true);
       expect(mockJobService.updateExpiredJobRoles).toHaveBeenCalledOnce();
-      expect(console.log).toHaveBeenCalledWith(
-        "Starting JobStatusScheduler - will run every 86400 seconds"
+      expect(cron.schedule).toHaveBeenCalledWith(
+        "0 1 * * *", // Default cron expression
+        expect.any(Function),
+        { timezone: "UTC" }
       );
-
-      // Clean up - stop the scheduler to prevent interval from running
-      scheduler.stop();
-
-      // Return to fake timers for other tests
-      vi.useFakeTimers();
+      expect(console.log).toHaveBeenCalledWith(
+        "Starting JobStatusScheduler with cron expression: 0 1 * * *"
+      );
     });
 
-    it("should run the scheduler every 24 hours", async () => {
+    it("should schedule the cron job correctly", () => {
       // Arrange
       const expectedResult = { updatedCount: 2 };
       vi.mocked(mockJobService.updateExpiredJobRoles).mockResolvedValue(
@@ -113,8 +124,13 @@ describe("JobStatusScheduler", () => {
       // Act - start without immediate execution to avoid test complexity
       scheduler.start(false);
 
-      // Verify scheduler is running
+      // Assert
       expect(scheduler.isRunning()).toBe(true);
+      expect(cron.schedule).toHaveBeenCalledWith(
+        "0 1 * * *", // Default cron expression: daily at 1 AM
+        expect.any(Function),
+        { timezone: "UTC" }
+      );
 
       // No immediate call should have happened
       expect(mockJobService.updateExpiredJobRoles).not.toHaveBeenCalled();
@@ -134,18 +150,11 @@ describe("JobStatusScheduler", () => {
       expect(console.warn).toHaveBeenCalledWith(
         "JobStatusScheduler is already running"
       );
+      expect(cron.schedule).toHaveBeenCalledTimes(1); // Should only be called once
     });
   });
 
   describe("stop", () => {
-    beforeEach(() => {
-      vi.useFakeTimers();
-    });
-
-    afterEach(() => {
-      vi.useRealTimers();
-    });
-
     it("should stop the scheduler", () => {
       // Arrange
       vi.mocked(mockJobService.updateExpiredJobRoles).mockResolvedValue({
@@ -159,6 +168,7 @@ describe("JobStatusScheduler", () => {
 
       // Assert
       expect(scheduler.isRunning()).toBe(false);
+      expect(mockScheduledTask.stop).toHaveBeenCalledOnce();
       expect(console.log).toHaveBeenCalledWith("JobStatusScheduler stopped");
     });
 
