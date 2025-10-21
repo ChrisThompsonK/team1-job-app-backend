@@ -22,6 +22,7 @@ export const auth = betterAuth({
   }),
   secret: env.betterAuthSecret,
   baseURL: env.betterAuthUrl,
+  trustedOrigins: ["http://localhost:3000", "http://localhost:3001"],
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: false, // No email verification for now
