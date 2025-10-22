@@ -238,6 +238,27 @@ class DatabaseJobStore {
       .where(eq(jobsTable.id, Number.parseInt(id, 10)))
       .run();
   }
+
+  async updateExpiredJobRoles(): Promise<{ updatedCount: number }> {
+    const today = new Date().toISOString().split("T")[0]; // Get YYYY-MM-DD format
+
+    // Update jobs where status is 'open' and either closing date has passed or no positions available
+    const result = await this.db
+      .update(jobsTable)
+      .set({ status: JobStatus.CLOSED })
+      .where(
+        and(
+          eq(jobsTable.status, JobStatus.OPEN),
+          or(
+            sql`date(${jobsTable.closingDate}) < date(${sql.placeholder("today")})`,
+            eq(jobsTable.numberOfOpenPositions, 0)
+          )
+        )
+      )
+      .run({ today });
+
+    return { updatedCount: result.rowsAffected };
+  }
 }
 
 // Singleton instance for the database job store
@@ -266,5 +287,9 @@ export class JobRepository {
 
   async deleteJobRole(id: string): Promise<void> {
     await jobStore.deleteJobRole(id);
+  }
+
+  async updateExpiredJobRoles(): Promise<{ updatedCount: number }> {
+    return await jobStore.updateExpiredJobRoles();
   }
 }

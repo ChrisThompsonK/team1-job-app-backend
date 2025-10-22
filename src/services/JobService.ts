@@ -58,4 +58,9 @@ export class JobService {
     const validatedId = this.jobValidator.validateJobId(id);
     await this.jobRepository.deleteJobRole(validatedId);
   }
+
+  // Update expired job roles
+  async updateExpiredJobRoles(): Promise<{ updatedCount: number }> {
+    return await this.jobRepository.updateExpiredJobRoles();
+  }
 }

@@ -6,6 +6,7 @@ import { errorHandler, notFoundHandler } from "./middleware/errorHandler.js";
 import { configureMiddleware } from "./middleware/middlewareConfig.js";
 import { createAuthRoutes } from "./routes/CreateAuthRoutes.js";
 import { createJobRoutes } from "./routes/CreateJobRoutes.js";
+import schedulerRoutes from "./routes/schedulerRoutes.js";
 import { auth } from "./utils/auth.js";
 
 const app = express();
@@ -31,6 +32,8 @@ app.get("/", (_req: Request, res: Response) => {
       filteredJobs: "/api/jobs/search",
       login: "/api/auth/sign-in/email [POST]",
       currentUser: "/api/auth/me [GET]",
+      schedulerStatus: "/api/scheduler/status [GET]",
+      runJobCheck: "/api/scheduler/run-now [POST]",
     },
     filtering: {
       endpoint: "/api/jobs/search",
@@ -58,9 +61,19 @@ app.get("/", (_req: Request, res: Response) => {
   });
 });
 
+// Health check endpoint
+app.get("/health", (_req: Request, res: Response) => {
+  res.status(200).json({
+    status: "healthy",
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+  });
+});
+
 // API routes
 app.use("/api", createJobRoutes(jobController));
 app.use("/api", createAuthRoutes(authController));
+app.use("/api/scheduler", schedulerRoutes);
 
 // Error handling middleware (must be after all routes)
 app.use(notFoundHandler);
