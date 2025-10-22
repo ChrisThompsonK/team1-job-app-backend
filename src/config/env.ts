@@ -135,7 +135,7 @@ const loadEnvironmentConfig = (): EnvironmentConfig => {
     const nodeEnv = validateNodeEnv(getEnvVariable("NODE_ENV", "development"));
     const corsOrigin = getEnvVariable("CORS_ORIGIN", "*");
     const jobSchedulerCronExpression = validateCronExpression(
-      getEnvVariable("JOB_SCHEDULER_CRON_EXPRESSION", "0 3 * * *")
+      getEnvVariable("JOB_SCHEDULER_CRON_EXPRESSION", "0 1 * * *")
     );
 
     // For test environment, provide default values to avoid process.exit
@@ -198,7 +198,7 @@ export const env: EnvironmentConfig = loadEnvironmentConfig();
 
 /**
  * Utility function to get the job scheduler cron expression
- * Default: "0 3 * * *" (runs daily at 3:00 AM UTC)
+ * Default: "0 1 * * *" (runs daily at 1:00 AM UTC)
  * @returns Job scheduler cron expression
  */
 export const getJobSchedulerCronExpression = (): string => {

@@ -9,11 +9,9 @@ const router = Router();
  */
 router.get("/status", (_req, res) => {
   const isRunning = jobScheduler.isRunning();
-  const nextRun = jobScheduler.getNextRun();
 
   res.json({
     isRunning,
-    nextRun: nextRun ? nextRun.toISOString() : null,
     message: isRunning ? "Scheduler is running" : "Scheduler is stopped",
   });
 });
@@ -24,10 +22,11 @@ router.get("/status", (_req, res) => {
  */
 router.post("/run-now", async (_req, res) => {
   try {
-    await jobScheduler.runNow();
+    const result = await jobScheduler.updateExpiredJobs();
     res.json({
       success: true,
       message: "Job check completed successfully",
+      updatedCount: result.updatedCount,
       timestamp: new Date().toISOString(),
     });
   } catch (error) {

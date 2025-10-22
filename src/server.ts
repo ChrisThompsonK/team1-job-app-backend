@@ -8,7 +8,7 @@ app.listen(env.port, () => {
 
   // Start the job scheduler
   jobScheduler.start();
-  console.log("Job scheduler initialized - will run daily at 3:00 AM UTC");
+  console.log("Job scheduler initialized - will run daily at 1:00 AM UTC");
 });
 
 // Graceful shutdown

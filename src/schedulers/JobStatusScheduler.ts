@@ -13,7 +13,7 @@ export class JobStatusScheduler {
 
   /**
    * Start the scheduler to automatically update expired job roles
-   * Runs at times configured by JOB_SCHEDULER_CRON_EXPRESSION environment variable (default: daily at 3:00 AM)
+   * Runs at times configured by JOB_SCHEDULER_CRON_EXPRESSION environment variable (default: daily at 1:00 AM)
    * @param runImmediately - Whether to run the update immediately on start (default: true)
    */
   start(runImmediately: boolean = true): void {
