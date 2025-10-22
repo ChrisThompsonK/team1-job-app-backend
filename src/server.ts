@@ -8,7 +8,9 @@ app.listen(env.port, () => {
 
   // Start the job scheduler
   jobScheduler.start();
-  console.log(`Job scheduler initialized - cron expression: ${getJobSchedulerCronExpression()}`);
+  console.log(
+    `Job scheduler initialized - cron expression: ${getJobSchedulerCronExpression()}`
+  );
 });
 
 // Graceful shutdown
