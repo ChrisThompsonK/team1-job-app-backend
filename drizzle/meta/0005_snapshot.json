@@ -1,8 +1,8 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "4f2b8196-0437-4753-96f0-80086610885c",
-  "prevId": "523de09d-707d-441b-aaf2-f5c28a9f416b",
+  "id": "73c4a926-e0fe-4f68-944a-08d645f151be",
+  "prevId": "4f2b8196-0437-4753-96f0-80086610885c",
   "tables": {
     "Applicants": {
       "name": "Applicants",
@@ -28,6 +28,13 @@
           "notNull": true,
           "autoincrement": false
         },
+        "cvPath": {
+          "name": "cvPath",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
         "applicationStatus": {
           "name": "applicationStatus",
           "type": "text",
@@ -42,7 +49,7 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false,
-          "default": "'2025-10-21T14:42:46.663Z'"
+          "default": "CURRENT_TIMESTAMP"
         }
       },
       "indexes": {},
@@ -53,7 +60,7 @@
           "tableTo": "Job_Roles",
           "columnsFrom": ["jobRoleID"],
           "columnsTo": ["id"],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         },
         "Applicants_applicantID_user_id_fk": {
@@ -62,7 +69,7 @@
           "tableTo": "user",
           "columnsFrom": ["applicantID"],
           "columnsTo": ["id"],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },

@@ -10,6 +10,7 @@ export const applicantTable = sqliteTable("Applicants", {
   applicantID: text()
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
+  cvPath: text().notNull(),
   applicationStatus: text().default("pending"),
-  appliedAt: text().default("sqlCURRENT_TIMESTAMP"),
+  appliedAt: text().default("CURRENT_TIMESTAMP"),
 });
