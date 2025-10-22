@@ -12,6 +12,7 @@ export const createJobRoutes = (jobController: JobController) => {
 
   // Public job routes - no authentication required
   // Note: /jobs/search MUST come before /jobs/:id to avoid "search" being treated as an ID
+
   router.get(
     "/jobs",
     optionalAuth, // Optional auth to potentially show user-specific data
@@ -21,6 +22,10 @@ export const createJobRoutes = (jobController: JobController) => {
     "/jobs/search",
     optionalAuth, // Optional auth for search
     asyncHandler(jobController.getFilteredJobs.bind(jobController))
+  );
+  router.put(
+    "/jobs/update-expired",
+    asyncHandler(jobController.updateExpiredJobs.bind(jobController))
   );
   router.get(
     "/jobs/:id",

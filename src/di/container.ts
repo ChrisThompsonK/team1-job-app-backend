@@ -4,6 +4,7 @@ import { JobController } from "../controllers/JobController.js";
 import { ApplicationRepository } from "../repositories/ApplicationRepository.js";
 import { JobRepository } from "../repositories/JobRepository.js";
 import { ApplicationService } from "../services/ApplicationService.js";
+import { JobStatusScheduler } from "../schedulers/JobStatusScheduler.js";
 import { JobService } from "../services/JobService.js";
 import { JobValidator } from "../validators/JobValidator.js";
 
@@ -27,3 +28,7 @@ const applicationController = new ApplicationController(applicationService);
 const authController = new AuthController();
 
 export { applicationController, authController, jobController };
+// Schedulers
+const jobScheduler = new JobStatusScheduler(jobService);
+
+export { authController, jobController, jobScheduler };

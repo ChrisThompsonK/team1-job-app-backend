@@ -9,6 +9,8 @@ interface EnvironmentConfig {
   corsOrigin: string;
   betterAuthSecret: string;
   betterAuthUrl: string;
+
+  jobSchedulerCronExpression: string;
 }
 
 const getEnvVariable = (key: string, defaultValue?: string): string => {
@@ -89,6 +91,41 @@ const validateBetterAuthUrl = (url: string): string => {
   return url;
 };
 
+const validateCronExpression = (cronExpression: string): string => {
+  if (!cronExpression || cronExpression.trim() === "") {
+    throw new Error("JOB_SCHEDULER_CRON_EXPRESSION cannot be empty");
+  }
+
+  // Basic validation - cron expression should have 5 or 6 parts
+  const parts = cronExpression.trim().split(/\s+/);
+  if (parts.length !== 5 && parts.length !== 6) {
+    throw new Error(
+      `Invalid cron expression: ${cronExpression}. Must have 5 or 6 parts (minute hour day month weekday [year])`
+    );
+  }
+
+  // Basic validation of each part
+  const cronPatterns = [
+    /^(\*|[0-9]|[1-5][0-9]|\/[0-9]+|\*\/[0-9]+|[0-9]+-[0-9]+)$/, // minute (0-59)
+    /^(\*|[0-9]|1[0-9]|2[0-3]|\/[0-9]+|\*\/[0-9]+|[0-9]+-[0-9]+)$/, // hour (0-23)
+    /^(\*|[1-9]|[12][0-9]|3[01]|\/[0-9]+|\*\/[0-9]+|[0-9]+-[0-9]+)$/, // day (1-31)
+    /^(\*|[1-9]|1[0-2]|\/[0-9]+|\*\/[0-9]+|[0-9]+-[0-9]+|JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)$/i, // month (1-12)
+    /^(\*|[0-6]|\/[0-9]+|\*\/[0-9]+|[0-9]+-[0-9]+|SUN|MON|TUE|WED|THU|FRI|SAT)$/i, // weekday (0-6)
+  ];
+
+  for (let i = 0; i < Math.min(parts.length, 5); i++) {
+    const part = parts[i];
+    const pattern = cronPatterns[i];
+    if (!part || !pattern || !pattern.test(part)) {
+      throw new Error(
+        `Invalid cron expression part "${part}" at position ${i + 1} in: ${cronExpression}`
+      );
+    }
+  }
+
+  return cronExpression;
+};
+
 const loadEnvironmentConfig = (): EnvironmentConfig => {
   try {
     const port = validatePort(getEnvVariable("PORT", "3001"));
@@ -97,6 +134,9 @@ const loadEnvironmentConfig = (): EnvironmentConfig => {
     );
     const nodeEnv = validateNodeEnv(getEnvVariable("NODE_ENV", "development"));
     const corsOrigin = getEnvVariable("CORS_ORIGIN", "*");
+    const jobSchedulerCronExpression = validateCronExpression(
+      getEnvVariable("JOB_SCHEDULER_CRON_EXPRESSION", "0 1 * * *")
+    );
 
     // For test environment, provide default values to avoid process.exit
     const isTestEnv =
@@ -132,6 +172,7 @@ const loadEnvironmentConfig = (): EnvironmentConfig => {
       corsOrigin,
       betterAuthSecret,
       betterAuthUrl,
+      jobSchedulerCronExpression,
     };
   } catch (error) {
     const isTestEnv =
@@ -154,3 +195,12 @@ const loadEnvironmentConfig = (): EnvironmentConfig => {
 };
 
 export const env: EnvironmentConfig = loadEnvironmentConfig();
+
+/**
+ * Utility function to get the job scheduler cron expression
+ * Default: "0 1 * * *" (runs daily at 1:00 AM UTC)
+ * @returns Job scheduler cron expression
+ */
+export const getJobSchedulerCronExpression = (): string => {
+  return env.jobSchedulerCronExpression;
+};
