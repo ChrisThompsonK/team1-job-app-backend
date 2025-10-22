@@ -3,8 +3,8 @@ import { AuthController } from "../controllers/AuthController.js";
 import { JobController } from "../controllers/JobController.js";
 import { ApplicationRepository } from "../repositories/ApplicationRepository.js";
 import { JobRepository } from "../repositories/JobRepository.js";
-import { ApplicationService } from "../services/ApplicationService.js";
 import { JobStatusScheduler } from "../schedulers/JobStatusScheduler.js";
+import { ApplicationService } from "../services/ApplicationService.js";
 import { JobService } from "../services/JobService.js";
 import { JobValidator } from "../validators/JobValidator.js";
 
