@@ -5,7 +5,7 @@ CREATE TABLE `__new_Applicants` (
 	`applicantID` text NOT NULL,
 	`cvPath` text NOT NULL,
 	`applicationStatus` text DEFAULT 'pending',
-	`appliedAt` text DEFAULT 'sqlCURRENT_TIMESTAMP',
+	`appliedAt` text DEFAULT CURRENT_TIMESTAMP,
 	FOREIGN KEY (`jobRoleID`) REFERENCES `Job_Roles`(`id`) ON UPDATE no action ON DELETE cascade,
 	FOREIGN KEY (`applicantID`) REFERENCES `user`(`id`) ON UPDATE no action ON DELETE cascade
 );

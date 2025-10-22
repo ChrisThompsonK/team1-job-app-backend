@@ -49,7 +49,7 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false,
-          "default": "'sqlCURRENT_TIMESTAMP'"
+          "default": "CURRENT_TIMESTAMP"
         }
       },
       "indexes": {},
