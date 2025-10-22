@@ -1,2 +1,3 @@
-export * from "./schemas/auth.js";
-export * from "./schemas/jobs.js";
+export * from "./schemas/applications";
+export * from "./schemas/auth";
+export * from "./schemas/jobs";
