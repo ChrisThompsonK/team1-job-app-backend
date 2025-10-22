@@ -7,6 +7,11 @@ vi.mock("node-cron", () => ({
   schedule: vi.fn(),
 }));
 
+// Mock the environment configuration
+vi.mock("../config/env.js", () => ({
+  getJobSchedulerCronExpression: vi.fn(() => "0 3 * * *"),
+}));
+
 import * as cron from "node-cron";
 
 describe("JobStatusScheduler", () => {
@@ -99,12 +104,12 @@ describe("JobStatusScheduler", () => {
       expect(scheduler.isRunning()).toBe(true);
       expect(mockJobService.updateExpiredJobRoles).toHaveBeenCalledOnce();
       expect(cron.schedule).toHaveBeenCalledWith(
-        "0 1 * * *", // Default cron expression
+        "0 3 * * *", // Default cron expression
         expect.any(Function),
         { timezone: "UTC" }
       );
       expect(console.log).toHaveBeenCalledWith(
-        "Starting JobStatusScheduler with cron expression: 0 1 * * *"
+        "Starting JobStatusScheduler with cron expression: 0 3 * * *"
       );
     });
 
@@ -121,7 +126,7 @@ describe("JobStatusScheduler", () => {
       // Assert
       expect(scheduler.isRunning()).toBe(true);
       expect(cron.schedule).toHaveBeenCalledWith(
-        "0 1 * * *", // Default cron expression: daily at 1 AM
+        "0 3 * * *", // Default cron expression: daily at 3 AM
         expect.any(Function),
         { timezone: "UTC" }
       );
