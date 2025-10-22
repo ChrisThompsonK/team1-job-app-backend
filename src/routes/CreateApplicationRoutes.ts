@@ -1,17 +1,27 @@
 import path from "node:path";
+import type { Request } from "express";
 import { Router } from "express";
-import multer from "multer";
+import multer, { type FileFilterCallback } from "multer";
+import "../types/express.js";
 import type { ApplicationController } from "../controllers/ApplicationController.js";
 import { requireAdmin, requireAuth } from "../middleware/authMiddleware.js";
 import { asyncHandler } from "../middleware/errorHandler.js";
 
 // Configure multer for CV file uploads
 const storage = multer.diskStorage({
-  destination: (_req, _file, cb) => {
+  destination: (
+    _req: Request,
+    _file: Express.Multer.File,
+    cb: (error: Error | null, destination: string) => void
+  ) => {
     // Store uploaded CVs in the 'uploads/cvs' directory
     cb(null, "uploads/cvs");
   },
-  filename: (_req, file, cb) => {
+  filename: (
+    _req: Request,
+    file: Express.Multer.File,
+    cb: (error: Error | null, filename: string) => void
+  ) => {
     // Generate unique filename with timestamp and original extension
     const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
     const ext = path.extname(file.originalname);
@@ -21,9 +31,9 @@ const storage = multer.diskStorage({
 
 // File filter to allow only PDF, DOC, and DOCX files
 const fileFilter = (
-  _req: Express.Request,
+  _req: Request,
   file: Express.Multer.File,
-  cb: multer.FileFilterCallback
+  cb: FileFilterCallback
 ) => {
   const allowedMimes = [
     "application/pdf",

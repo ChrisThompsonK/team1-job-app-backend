@@ -1,4 +1,5 @@
 import type { Request, Response } from "express";
+import "../types/express.js";
 import { BusinessError, NotFoundError } from "../middleware/errorHandler.js";
 import type { ApplicationService } from "../services/ApplicationService.js";
 

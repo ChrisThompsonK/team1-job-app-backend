@@ -27,8 +27,7 @@ const applicationController = new ApplicationController(applicationService);
 // Auth controller
 const authController = new AuthController();
 
-export { applicationController, authController, jobController };
 // Schedulers
 const jobScheduler = new JobStatusScheduler(jobService);
 
-export { authController, jobController, jobScheduler };
+export { applicationController, authController, jobController, jobScheduler };
