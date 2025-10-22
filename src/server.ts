@@ -1,5 +1,5 @@
 import app from "./app.js";
-import { env } from "./config/env.js";
+import { env, getJobSchedulerCronExpression } from "./config/env.js";
 import { jobScheduler } from "./di/container.js";
 
 app.listen(env.port, () => {
@@ -8,7 +8,7 @@ app.listen(env.port, () => {
 
   // Start the job scheduler
   jobScheduler.start();
-  console.log("Job scheduler initialized - will run daily at 1:00 AM UTC");
+  console.log(`Job scheduler initialized - cron expression: ${getJobSchedulerCronExpression()}`);
 });
 
 // Graceful shutdown
