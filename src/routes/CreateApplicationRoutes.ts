@@ -2,7 +2,6 @@ import path from "node:path";
 import type { Request } from "express";
 import { Router } from "express";
 import multer, { type FileFilterCallback } from "multer";
-import "../types/express.js";
 import type { ApplicationController } from "../controllers/ApplicationController.js";
 import { requireAdmin, requireAuth } from "../middleware/authMiddleware.js";
 import { asyncHandler } from "../middleware/errorHandler.js";
