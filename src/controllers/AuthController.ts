@@ -74,6 +74,8 @@ export class AuthController {
         phoneNumber: string | null;
         address: string | null;
       } | null = null;
+      const responseMessages: string[] = [];
+
       // Check if email already exists (if updating email)
       if (validatedData.emailUpdate) {
         const [existingUser] = await db
@@ -89,7 +91,6 @@ export class AuthController {
 
       // Handle basic fields update (name, phone, address)
       if (Object.keys(validatedData.basicFields).length > 0) {
-
         // Update basic fields in database
         const updateData: {
           name?: string;
