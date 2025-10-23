@@ -1,7 +1,7 @@
 import { Router } from "express";
 import type { ChatController } from "../controllers/ChatController.js";
-import { asyncHandler } from "../middleware/errorHandler.js";
 import { requireAuth } from "../middleware/authMiddleware.js";
+import { asyncHandler } from "../middleware/errorHandler.js";
 
 export const createChatRoutes = (chatController: ChatController) => {
   const router = Router();

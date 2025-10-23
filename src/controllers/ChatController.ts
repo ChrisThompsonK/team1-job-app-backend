@@ -55,7 +55,7 @@ export class ChatController {
       // Use node-fetch with custom https agent to bypass SSL verification
       const nodeFetch = (await import("node-fetch")).default;
       const https = await import("https");
-      
+
       const httpsAgent = new https.Agent({
         rejectUnauthorized: false, // Disable SSL verification for development
       });
@@ -101,7 +101,10 @@ export class ChatController {
         data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
 
       if (!assistantMessage) {
-        console.error("No text in Gemini response. Full response:", JSON.stringify(data, null, 2));
+        console.error(
+          "No text in Gemini response. Full response:",
+          JSON.stringify(data, null, 2)
+        );
         console.error("Finish reason:", data.candidates?.[0]?.finishReason);
         throw new BusinessError(
           `No response text from AI service. Finish reason: ${data.candidates?.[0]?.finishReason || "unknown"}`,
