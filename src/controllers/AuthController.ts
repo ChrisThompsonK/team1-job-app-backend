@@ -1,12 +1,12 @@
-import type { Request, Response } from "express";
 import { createClient } from "@libsql/client";
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/libsql";
+import type { Request, Response } from "express";
 import { env } from "../config/env.js";
 import { user } from "../db/schemas/auth.js";
 import * as schema from "../db/schemas.js";
-import { auth } from "../utils/auth.js";
 import { BusinessError } from "../middleware/errorHandler.js";
+import { auth } from "../utils/auth.js";
 import { ProfileValidator } from "../validators/ProfileValidator.js";
 
 // Create database connection
@@ -61,7 +61,9 @@ export class AuthController {
       }
 
       // Validate the update request using ProfileValidator
-      const validatedData = this.profileValidator.validateProfileUpdate(req.body);
+      const validatedData = this.profileValidator.validateProfileUpdate(
+        req.body
+      );
 
       let updatedUser: {
         id: string;
@@ -100,10 +102,7 @@ export class AuthController {
           updatedAt: new Date(),
         };
 
-        await db
-          .update(user)
-          .set(updateData)
-          .where(eq(user.id, req.user.id));
+        await db.update(user).set(updateData).where(eq(user.id, req.user.id));
 
         responseMessages.push("Profile information updated successfully");
       }
@@ -119,7 +118,10 @@ export class AuthController {
           });
           responseMessages.push("Email updated successfully");
         } catch (_authError) {
-          throw new BusinessError("Failed to update email. Please check your current password.", 400);
+          throw new BusinessError(
+            "Failed to update email. Please check your current password.",
+            400
+          );
         }
       }
 
@@ -135,7 +137,10 @@ export class AuthController {
           });
           responseMessages.push("Password updated successfully");
         } catch (_authError) {
-          throw new BusinessError("Failed to update password. Please check your current password.", 400);
+          throw new BusinessError(
+            "Failed to update password. Please check your current password.",
+            400
+          );
         }
       }
 

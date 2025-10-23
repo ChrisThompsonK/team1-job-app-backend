@@ -18,13 +18,15 @@ const db = drizzle(client, { schema });
  * Helper function to get additional user fields from database
  * Optimized to fetch only what we need since Better Auth already provides basic user data
  */
-const getUserAdditionalFields = async (userId: string): Promise<{
+const getUserAdditionalFields = async (
+  userId: string
+): Promise<{
   isAdmin: boolean;
   phoneNumber?: string;
   address?: string;
 }> => {
   const [userRecord] = await db
-    .select({ 
+    .select({
       isAdmin: user.isAdmin,
       phoneNumber: user.phoneNumber,
       address: user.address,
@@ -114,7 +116,9 @@ export const validateSession = async (
       email: session.user.email,
       emailVerified: session.user.emailVerified || false,
       isAdmin: additionalFields.isAdmin,
-      ...(additionalFields.phoneNumber && { phoneNumber: additionalFields.phoneNumber }),
+      ...(additionalFields.phoneNumber && {
+        phoneNumber: additionalFields.phoneNumber,
+      }),
       ...(additionalFields.address && { address: additionalFields.address }),
       createdAt: session.user.createdAt,
       updatedAt: session.user.updatedAt,
@@ -209,8 +213,12 @@ export const optionalAuth = async (
           email: session.user.email,
           emailVerified: session.user.emailVerified || false,
           isAdmin: additionalFields.isAdmin,
-          ...(additionalFields.phoneNumber && { phoneNumber: additionalFields.phoneNumber }),
-          ...(additionalFields.address && { address: additionalFields.address }),
+          ...(additionalFields.phoneNumber && {
+            phoneNumber: additionalFields.phoneNumber,
+          }),
+          ...(additionalFields.address && {
+            address: additionalFields.address,
+          }),
           createdAt: session.user.createdAt,
           updatedAt: session.user.updatedAt,
         };

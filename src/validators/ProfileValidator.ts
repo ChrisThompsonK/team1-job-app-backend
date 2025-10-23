@@ -49,9 +49,10 @@ export class ProfileValidator {
     };
 
     // Check if any valid fields are provided
-    const hasBasicFields = data.name !== undefined || 
-                          data.phoneNumber !== undefined || 
-                          data.address !== undefined;
+    const hasBasicFields =
+      data.name !== undefined ||
+      data.phoneNumber !== undefined ||
+      data.address !== undefined;
     const hasEmailUpdate = data.email !== undefined;
     const hasPasswordUpdate = data.newPassword !== undefined;
 
@@ -84,7 +85,7 @@ export class ProfileValidator {
    * @throws Error if validation fails
    */
   private validateBasicFields(
-    data: ProfileUpdateRequest, 
+    data: ProfileUpdateRequest,
     basicFields: ValidatedProfileUpdate["basicFields"]
   ): void {
     // Validate name
@@ -228,10 +229,12 @@ export class ProfileValidator {
     // Allow various phone number formats
     // Remove common formatting characters for validation
     const cleanPhone = phoneNumber.replace(/[\s\-()+]/g, "");
-    
+
     // Check if it contains only digits after cleaning
     if (!/^\d+$/.test(cleanPhone)) {
-      throw new Error("Phone number can only contain digits, spaces, dashes, parentheses, and plus sign");
+      throw new Error(
+        "Phone number can only contain digits, spaces, dashes, parentheses, and plus sign"
+      );
     }
 
     // Check length (international numbers can be 7-15 digits)
@@ -259,7 +262,9 @@ export class ProfileValidator {
     const hasNumber = /\d/.test(password);
 
     if (!hasLetter || !hasNumber) {
-      throw new Error("Password must contain at least one letter and one number");
+      throw new Error(
+        "Password must contain at least one letter and one number"
+      );
     }
   }
 }
