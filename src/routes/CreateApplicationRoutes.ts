@@ -94,6 +94,19 @@ export const createApplicationRoutes = (
   );
 
   /**
+   * GET /applications - Get all applications with details (admin only)
+   * Requires admin authentication
+   */
+  router.get(
+    "/applications",
+    requireAuth,
+    requireAdmin,
+    asyncHandler(
+      applicationController.getAllApplications.bind(applicationController)
+    )
+  );
+
+  /**
    * GET /applications/job/:jobId - Get all applications for a specific job
    * Requires admin privileges
    */

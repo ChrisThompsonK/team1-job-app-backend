@@ -3,6 +3,8 @@ import { and, eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/libsql";
 import { env } from "../config/env.js";
 import { applicantTable } from "../db/schemas/applications.js";
+import { user } from "../db/schemas/auth.js";
+import { jobsTable } from "../db/schemas/jobs.js";
 import * as schema from "../db/schemas.js";
 
 const client = createClient({
@@ -24,6 +26,24 @@ export interface Application {
   cvPath: string;
   applicationStatus: string | null;
   appliedAt: string | null;
+}
+
+export interface ApplicationWithDetails {
+  id: number;
+  jobRoleID: number;
+  applicantID: string;
+  cvPath: string;
+  applicationStatus: string | null;
+  appliedAt: string | null;
+  jobRoleName: string;
+  jobDescription: string;
+  jobBand: string;
+  jobCapability: string;
+  jobClosingDate: string;
+  jobLocation: string;
+  jobStatus: string;
+  applicantName: string | null;
+  applicantEmail: string;
 }
 
 /**
@@ -99,5 +119,33 @@ export class ApplicationRepository {
       .limit(1);
 
     return application || null;
+  }
+
+  /**
+   * Get all applications with job and user details (admin only)
+   */
+  async getAllApplicationsWithDetails(): Promise<ApplicationWithDetails[]> {
+    return await db
+      .select({
+        id: applicantTable.id,
+        jobRoleID: applicantTable.jobRoleID,
+        applicantID: applicantTable.applicantID,
+        cvPath: applicantTable.cvPath,
+        applicationStatus: applicantTable.applicationStatus,
+        appliedAt: applicantTable.appliedAt,
+        jobRoleName: jobsTable.jobRoleName,
+        jobDescription: jobsTable.description,
+        jobBand: jobsTable.band,
+        jobCapability: jobsTable.capability,
+        jobClosingDate: jobsTable.closingDate,
+        jobLocation: jobsTable.location,
+        jobStatus: jobsTable.status,
+        applicantName: user.name,
+        applicantEmail: user.email,
+      })
+      .from(applicantTable)
+      .innerJoin(jobsTable, eq(applicantTable.jobRoleID, jobsTable.id))
+      .innerJoin(user, eq(applicantTable.applicantID, user.id))
+      .orderBy(applicantTable.appliedAt);
   }
 }

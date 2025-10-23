@@ -47,6 +47,7 @@ app.get("/", (_req: Request, res: Response) => {
       applications: {
         applyToJob: "/api/applications [POST] (requires auth)",
         getMyApplications: "/api/applications/me [GET] (requires auth)",
+        getAllApplications: "/api/applications [GET] (requires auth & admin)",
         getApplicationById: "/api/applications/:id [GET] (requires auth)",
         getJobApplications:
           "/api/applications/job/:jobId [GET] (requires auth & admin)",
