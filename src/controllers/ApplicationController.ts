@@ -158,4 +158,37 @@ export class ApplicationController {
       data: application,
     });
   }
+
+  /**
+   * GET /applications - Get all applications with details (admin only)
+   * Requires admin authentication
+   */
+  async getAllApplications(req: Request, res: Response): Promise<void> {
+    if (!req.user) {
+      throw new BusinessError("Authentication required", 401);
+    }
+
+    if (!req.user.isAdmin) {
+      throw new BusinessError("Admin privileges required", 403);
+    }
+
+    try {
+      const applications =
+        await this.applicationService.getAllApplicationsWithDetails();
+
+      res.status(200).json({
+        success: true,
+        message: "All applications retrieved successfully",
+        data: applications,
+        count: applications.length,
+      });
+    } catch (error) {
+      throw new BusinessError(
+        error instanceof Error
+          ? error.message
+          : "Failed to retrieve applications",
+        500
+      );
+    }
+  }
 }

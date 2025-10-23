@@ -1,6 +1,7 @@
 import type {
   Application,
   ApplicationRepository,
+  ApplicationWithDetails,
   CreateApplicationData,
 } from "../repositories/ApplicationRepository.js";
 import type { JobRepository } from "../repositories/JobRepository.js";
@@ -80,5 +81,12 @@ export class ApplicationService {
    */
   async getApplicationById(id: number): Promise<Application | null> {
     return await this.applicationRepository.getApplicationById(id);
+  }
+
+  /**
+   * Get all applications with job and user details (admin only)
+   */
+  async getAllApplicationsWithDetails(): Promise<ApplicationWithDetails[]> {
+    return await this.applicationRepository.getAllApplicationsWithDetails();
   }
 }
