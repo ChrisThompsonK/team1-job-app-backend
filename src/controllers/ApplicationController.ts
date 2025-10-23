@@ -112,8 +112,11 @@ export class ApplicationController {
         count: applications.length,
       });
     } catch (error) {
-      throw new NotFoundError(
-        error instanceof Error ? error.message : "Job not found"
+      throw new BusinessError(
+        error instanceof Error
+          ? error.message
+          : "Failed to retrieve job applications",
+        500
       );
     }
   }
@@ -163,7 +166,7 @@ export class ApplicationController {
    * GET /applications - Get all applications with details (admin only)
    * Requires admin authentication
    */
-  async getAllApplications(req: Request, res: Response): Promise<void> {
+  async getAllApplications(_req: Request, res: Response): Promise<void> {
     try {
       const applications =
         await this.applicationService.getAllApplicationsWithDetails();
