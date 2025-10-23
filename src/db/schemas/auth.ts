@@ -10,6 +10,8 @@ export const user = sqliteTable("user", {
   email: text("email").notNull().unique(),
   emailVerified: integer("emailVerified", { mode: "boolean" }).default(false),
   isAdmin: integer("isAdmin", { mode: "boolean" }).default(false),
+  phoneNumber: text("phoneNumber"), // Optional phone number
+  address: text("address"), // Optional address
   createdAt: integer("createdAt", { mode: "timestamp" })
     .default(sql`(cast(unixepoch() as integer))`)
     .notNull(),

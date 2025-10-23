@@ -15,17 +15,31 @@ const client = createClient({
 const db = drizzle(client, { schema });
 
 /**
- * Helper function to get only the isAdmin field from database
- * Optimized to fetch only what we need since Better Auth already provides user data
+ * Helper function to get additional user fields from database
+ * Optimized to fetch only what we need since Better Auth already provides basic user data
  */
-const getIsAdminStatus = async (userId: string): Promise<boolean> => {
+const getUserAdditionalFields = async (
+  userId: string
+): Promise<{
+  isAdmin: boolean;
+  phoneNumber?: string;
+  address?: string;
+}> => {
   const [userRecord] = await db
-    .select({ isAdmin: user.isAdmin })
+    .select({
+      isAdmin: user.isAdmin,
+      phoneNumber: user.phoneNumber,
+      address: user.address,
+    })
     .from(user)
     .where(eq(user.id, userId))
     .limit(1);
 
-  return userRecord?.isAdmin || false;
+  return {
+    isAdmin: userRecord?.isAdmin || false,
+    ...(userRecord?.phoneNumber && { phoneNumber: userRecord.phoneNumber }),
+    ...(userRecord?.address && { address: userRecord.address }),
+  };
 };
 
 // Extend Express Request type to include user information
@@ -38,6 +52,8 @@ declare global {
         email: string;
         emailVerified?: boolean;
         isAdmin?: boolean;
+        phoneNumber?: string;
+        address?: string;
         createdAt: Date;
         updatedAt: Date;
       };
@@ -89,9 +105,9 @@ export const validateSession = async (
       return;
     }
 
-    // Single optimized database query to get only isAdmin status
+    // Single optimized database query to get additional user fields
     // Better Auth already validated the user exists and provided user data
-    const isAdmin = await getIsAdminStatus(session.user.id);
+    const additionalFields = await getUserAdditionalFields(session.user.id);
 
     // Attach user and session info to request
     req.user = {
@@ -99,7 +115,11 @@ export const validateSession = async (
       ...(session.user.name && { name: session.user.name }),
       email: session.user.email,
       emailVerified: session.user.emailVerified || false,
-      isAdmin,
+      isAdmin: additionalFields.isAdmin,
+      ...(additionalFields.phoneNumber && {
+        phoneNumber: additionalFields.phoneNumber,
+      }),
+      ...(additionalFields.address && { address: additionalFields.address }),
       createdAt: session.user.createdAt,
       updatedAt: session.user.updatedAt,
     };
@@ -183,8 +203,8 @@ export const optionalAuth = async (
       const now = new Date();
       const expiresAt = new Date(session.session.expiresAt);
       if (now <= expiresAt) {
-        // Single optimized database query to get only isAdmin status
-        const isAdmin = await getIsAdminStatus(session.user.id);
+        // Single optimized database query to get additional user fields
+        const additionalFields = await getUserAdditionalFields(session.user.id);
 
         // Attach user and session info to request
         req.user = {
@@ -192,7 +212,13 @@ export const optionalAuth = async (
           ...(session.user.name && { name: session.user.name }),
           email: session.user.email,
           emailVerified: session.user.emailVerified || false,
-          isAdmin,
+          isAdmin: additionalFields.isAdmin,
+          ...(additionalFields.phoneNumber && {
+            phoneNumber: additionalFields.phoneNumber,
+          }),
+          ...(additionalFields.address && {
+            address: additionalFields.address,
+          }),
           createdAt: session.user.createdAt,
           updatedAt: session.user.updatedAt,
         };
