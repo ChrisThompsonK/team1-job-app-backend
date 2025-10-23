@@ -1,23 +1,19 @@
 import type { Request, Response } from "express";
-import OpenAI from "openai";
 import { BusinessError } from "../middleware/errorHandler.js";
 
 export class ChatController {
-  private openai: OpenAI | null = null;
+  private apiKey: string | null = null;
 
   constructor() {
-    // Initialize OpenAI client only if API key is provided
-    const apiKey = process.env.OPENAI_API_KEY;
-    if (apiKey) {
-      this.openai = new OpenAI({ apiKey });
-    }
+    // Store API key if provided
+    this.apiKey = process.env.GEMINI_API_KEY || null;
   }
 
   // POST /chat - Send a message to the chatbot
   async sendMessage(req: Request, res: Response): Promise<void> {
-    if (!this.openai) {
+    if (!this.apiKey) {
       throw new BusinessError(
-        "OpenAI API key is not configured. Please add OPENAI_API_KEY to your environment variables.",
+        "Gemini API key is not configured. Please add GEMINI_API_KEY to your environment variables.",
         503
       );
     }
@@ -33,39 +29,87 @@ export class ChatController {
     }
 
     try {
-      // Build messages array with system prompt, conversation history, and new message
-      const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [
-        {
-          role: "system",
-          content:
-            "You are a helpful assistant for a job application platform. You help users with questions about job applications, job listings, application status, and general platform navigation. Be professional, concise, and friendly.",
-        },
-      ];
+      // Build conversation prompt
+      let prompt =
+        "You are a helpful assistant for a job application platform. You help users with questions about job applications, job listings, application status, and general platform navigation. Be professional, concise, and friendly.\n\n";
 
       // Add conversation history if provided
       if (conversationHistory && conversationHistory.length > 0) {
-        messages.push(...conversationHistory);
+        for (const msg of conversationHistory) {
+          if (msg.role === "user") {
+            prompt += `User: ${msg.content}\n`;
+          } else if (msg.role === "assistant") {
+            prompt += `Assistant: ${msg.content}\n`;
+          }
+        }
       }
 
       // Add the new user message
-      messages.push({
-        role: "user",
-        content: message,
+      prompt += `User: ${message}\nAssistant:`;
+
+      console.log("Calling Gemini API via REST...");
+
+      // Call Gemini REST API directly (using v1 endpoint with gemini-2.5-flash)
+      const apiUrl = `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${this.apiKey}`;
+
+      // Use node-fetch with custom https agent to bypass SSL verification
+      const nodeFetch = (await import("node-fetch")).default;
+      const https = await import("https");
+      
+      const httpsAgent = new https.Agent({
+        rejectUnauthorized: false, // Disable SSL verification for development
       });
 
-      // Call OpenAI API
-      const completion = await this.openai.chat.completions.create({
-        model: "gpt-3.5-turbo",
-        messages: messages,
-        max_tokens: 500,
-        temperature: 0.7,
+      const response = await nodeFetch(apiUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [
+                {
+                  text: prompt,
+                },
+              ],
+            },
+          ],
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 2048, // Increased to allow for internal reasoning + response
+          },
+        }),
+        agent: httpsAgent,
       });
 
-      const assistantMessage = completion.choices[0]?.message?.content;
+      console.log("Gemini API response status:", response.status);
+
+      const responseText = await response.text();
+      console.log("Gemini API raw response:", responseText);
+
+      if (!response.ok) {
+        console.error("Gemini API error response:", responseText);
+        throw new BusinessError(
+          `Gemini API error (${response.status}): ${responseText}`,
+          503
+        );
+      }
+
+      const data = JSON.parse(responseText);
+      const assistantMessage =
+        data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
 
       if (!assistantMessage) {
-        throw new BusinessError("No response received from AI service", 500);
+        console.error("No text in Gemini response. Full response:", JSON.stringify(data, null, 2));
+        console.error("Finish reason:", data.candidates?.[0]?.finishReason);
+        throw new BusinessError(
+          `No response text from AI service. Finish reason: ${data.candidates?.[0]?.finishReason || "unknown"}`,
+          500
+        );
       }
+
+      console.log("Successfully generated response");
 
       res.status(200).json({
         success: true,
@@ -75,15 +119,17 @@ export class ChatController {
           role: "assistant",
         },
       });
-    } catch (error) {
-      // Handle OpenAI API errors
-      if (error instanceof OpenAI.APIError) {
-        throw new BusinessError(
-          `OpenAI API error: ${error.message}`,
-          error.status || 500
-        );
+    } catch (error: any) {
+      console.error("Gemini API error:", error);
+
+      if (error instanceof BusinessError) {
+        throw error;
       }
-      throw error;
+
+      throw new BusinessError(
+        `AI service error: ${error instanceof Error ? error.message : "Unknown error"}`,
+        500
+      );
     }
   }
 }
