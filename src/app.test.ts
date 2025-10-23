@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { Band, Capability, type Job, JobStatus } from "./models/JobModel";
+import { Band, Capability, type Job, JobStatus } from "./models/JobModel.js";
 
 describe("Job Application Backend API", () => {
   let mockRequest: Partial<Request>;

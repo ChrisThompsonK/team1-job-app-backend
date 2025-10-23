@@ -1,7 +1,7 @@
 import { createClient } from "@libsql/client";
 import { drizzle } from "drizzle-orm/libsql";
 import { env } from "../../config/env.js";
-import { comprehensiveJobSeeds, jobRolesTable, runAuthSeeds } from "./index";
+import { comprehensiveJobSeeds, jobRolesTable, runAuthSeeds } from "./index.js";
 
 const client = createClient({
   url: env.databaseUrl,
