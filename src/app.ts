@@ -4,12 +4,14 @@ import express from "express";
 import {
   applicationController,
   authController,
+  chatController,
   jobController,
 } from "./di/container.js";
 import { errorHandler, notFoundHandler } from "./middleware/errorHandler.js";
 import { configureMiddleware } from "./middleware/middlewareConfig.js";
 import { createApplicationRoutes } from "./routes/CreateApplicationRoutes.js";
 import { createAuthRoutes } from "./routes/CreateAuthRoutes.js";
+import { createChatRoutes } from "./routes/CreateChatRoutes.js";
 import { createJobRoutes } from "./routes/CreateJobRoutes.js";
 import schedulerRoutes from "./routes/schedulerRoutes.js";
 import { auth } from "./utils/auth.js";
@@ -91,6 +93,7 @@ app.get("/health", (_req: Request, res: Response) => {
 app.use("/api", createJobRoutes(jobController));
 app.use("/api", createAuthRoutes(authController));
 app.use("/api", createApplicationRoutes(applicationController));
+app.use("/api", createChatRoutes(chatController));
 app.use("/api/scheduler", schedulerRoutes);
 
 // Error handling middleware (must be after all routes)

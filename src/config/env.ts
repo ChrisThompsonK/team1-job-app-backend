@@ -11,6 +11,7 @@ interface EnvironmentConfig {
   betterAuthUrl: string;
 
   jobSchedulerCronExpression: string;
+  openaiApiKey?: string; // Optional - chatbot will be disabled if not provided
 }
 
 const getEnvVariable = (key: string, defaultValue?: string): string => {
@@ -165,6 +166,9 @@ const loadEnvironmentConfig = (): EnvironmentConfig => {
       betterAuthUrl = validateBetterAuthUrl(getEnvVariable("BETTER_AUTH_URL"));
     }
 
+    // OpenAI API Key is optional - chatbot will be disabled if not provided
+    const openaiApiKey = process.env.OPENAI_API_KEY || undefined;
+
     return {
       port,
       databaseUrl,
@@ -173,6 +177,7 @@ const loadEnvironmentConfig = (): EnvironmentConfig => {
       betterAuthSecret,
       betterAuthUrl,
       jobSchedulerCronExpression,
+      ...(openaiApiKey && { openaiApiKey }),
     };
   } catch (error) {
     const isTestEnv =
