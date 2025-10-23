@@ -164,14 +164,6 @@ export class ApplicationController {
    * Requires admin authentication
    */
   async getAllApplications(req: Request, res: Response): Promise<void> {
-    if (!req.user) {
-      throw new BusinessError("Authentication required", 401);
-    }
-
-    if (!req.user.isAdmin) {
-      throw new BusinessError("Admin privileges required", 403);
-    }
-
     try {
       const applications =
         await this.applicationService.getAllApplicationsWithDetails();
