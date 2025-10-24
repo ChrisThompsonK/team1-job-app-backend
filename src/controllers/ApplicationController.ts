@@ -229,4 +229,57 @@ export class ApplicationController {
       );
     }
   }
+
+  /**
+   * PATCH /applications/:id/status - Update application status (admin only)
+   * Requires admin authentication
+   */
+  async updateApplicationStatus(req: Request, res: Response): Promise<void> {
+    if (!req.user) {
+      throw new BusinessError("Authentication required", 401);
+    }
+
+    const applicationIdParam = req.params.id;
+    if (!applicationIdParam) {
+      throw new BusinessError("Application ID is required", 400);
+    }
+
+    const applicationId = Number.parseInt(applicationIdParam, 10);
+    if (Number.isNaN(applicationId)) {
+      throw new BusinessError("Valid application ID is required", 400);
+    }
+
+    const { status } = req.body;
+    if (!status || !["pending", "approved", "rejected"].includes(status)) {
+      throw new BusinessError(
+        "Valid status is required (pending, approved, rejected)",
+        400
+      );
+    }
+
+    try {
+      const updatedApplication =
+        await this.applicationService.updateApplicationStatus(
+          applicationId,
+          status
+        );
+
+      if (!updatedApplication) {
+        throw new NotFoundError("Application not found");
+      }
+
+      res.status(200).json({
+        success: true,
+        message: `Application ${status === "approved" ? "accepted" : status === "rejected" ? "rejected" : "updated"} successfully`,
+        data: updatedApplication,
+      });
+    } catch (error) {
+      throw new BusinessError(
+        error instanceof Error ? error.message : "Failed to update application",
+        error instanceof Error && error.message.includes("not found")
+          ? 404
+          : 500
+      );
+    }
+  }
 }

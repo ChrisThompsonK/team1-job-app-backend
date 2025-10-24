@@ -145,5 +145,20 @@ export const createApplicationRoutes = (
     )
   );
 
+  /**
+   * PATCH /applications/:id/status - Update application status (admin only)
+   * Requires admin authentication
+   * Expects JSON body with:
+   * - status: "pending" | "approved" | "rejected"
+   */
+  router.patch(
+    "/applications/:id/status",
+    requireAuth,
+    requireAdmin,
+    asyncHandler(
+      applicationController.updateApplicationStatus.bind(applicationController)
+    )
+  );
+
   return router;
 };

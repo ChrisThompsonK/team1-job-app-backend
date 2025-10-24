@@ -1,3 +1,4 @@
+import { JobStatus } from "../models/JobModel.js";
 import type {
   Application,
   ApplicationRepository,
@@ -97,5 +98,46 @@ export class ApplicationService {
     id: number
   ): Promise<ApplicationWithDetails | null> {
     return await this.applicationRepository.getApplicationWithDetailsById(id);
+  }
+
+  /**
+   * Update application status (admin only)
+   */
+  async updateApplicationStatus(
+    id: number,
+    status: "pending" | "approved" | "rejected"
+  ): Promise<Application | null> {
+    // Validate the application exists
+    const existingApplication =
+      await this.applicationRepository.getApplicationById(id);
+    if (!existingApplication) {
+      throw new Error(`Application with ID ${id} not found`);
+    }
+
+    // Update the application status
+    const updatedApplication =
+      await this.applicationRepository.updateApplicationStatus(id, status);
+
+    // If the application is approved, close the job role
+    if (status === "approved" && updatedApplication) {
+      try {
+        await this.jobRepository.updateJobStatus(
+          updatedApplication.jobRoleID,
+          JobStatus.CLOSED
+        );
+        console.log(
+          `Job role ${updatedApplication.jobRoleID} marked as closed due to approved application ${id}`
+        );
+      } catch (error) {
+        console.error(
+          `Failed to update job status for job ${updatedApplication.jobRoleID}:`,
+          error
+        );
+        // We don't throw here because the application status update was successful
+        // The job status update is a secondary action
+      }
+    }
+
+    return updatedApplication;
   }
 }

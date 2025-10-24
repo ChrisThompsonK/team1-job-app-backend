@@ -181,4 +181,20 @@ export class ApplicationRepository {
 
     return application || null;
   }
+
+  /**
+   * Update application status (admin only)
+   */
+  async updateApplicationStatus(
+    id: number,
+    status: "pending" | "approved" | "rejected"
+  ): Promise<Application | null> {
+    const [updatedApplication] = await db
+      .update(applicantTable)
+      .set({ applicationStatus: status })
+      .where(eq(applicantTable.id, id))
+      .returning();
+
+    return updatedApplication || null;
+  }
 }
