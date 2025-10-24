@@ -6,7 +6,7 @@ import {
   jobRolesTable,
   runApplicationSeeds,
   runAuthSeeds,
-} from "./index";
+} from "./index.js";
 
 const client = createClient({
   url: env.databaseUrl,

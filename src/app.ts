@@ -48,6 +48,8 @@ app.get("/", (_req: Request, res: Response) => {
     title: "Job Application Backend API",
     message: "Welcome to the Job Application System",
     version: "1.0.0",
+    documentation:
+      "See /docs/api-documentation.md for complete API documentation",
     endpoints: {
       authentication: {
         signIn: "/api/auth/sign-in/email [POST]",
@@ -55,6 +57,7 @@ app.get("/", (_req: Request, res: Response) => {
         signOut: "/api/auth/sign-out [POST]",
         getSession: "/api/auth/get-session [GET]",
         profile: "/api/profile [GET] (requires auth)",
+        updateProfile: "/api/profile [PUT] (requires auth)",
       },
       jobs: {
         getAllJobs: "/api/jobs [GET]",
@@ -74,33 +77,14 @@ app.get("/", (_req: Request, res: Response) => {
         getJobApplications:
           "/api/applications/job/:jobId [GET] (requires auth & admin)",
       },
+      scheduler: {
+        manage: "/api/scheduler/* [Various] (requires auth & admin)",
+      },
       files: {
         downloadCV: "/api/files/cv/:filename [GET] (requires auth)",
         getCVInfo: "/api/files/cv/:filename/info [GET] (requires auth)",
       },
-    },
-    filtering: {
-      endpoint: "/api/jobs/search",
-      description: "Server-side filtering with query parameters",
-      queryParameters: {
-        capability:
-          "Filter by capability (DATA, WORKDAY, ENGINEERING, PRODUCT, DESIGN, PLATFORM, QUALITY, ARCHITECTURE, BUSINESS_ANALYSIS, SECURITY)",
-        band: "Filter by band (Junior, Mid, Senior, Principal)",
-        location: "Filter by location (partial match)",
-        status: "Filter by status (open, closed)",
-        search:
-          "Text search across job title, description, and responsibilities",
-        page: "Page number for pagination (default: 1)",
-        limit: "Items per page (1-100, default: 10)",
-        sortBy:
-          "Sort field (jobRoleName, closingDate, band, capability, location)",
-        sortOrder: "Sort direction (asc, desc, default: asc)",
-      },
-      examples: [
-        "/api/jobs/search?capability=DATA&band=Senior",
-        "/api/jobs/search?search=engineer&sortBy=closingDate&sortOrder=desc",
-        "/api/jobs/search?location=London&page=1&limit=5",
-      ],
+      health: "/health [GET] - API health check",
     },
   });
 });
