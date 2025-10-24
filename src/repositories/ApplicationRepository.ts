@@ -148,4 +148,37 @@ export class ApplicationRepository {
       .innerJoin(user, eq(applicantTable.applicantID, user.id))
       .orderBy(applicantTable.appliedAt);
   }
+
+  /**
+   * Get a specific application with job and user details by application ID
+   */
+  async getApplicationWithDetailsById(
+    id: number
+  ): Promise<ApplicationWithDetails | null> {
+    const [application] = await db
+      .select({
+        id: applicantTable.id,
+        jobRoleID: applicantTable.jobRoleID,
+        applicantID: applicantTable.applicantID,
+        cvPath: applicantTable.cvPath,
+        applicationStatus: applicantTable.applicationStatus,
+        appliedAt: applicantTable.appliedAt,
+        jobRoleName: jobsTable.jobRoleName,
+        jobDescription: jobsTable.description,
+        jobBand: jobsTable.band,
+        jobCapability: jobsTable.capability,
+        jobClosingDate: jobsTable.closingDate,
+        jobLocation: jobsTable.location,
+        jobStatus: jobsTable.status,
+        applicantName: user.name,
+        applicantEmail: user.email,
+      })
+      .from(applicantTable)
+      .innerJoin(jobsTable, eq(applicantTable.jobRoleID, jobsTable.id))
+      .innerJoin(user, eq(applicantTable.applicantID, user.id))
+      .where(eq(applicantTable.id, id))
+      .limit(1);
+
+    return application || null;
+  }
 }

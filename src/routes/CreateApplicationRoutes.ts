@@ -120,6 +120,19 @@ export const createApplicationRoutes = (
   );
 
   /**
+   * GET /applications/:id/details - Get a specific application with full details
+   * Requires authentication
+   * Users can only view their own applications, admins can view all
+   */
+  router.get(
+    "/applications/:id/details",
+    requireAuth,
+    asyncHandler(
+      applicationController.getApplicationDetails.bind(applicationController)
+    )
+  );
+
+  /**
    * GET /applications/:id - Get a specific application by ID
    * Requires authentication
    * Users can only view their own applications, admins can view all

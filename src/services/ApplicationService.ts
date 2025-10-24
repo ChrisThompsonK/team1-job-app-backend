@@ -89,4 +89,13 @@ export class ApplicationService {
   async getAllApplicationsWithDetails(): Promise<ApplicationWithDetails[]> {
     return await this.applicationRepository.getAllApplicationsWithDetails();
   }
+
+  /**
+   * Get a specific application with job and user details by ID
+   */
+  async getApplicationWithDetailsById(
+    id: number
+  ): Promise<ApplicationWithDetails | null> {
+    return await this.applicationRepository.getApplicationWithDetailsById(id);
+  }
 }

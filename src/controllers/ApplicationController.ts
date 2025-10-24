@@ -163,6 +163,49 @@ export class ApplicationController {
   }
 
   /**
+   * GET /applications/:id/details - Get a specific application with full details
+   * Requires authentication (users can only see their own, admins can see all)
+   */
+  async getApplicationDetails(req: Request, res: Response): Promise<void> {
+    if (!req.user) {
+      throw new BusinessError("Authentication required", 401);
+    }
+
+    const applicationIdParam = req.params.id;
+    if (!applicationIdParam) {
+      throw new BusinessError("Application ID is required", 400);
+    }
+
+    const applicationId = Number.parseInt(applicationIdParam, 10);
+    if (Number.isNaN(applicationId)) {
+      throw new BusinessError("Valid application ID is required", 400);
+    }
+
+    const application =
+      await this.applicationService.getApplicationWithDetailsById(
+        applicationId
+      );
+
+    if (!application) {
+      throw new NotFoundError("Application not found");
+    }
+
+    // Check if user owns this application or is admin
+    if (application.applicantID !== req.user.id && !req.user.isAdmin) {
+      throw new BusinessError(
+        "You do not have permission to view this application",
+        403
+      );
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Application details retrieved successfully",
+      data: application,
+    });
+  }
+
+  /**
    * GET /applications - Get all applications with details (admin only)
    * Requires admin authentication
    */
