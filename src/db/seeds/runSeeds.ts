@@ -1,7 +1,12 @@
 import { createClient } from "@libsql/client";
 import { drizzle } from "drizzle-orm/libsql";
 import { env } from "../../config/env.js";
-import { comprehensiveJobSeeds, jobRolesTable, runAuthSeeds } from "./index";
+import {
+  comprehensiveJobSeeds,
+  jobRolesTable,
+  runApplicationSeeds,
+  runAuthSeeds,
+} from "./index";
 
 const client = createClient({
   url: env.databaseUrl,
@@ -36,6 +41,9 @@ export async function runSeeds(): Promise<void> {
     console.log(
       "     special characters, various locations, 0 positions, etc."
     );
+
+    // Seed sample applications
+    await runApplicationSeeds();
   } catch (error) {
     console.error("❌ Error seeding database:", error);
     throw error;

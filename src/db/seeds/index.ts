@@ -1,3 +1,4 @@
+export * from "./applicationSeeds";
 export * from "./authSeeds";
 export * from "./comprehensiveJobSeeds";
 export * from "./jobRolesSeeds";

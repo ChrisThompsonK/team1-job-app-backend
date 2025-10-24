@@ -259,6 +259,14 @@ class DatabaseJobStore {
 
     return { updatedCount: result.rowsAffected };
   }
+
+  async updateJobStatus(id: number, status: JobStatus): Promise<void> {
+    await this.db
+      .update(jobsTable)
+      .set({ status })
+      .where(eq(jobsTable.id, id))
+      .run();
+  }
 }
 
 // Singleton instance for the database job store
@@ -291,5 +299,9 @@ export class JobRepository {
 
   async updateExpiredJobRoles(): Promise<{ updatedCount: number }> {
     return await jobStore.updateExpiredJobRoles();
+  }
+
+  async updateJobStatus(id: number, status: JobStatus): Promise<void> {
+    return await jobStore.updateJobStatus(id, status);
   }
 }
