@@ -36,14 +36,33 @@ export const asyncHandler = (fn: AsyncRouteHandler) => {
 // Global error handling middleware
 export const errorHandler = (
   error: Error,
-  _req: Request,
+  req: Request,
   res: Response,
   _next: NextFunction
 ): void => {
-  console.error("Error:", error);
+  // Enhanced logging for debugging 500 errors
+  console.error("🚨 ERROR HANDLER TRIGGERED:");
+  console.error("📍 Request:", {
+    method: req.method,
+    url: req.url,
+    path: req.path,
+    headers: req.headers,
+    body: req.body,
+    cookies: req.cookies,
+    timestamp: new Date().toISOString(),
+  });
+  console.error("💥 Error Details:", {
+    name: error.name,
+    message: error.message,
+    stack: error.stack,
+    statusCode: error instanceof BusinessError ? error.statusCode : "unknown",
+  });
 
   // Handle custom business errors
   if (error instanceof BusinessError) {
+    console.log(
+      `✅ Handled BusinessError: ${error.statusCode} - ${error.message}`
+    );
     res.status(error.statusCode).json({
       success: false,
       message: error.message,
@@ -57,6 +76,7 @@ export const errorHandler = (
     error.message.includes("Invalid band") ||
     error.message.includes("Invalid status")
   ) {
+    console.log(`✅ Handled validation error: ${error.message}`);
     res.status(400).json({
       success: false,
       message: error.message,
@@ -64,10 +84,26 @@ export const errorHandler = (
     return;
   }
 
-  // Handle generic errors
+  // Enhanced generic error handling with more details
+  console.error("🔥 UNHANDLED ERROR - sending 500:", {
+    type: typeof error,
+    constructor: error.constructor.name,
+    isInstanceOf: {
+      Error: error instanceof Error,
+      BusinessError: error instanceof BusinessError,
+    },
+  });
+
   res.status(500).json({
     success: false,
     message: "An unexpected error occurred",
+    ...(process.env.NODE_ENV === "development" && {
+      debug: {
+        name: error.name,
+        message: error.message,
+        stack: error.stack,
+      },
+    }),
   });
 };
 
