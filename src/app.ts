@@ -21,6 +21,25 @@ const app = express();
 // Configure middleware BEFORE Better Auth handler
 configureMiddleware(app);
 
+// Add debug logging for authentication requests
+app.use("/api/auth", (req, _res, next) => {
+  console.log("🔐 BETTER AUTH REQUEST:");
+  console.log("📍 Request details:", {
+    method: req.method,
+    url: req.url,
+    path: req.path,
+    headers: {
+      "content-type": req.headers["content-type"],
+      "user-agent": req.headers["user-agent"],
+      cookie: req.headers.cookie || "NO COOKIES",
+      origin: req.headers.origin || "NO ORIGIN",
+    },
+    body: req.method === "POST" ? req.body : "GET request",
+    timestamp: new Date().toISOString(),
+  });
+  next();
+});
+
 // Mount Better Auth handler - use the correct pattern
 app.use("/api/auth", toNodeHandler(auth));
 
@@ -49,9 +68,16 @@ app.get("/", (_req: Request, res: Response) => {
       applications: {
         applyToJob: "/api/applications [POST] (requires auth)",
         getMyApplications: "/api/applications/me [GET] (requires auth)",
+        getAllApplications: "/api/applications [GET] (requires auth & admin)",
         getApplicationById: "/api/applications/:id [GET] (requires auth)",
+        getApplicationDetails:
+          "/api/applications/:id/details [GET] (requires auth)",
         getJobApplications:
           "/api/applications/job/:jobId [GET] (requires auth & admin)",
+      },
+      files: {
+        downloadCV: "/api/files/cv/:filename [GET] (requires auth)",
+        getCVInfo: "/api/files/cv/:filename/info [GET] (requires auth)",
       },
     },
     filtering: {
@@ -94,6 +120,7 @@ app.use("/api", createJobRoutes(jobController));
 app.use("/api", createAuthRoutes(authController));
 app.use("/api", createApplicationRoutes(applicationController));
 app.use("/api", createChatRoutes(chatController));
+app.use("/api", createFileRoutes());
 app.use("/api/scheduler", schedulerRoutes);
 
 // Error handling middleware (must be after all routes)

@@ -1,6 +1,6 @@
 import { int, sqliteTable, text } from "drizzle-orm/sqlite-core";
-import { user } from "./auth.js";
-import { jobsTable } from "./jobs.js";
+import { user } from "./auth";
+import { jobsTable } from "./jobs";
 
 export const applicantTable = sqliteTable("Applicants", {
   id: int().primaryKey({ autoIncrement: true }),

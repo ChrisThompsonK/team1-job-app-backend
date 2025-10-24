@@ -43,6 +43,13 @@
       "when": 1761123175808,
       "tag": "0005_sticky_cassandra_nova",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1761225521526,
+      "tag": "0006_fair_gamora",
+      "breakpoints": true
     }
   ]
 }
