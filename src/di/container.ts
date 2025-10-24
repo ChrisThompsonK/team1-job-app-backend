@@ -1,5 +1,6 @@
 import { ApplicationController } from "../controllers/ApplicationController.js";
 import { AuthController } from "../controllers/AuthController.js";
+import { ChatController } from "../controllers/ChatController.js";
 import { JobController } from "../controllers/JobController.js";
 import { ApplicationRepository } from "../repositories/ApplicationRepository.js";
 import { JobRepository } from "../repositories/JobRepository.js";
@@ -27,7 +28,16 @@ const applicationController = new ApplicationController(applicationService);
 // Auth controller
 const authController = new AuthController();
 
+// Chat controller
+const chatController = new ChatController();
+
 // Schedulers
 const jobScheduler = new JobStatusScheduler(jobService);
 
-export { applicationController, authController, jobController, jobScheduler };
+export {
+  applicationController,
+  authController,
+  chatController,
+  jobController,
+  jobScheduler,
+};
