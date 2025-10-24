@@ -12,6 +12,7 @@ import { configureMiddleware } from "./middleware/middlewareConfig.js";
 import { createApplicationRoutes } from "./routes/CreateApplicationRoutes.js";
 import { createAuthRoutes } from "./routes/CreateAuthRoutes.js";
 import { createChatRoutes } from "./routes/CreateChatRoutes.js";
+import { createFileRoutes } from "./routes/CreateFileRoutes.js";
 import { createJobRoutes } from "./routes/CreateJobRoutes.js";
 import schedulerRoutes from "./routes/schedulerRoutes.js";
 import { auth } from "./utils/auth.js";
