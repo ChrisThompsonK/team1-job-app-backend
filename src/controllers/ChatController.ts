@@ -52,41 +52,57 @@ export class ChatController {
       // Call Gemini REST API directly (using v1 endpoint with gemini-2.5-flash)
       const apiUrl = `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${this.apiKey}`;
 
-      // Use node-fetch with custom https agent to bypass SSL verification
-      const nodeFetch = (await import("node-fetch")).default;
-      const https = await import("https");
+      // Disable SSL verification for development (native fetch respects NODE_TLS_REJECT_UNAUTHORIZED)
+      const originalTlsReject = process.env.NODE_TLS_REJECT_UNAUTHORIZED;
+      process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
-      const httpsAgent = new https.Agent({
-        rejectUnauthorized: false, // Disable SSL verification for development
-      });
+      let response: globalThis.Response;
+      let responseText: string;
 
-      const response = await nodeFetch(apiUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [
-                {
-                  text: prompt,
-                },
-              ],
-            },
-          ],
-          generationConfig: {
-            temperature: 0.7,
-            maxOutputTokens: 2048, // Increased to allow for internal reasoning + response
+      try {
+        // Use native fetch (Node.js 18+)
+        response = await fetch(apiUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
           },
-        }),
-        agent: httpsAgent,
-      });
+          body: JSON.stringify({
+            contents: [
+              {
+                parts: [
+                  {
+                    text: prompt,
+                  },
+                ],
+              },
+            ],
+            generationConfig: {
+              temperature: 0.7,
+              maxOutputTokens: 2048, // Increased to allow for internal reasoning + response
+            },
+          }),
+        });
 
-      console.log("Gemini API response status:", response.status);
+        console.log("Gemini API response status:", response.status);
 
-      const responseText = await response.text();
-      console.log("Gemini API raw response:", responseText);
+        responseText = await response.text();
+        console.log("Gemini API raw response:", responseText);
+      } catch (fetchError) {
+        // Restore original TLS setting on error
+        if (originalTlsReject !== undefined) {
+          process.env.NODE_TLS_REJECT_UNAUTHORIZED = originalTlsReject;
+        } else {
+          delete process.env.NODE_TLS_REJECT_UNAUTHORIZED;
+        }
+        throw fetchError;
+      } finally {
+        // Restore original TLS setting
+        if (originalTlsReject !== undefined) {
+          process.env.NODE_TLS_REJECT_UNAUTHORIZED = originalTlsReject;
+        } else {
+          delete process.env.NODE_TLS_REJECT_UNAUTHORIZED;
+        }
+      }
 
       if (!response.ok) {
         console.error("Gemini API error response:", responseText);
