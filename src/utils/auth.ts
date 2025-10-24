@@ -19,7 +19,7 @@ const getTrustedOrigins = (): string[] => {
   return env.corsOrigin.split(",").map((origin) => origin.trim());
 };
 
-if (process.env.NODE_ENV === 'development') {
+if (process.env.NODE_ENV === "development") {
   console.log("🔐 BETTER AUTH CONFIGURATION:");
   console.log("📍 Configuration details:", {
     baseURL: env.betterAuthUrl,
