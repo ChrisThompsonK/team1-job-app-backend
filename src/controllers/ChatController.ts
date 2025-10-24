@@ -92,7 +92,7 @@ export class ChatController {
         if (originalTlsReject !== undefined) {
           process.env.NODE_TLS_REJECT_UNAUTHORIZED = originalTlsReject;
         } else {
-          delete process.env.NODE_TLS_REJECT_UNAUTHORIZED;
+          process.env.NODE_TLS_REJECT_UNAUTHORIZED = undefined;
         }
         throw fetchError;
       } finally {
@@ -100,7 +100,7 @@ export class ChatController {
         if (originalTlsReject !== undefined) {
           process.env.NODE_TLS_REJECT_UNAUTHORIZED = originalTlsReject;
         } else {
-          delete process.env.NODE_TLS_REJECT_UNAUTHORIZED;
+          process.env.NODE_TLS_REJECT_UNAUTHORIZED = undefined;
         }
       }
 
