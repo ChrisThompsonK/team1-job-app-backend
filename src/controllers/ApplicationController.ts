@@ -163,6 +163,49 @@ export class ApplicationController {
   }
 
   /**
+   * GET /applications/:id/details - Get a specific application with full details
+   * Requires authentication (users can only see their own, admins can see all)
+   */
+  async getApplicationDetails(req: Request, res: Response): Promise<void> {
+    if (!req.user) {
+      throw new BusinessError("Authentication required", 401);
+    }
+
+    const applicationIdParam = req.params.id;
+    if (!applicationIdParam) {
+      throw new BusinessError("Application ID is required", 400);
+    }
+
+    const applicationId = Number.parseInt(applicationIdParam, 10);
+    if (Number.isNaN(applicationId)) {
+      throw new BusinessError("Valid application ID is required", 400);
+    }
+
+    const application =
+      await this.applicationService.getApplicationWithDetailsById(
+        applicationId
+      );
+
+    if (!application) {
+      throw new NotFoundError("Application not found");
+    }
+
+    // Check if user owns this application or is admin
+    if (application.applicantID !== req.user.id && !req.user.isAdmin) {
+      throw new BusinessError(
+        "You do not have permission to view this application",
+        403
+      );
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Application details retrieved successfully",
+      data: application,
+    });
+  }
+
+  /**
    * GET /applications - Get all applications with details (admin only)
    * Requires admin authentication
    */
@@ -183,6 +226,59 @@ export class ApplicationController {
           ? error.message
           : "Failed to retrieve applications",
         500
+      );
+    }
+  }
+
+  /**
+   * PATCH /applications/:id/status - Update application status (admin only)
+   * Requires admin authentication
+   */
+  async updateApplicationStatus(req: Request, res: Response): Promise<void> {
+    if (!req.user) {
+      throw new BusinessError("Authentication required", 401);
+    }
+
+    const applicationIdParam = req.params.id;
+    if (!applicationIdParam) {
+      throw new BusinessError("Application ID is required", 400);
+    }
+
+    const applicationId = Number.parseInt(applicationIdParam, 10);
+    if (Number.isNaN(applicationId)) {
+      throw new BusinessError("Valid application ID is required", 400);
+    }
+
+    const { status } = req.body;
+    if (!status || !["pending", "approved", "rejected"].includes(status)) {
+      throw new BusinessError(
+        "Valid status is required (pending, approved, rejected)",
+        400
+      );
+    }
+
+    try {
+      const updatedApplication =
+        await this.applicationService.updateApplicationStatus(
+          applicationId,
+          status
+        );
+
+      if (!updatedApplication) {
+        throw new NotFoundError("Application not found");
+      }
+
+      res.status(200).json({
+        success: true,
+        message: `Application ${status === "approved" ? "accepted" : status === "rejected" ? "rejected" : "updated"} successfully`,
+        data: updatedApplication,
+      });
+    } catch (error) {
+      throw new BusinessError(
+        error instanceof Error ? error.message : "Failed to update application",
+        error instanceof Error && error.message.includes("not found")
+          ? 404
+          : 500
       );
     }
   }

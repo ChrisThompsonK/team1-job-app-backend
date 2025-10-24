@@ -63,4 +63,12 @@ export class JobService {
   async updateExpiredJobRoles(): Promise<{ updatedCount: number }> {
     return await this.jobRepository.updateExpiredJobRoles();
   }
+
+  // Update job status
+  async updateJobStatus(
+    id: number,
+    status: import("../models/JobModel.js").JobStatus
+  ): Promise<void> {
+    await this.jobRepository.updateJobStatus(id, status);
+  }
 }
