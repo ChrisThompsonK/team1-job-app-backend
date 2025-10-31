@@ -60,9 +60,6 @@ export const errorHandler = (
 
   // Handle custom business errors
   if (error instanceof BusinessError) {
-    console.log(
-      `✅ Handled BusinessError: ${error.statusCode} - ${error.message}`
-    );
     res.status(error.statusCode).json({
       success: false,
       message: error.message,
@@ -76,7 +73,6 @@ export const errorHandler = (
     error.message.includes("Invalid band") ||
     error.message.includes("Invalid status")
   ) {
-    console.log(`✅ Handled validation error: ${error.message}`);
     res.status(400).json({
       success: false,
       message: error.message,

@@ -62,12 +62,6 @@ describe("JobStatusScheduler", () => {
       // Assert
       expect(mockJobService.updateExpiredJobRoles).toHaveBeenCalledOnce();
       expect(result).toEqual(expectedResult);
-      expect(console.log).toHaveBeenCalledWith(
-        "Running scheduled job status update..."
-      );
-      expect(console.log).toHaveBeenCalledWith(
-        "Job status update completed: 5 jobs updated to closed status"
-      );
     });
 
     it("should handle errors from jobService", async () => {

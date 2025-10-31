@@ -19,17 +19,6 @@ const getTrustedOrigins = (): string[] => {
   return env.corsOrigin.split(",").map((origin) => origin.trim());
 };
 
-if (process.env.NODE_ENV === "development") {
-  console.log("🔐 BETTER AUTH CONFIGURATION:");
-  console.log("📍 Configuration details:", {
-    baseURL: env.betterAuthUrl,
-    trustedOrigins: getTrustedOrigins(),
-    databaseUrl: env.databaseUrl ? "CONFIGURED" : "MISSING",
-    secret: env.betterAuthSecret ? "CONFIGURED" : "MISSING",
-    timestamp: new Date().toISOString(),
-  });
-}
-
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: "sqlite", // LibSQL is SQLite-compatible
@@ -58,9 +47,5 @@ export const auth = betterAuth({
     crossSubDomainCookies: {
       enabled: false, // Set to true if frontend is on different subdomain
     },
-  },
-  logger: {
-    level: "debug", // Enable debug logging
-    disabled: false,
   },
 });

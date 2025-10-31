@@ -4,13 +4,9 @@ import { jobScheduler } from "./di/container.js";
 
 app.listen(env.port, () => {
   console.log(`Server is running on http://localhost:${env.port}`);
-  console.log(`Environment: ${env.nodeEnv}`);
 
   // Start the job scheduler
   jobScheduler.start();
-  console.log(
-    `Job scheduler initialized - cron expression: ${getJobSchedulerCronExpression()}`
-  );
 });
 
 // Graceful shutdown

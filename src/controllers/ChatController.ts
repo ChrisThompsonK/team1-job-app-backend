@@ -47,8 +47,6 @@ export class ChatController {
       // Add the new user message
       prompt += `User: ${message}\nAssistant:`;
 
-      console.log("Calling Gemini API via REST...");
-
       // Call Gemini REST API directly (using v1 endpoint with gemini-2.5-flash)
       const apiUrl = `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${this.apiKey}`;
 
@@ -83,10 +81,7 @@ export class ChatController {
           }),
         });
 
-        console.log("Gemini API response status:", response.status);
-
         responseText = await response.text();
-        console.log("Gemini API raw response:", responseText);
       } catch (fetchError) {
         // Restore original TLS setting on error
         if (originalTlsReject !== undefined) {
@@ -127,8 +122,6 @@ export class ChatController {
           500
         );
       }
-
-      console.log("Successfully generated response");
 
       res.status(200).json({
         success: true,
