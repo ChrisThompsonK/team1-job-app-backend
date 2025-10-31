@@ -159,4 +159,9 @@ build/Release
 # Biome cache
 .biome/
 
+# Database files
 *.db
+
+# Uploaded files - keep directory structure but ignore actual uploads
+uploads/cvs/*
+!uploads/cvs/.gitkeep

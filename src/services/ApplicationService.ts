@@ -125,14 +125,7 @@ export class ApplicationService {
           updatedApplication.jobRoleID,
           JobStatus.CLOSED
         );
-        console.log(
-          `Job role ${updatedApplication.jobRoleID} marked as closed due to approved application ${id}`
-        );
-      } catch (error) {
-        console.error(
-          `Failed to update job status for job ${updatedApplication.jobRoleID}:`,
-          error
-        );
+      } catch (_error) {
         // We don't throw here because the application status update was successful
         // The job status update is a secondary action
       }

@@ -22,25 +22,6 @@ const app = express();
 // Configure middleware BEFORE Better Auth handler
 configureMiddleware(app);
 
-// Add debug logging for authentication requests
-app.use("/api/auth", (req, _res, next) => {
-  console.log("🔐 BETTER AUTH REQUEST:");
-  console.log("📍 Request details:", {
-    method: req.method,
-    url: req.url,
-    path: req.path,
-    headers: {
-      "content-type": req.headers["content-type"],
-      "user-agent": req.headers["user-agent"],
-      cookie: req.headers.cookie || "NO COOKIES",
-      origin: req.headers.origin || "NO ORIGIN",
-    },
-    body: req.method === "POST" ? req.body : "GET request",
-    timestamp: new Date().toISOString(),
-  });
-  next();
-});
-
 // Mount Better Auth handler - use the correct pattern
 app.use("/api/auth", toNodeHandler(auth));
 

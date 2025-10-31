@@ -25,8 +25,6 @@ const getUserAdditionalFields = async (
   phoneNumber?: string;
   address?: string;
 }> => {
-  console.log("🔍 Fetching additional user fields for userId:", userId);
-
   try {
     const [userRecord] = await db
       .select({
@@ -38,15 +36,12 @@ const getUserAdditionalFields = async (
       .where(eq(user.id, userId))
       .limit(1);
 
-    console.log("📊 Database query result:", userRecord || "No user found");
-
     const result = {
       isAdmin: userRecord?.isAdmin || false,
       ...(userRecord?.phoneNumber && { phoneNumber: userRecord.phoneNumber }),
       ...(userRecord?.address && { address: userRecord.address }),
     };
 
-    console.log("✅ Returning user fields:", result);
     return result;
   } catch (dbError) {
     console.error("🚨 Database error in getUserAdditionalFields:", {
@@ -97,36 +92,12 @@ export const validateSession = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    console.log("🔐 AUTH MIDDLEWARE DEBUG:");
-    console.log("📍 Request details:", {
-      method: req.method,
-      url: req.url,
-      headers: {
-        "content-type": req.headers["content-type"],
-        "user-agent": req.headers["user-agent"],
-        cookie: req.headers.cookie || "NO COOKIES",
-        authorization: req.headers.authorization || "NO AUTH HEADER",
-      },
-      timestamp: new Date().toISOString(),
-    });
-
     // Get session from Better Auth (this validates the session cookie)
-    console.log("🔍 Calling auth.api.getSession...");
     const session = await auth.api.getSession({
       headers: req.headers as Record<string, string>,
     });
 
-    console.log("📊 Session result:", {
-      hasSession: !!session,
-      hasUser: !!session?.user,
-      hasSessionData: !!session?.session,
-      userId: session?.user?.id || "NO USER ID",
-      userEmail: session?.user?.email || "NO EMAIL",
-      sessionExpiry: session?.session?.expiresAt || "NO EXPIRY",
-    });
-
     if (!session || !session.user || !session.session) {
-      console.log("❌ Session validation failed: No session or user data");
       res.status(401).json({
         error: "Unauthorized",
         message: "Invalid or expired session",
@@ -137,14 +108,8 @@ export const validateSession = async (
     // Check if session is expired
     const now = new Date();
     const expiresAt = new Date(session.session.expiresAt);
-    console.log("⏰ Session expiry check:", {
-      now: now.toISOString(),
-      expiresAt: expiresAt.toISOString(),
-      isExpired: now > expiresAt,
-    });
 
     if (now > expiresAt) {
-      console.log("❌ Session expired");
       res.status(401).json({
         error: "Unauthorized",
         message: "Session has expired",
@@ -152,11 +117,9 @@ export const validateSession = async (
       return;
     }
 
-    console.log("🔍 Fetching additional user fields from database...");
     // Single optimized database query to get additional user fields
     // Better Auth already validated the user exists and provided user data
     const additionalFields = await getUserAdditionalFields(session.user.id);
-    console.log("📊 Additional fields result:", additionalFields);
 
     // Attach user and session info to request
     req.user = {
@@ -187,13 +150,6 @@ export const validateSession = async (
       createdAt: session.session.createdAt,
       updatedAt: session.session.updatedAt,
     };
-
-    console.log("✅ Authentication successful:", {
-      userId: req.user.id,
-      email: req.user.email,
-      isAdmin: req.user.isAdmin,
-      sessionId: req.session.id,
-    });
 
     next();
   } catch (error) {
