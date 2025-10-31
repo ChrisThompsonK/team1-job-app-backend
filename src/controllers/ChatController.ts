@@ -131,7 +131,7 @@ export class ChatController {
           role: "assistant",
         },
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Gemini API error:", error);
 
       if (error instanceof BusinessError) {

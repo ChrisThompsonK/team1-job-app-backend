@@ -1,5 +1,5 @@
 import app from "./app.js";
-import { env, getJobSchedulerCronExpression } from "./config/env.js";
+import { env } from "./config/env.js";
 import { jobScheduler } from "./di/container.js";
 
 app.listen(env.port, () => {

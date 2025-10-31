@@ -125,7 +125,7 @@ export class ApplicationService {
           updatedApplication.jobRoleID,
           JobStatus.CLOSED
         );
-      } catch (error) {
+      } catch (_error) {
         // We don't throw here because the application status update was successful
         // The job status update is a secondary action
       }
