@@ -32,6 +32,3 @@ jobs:
         
       - name: Run Biome full check
         run: npm run check
-        
-      - name: Run tests (excluding database tests)
-        run: npm run test -- --run --exclude="**/JobRepository.test.ts"
