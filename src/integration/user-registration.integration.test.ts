@@ -1,10 +1,10 @@
-import { describe, expect, it, beforeAll, afterAll, beforeEach } from "vitest";
 import request from "supertest";
+import { describe, expect, it } from "vitest";
 import app from "../app.js";
 
 /**
  * Comprehensive Integration Tests for User Registration API
- * 
+ *
  * This test suite performs real HTTP requests to the registration endpoint
  * to validate end-to-end functionality including:
  * - HTTP status codes and responses
@@ -12,20 +12,20 @@ import app from "../app.js";
  * - Database integration
  * - Security features (session management, password handling)
  * - Error handling and edge cases
- * 
+ *
  * Endpoint: POST /api/auth/sign-up/email
- * 
+ *
  * @group integration
  * @group authentication
  */
 
 describe("User Registration API - Integration Tests", () => {
   // Test data helpers
-  const generateUniqueEmail = () => 
+  const generateUniqueEmail = () =>
     `test-${Date.now()}-${Math.random().toString(36).substring(7)}@example.com`;
 
   const validPassword = "TestPass123";
-  
+
   const createValidRegistrationData = (overrides = {}) => ({
     email: generateUniqueEmail(),
     password: validPassword,
@@ -61,7 +61,7 @@ describe("User Registration API - Integration Tests", () => {
         // Validate response structure
         expect(response.body).toHaveProperty("user");
         expect(response.body.user.email).toBe(userData.email);
-        
+
         // Validate user object properties
         expect(response.body.user).toHaveProperty("id");
         expect(response.body.user).toHaveProperty("emailVerified");
@@ -72,7 +72,7 @@ describe("User Registration API - Integration Tests", () => {
         expect(typeof response.body.user.id).toBe("string");
         expect(typeof response.body.user.email).toBe("string");
         expect(typeof response.body.user.emailVerified).toBe("boolean");
-        
+
         // Validate session cookie is set
         expect(response.headers["set-cookie"]).toBeDefined();
       });
@@ -147,10 +147,17 @@ describe("User Registration API - Integration Tests", () => {
           .expect(200);
 
         const { user } = response.body;
-        
+
         // Check all expected fields exist
-        const expectedFields = ["id", "email", "name", "emailVerified", "createdAt", "updatedAt"];
-        expectedFields.forEach(field => {
+        const expectedFields = [
+          "id",
+          "email",
+          "name",
+          "emailVerified",
+          "createdAt",
+          "updatedAt",
+        ];
+        expectedFields.forEach((field) => {
           expect(user).toHaveProperty(field);
         });
 
@@ -185,11 +192,13 @@ describe("User Registration API - Integration Tests", () => {
         const cookies = response.headers["set-cookie"];
         expect(cookies).toBeDefined();
 
-        const cookieString = Array.isArray(cookies) ? cookies.join("; ") : cookies;
-        
+        const cookieString = Array.isArray(cookies)
+          ? cookies.join("; ")
+          : cookies;
+
         // Verify HttpOnly flag is set (prevents XSS)
         expect(cookieString).toContain("HttpOnly");
-        
+
         // Verify session token cookie exists
         expect(cookieString).toContain("better-auth.session_token");
       });
@@ -213,7 +222,7 @@ describe("User Registration API - Integration Tests", () => {
 
       it("should return 500 when password is missing", async () => {
         // Better Auth returns 500 for missing password instead of 400
-        const response = await request(app)
+        const _response = await request(app)
           .post("/api/auth/sign-up/email")
           .send({
             email: generateUniqueEmail(),
@@ -293,7 +302,7 @@ describe("User Registration API - Integration Tests", () => {
       it("should return 422 when registering with an existing email", async () => {
         // Better Auth returns 422 for duplicate email instead of 409
         const email = generateUniqueEmail();
-        
+
         // First registration - should succeed
         const firstResponse = await request(app)
           .post("/api/auth/sign-up/email")
@@ -321,7 +330,7 @@ describe("User Registration API - Integration Tests", () => {
 
       it("should treat emails as case-insensitive for duplicates", async () => {
         const baseEmail = `test-${Date.now()}@example.com`;
-        
+
         // Register with lowercase
         await request(app)
           .post("/api/auth/sign-up/email")
@@ -460,7 +469,7 @@ describe("User Registration API - Integration Tests", () => {
           .expect(200);
 
         const responseString = JSON.stringify(response.body);
-        
+
         // Password should not appear anywhere in response
         expect(responseString).not.toContain(userData.password);
         expect(response.body.user).not.toHaveProperty("password");
@@ -498,8 +507,10 @@ describe("User Registration API - Integration Tests", () => {
         // Session cookie should be set
         const cookies = response.headers["set-cookie"];
         expect(cookies).toBeDefined();
-        
-        const cookieString = Array.isArray(cookies) ? cookies.join("; ") : cookies;
+
+        const cookieString = Array.isArray(cookies)
+          ? cookies.join("; ")
+          : cookies;
         expect(cookieString).toContain("better-auth.session_token");
       });
 
@@ -513,8 +524,10 @@ describe("User Registration API - Integration Tests", () => {
           .expect(200);
 
         const cookies = response.headers["set-cookie"];
-        const cookieString = Array.isArray(cookies) ? cookies.join("; ") : cookies;
-        
+        const cookieString = Array.isArray(cookies)
+          ? cookies.join("; ")
+          : cookies;
+
         expect(cookieString).toContain("HttpOnly");
       });
     });
@@ -531,7 +544,7 @@ describe("User Registration API - Integration Tests", () => {
           .expect(400);
 
         const responseString = JSON.stringify(response.body);
-        
+
         // Should not expose internal details
         expect(responseString).not.toMatch(/database|db|sql|stack|trace/i);
         expect(responseString).not.toContain("password"); // Don't mention password in validation errors ideally
@@ -584,9 +597,7 @@ describe("User Registration API - Integration Tests", () => {
       const userData = createValidRegistrationData();
 
       // GET should not be allowed
-      await request(app)
-        .get("/api/auth/sign-up/email")
-        .expect(404);
+      await request(app).get("/api/auth/sign-up/email").expect(404);
 
       // PUT should not be allowed
       await request(app)
@@ -595,9 +606,7 @@ describe("User Registration API - Integration Tests", () => {
         .expect(404);
 
       // DELETE should not be allowed
-      await request(app)
-        .delete("/api/auth/sign-up/email")
-        .expect(404);
+      await request(app).delete("/api/auth/sign-up/email").expect(404);
 
       // POST should work
       await request(app)
@@ -620,20 +629,20 @@ describe("User Registration API - Integration Tests", () => {
       const responses = await Promise.all(registrationPromises);
 
       // All should succeed
-      responses.forEach(response => {
+      responses.forEach((response) => {
         expect(response.status).toBe(200);
         expect(response.body).toHaveProperty("user");
       });
 
       // All should have unique IDs
-      const userIds = responses.map(r => r.body.user.id);
+      const userIds = responses.map((r) => r.body.user.id);
       const uniqueIds = new Set(userIds);
       expect(uniqueIds.size).toBe(5);
     });
 
     it("should complete registration within reasonable time", async () => {
       const startTime = Date.now();
-      
+
       await request(app)
         .post("/api/auth/sign-up/email")
         .send(createValidRegistrationData())
@@ -641,7 +650,7 @@ describe("User Registration API - Integration Tests", () => {
         .expect(200);
 
       const duration = Date.now() - startTime;
-      
+
       // Registration should complete within 3 seconds
       expect(duration).toBeLessThan(3000);
     });

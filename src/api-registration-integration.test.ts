@@ -1,5 +1,5 @@
-import { describe, expect, it, beforeAll, afterAll } from "vitest";
 import request from "supertest";
+import { describe, expect, it } from "vitest";
 import app from "./app.js";
 
 /**
@@ -10,7 +10,8 @@ import app from "./app.js";
 
 describe("User Registration API Integration Tests", () => {
   // Generate unique email for each test run to avoid conflicts
-  const generateTestEmail = () => `test-${Date.now()}-${Math.random().toString(36).substring(7)}@example.com`;
+  const generateTestEmail = () =>
+    `test-${Date.now()}-${Math.random().toString(36).substring(7)}@example.com`;
 
   describe("HTTP Status Codes", () => {
     it("should return 200 with valid registration data", async () => {
@@ -115,7 +116,7 @@ describe("User Registration API Integration Tests", () => {
 
       expect(response.status).toBe(200);
       expect(response.body).toHaveProperty("user");
-      
+
       const user = response.body.user;
       expect(user).toHaveProperty("id");
       expect(user).toHaveProperty("email");
@@ -155,13 +156,15 @@ describe("User Registration API Integration Tests", () => {
         .set("Content-Type", "application/json");
 
       expect(response.status).toBe(200);
-      
+
       // Check for Set-Cookie header
       const cookies = response.headers["set-cookie"];
       expect(cookies).toBeDefined();
-      
+
       if (Array.isArray(cookies)) {
-        const sessionCookie = cookies.find(c => c.includes("better-auth.session_token"));
+        const sessionCookie = cookies.find((c) =>
+          c.includes("better-auth.session_token")
+        );
         expect(sessionCookie).toBeDefined();
       } else if (typeof cookies === "string") {
         expect(cookies).toContain("better-auth.session_token");
@@ -227,11 +230,7 @@ describe("User Registration API Integration Tests", () => {
     });
 
     it("should accept valid passwords with letters and numbers", async () => {
-      const validPasswords = [
-        "Password123",
-        "Test1234",
-        "abcDEF123",
-      ];
+      const validPasswords = ["Password123", "Test1234", "abcDEF123"];
 
       for (const password of validPasswords) {
         const response = await request(app)
@@ -323,11 +322,13 @@ describe("User Registration API Integration Tests", () => {
         .set("Content-Type", "application/json");
 
       expect(response.status).toBe(200);
-      
+
       const cookies = response.headers["set-cookie"];
       expect(cookies).toBeDefined();
-      
-      const cookieString = Array.isArray(cookies) ? cookies.join("; ") : cookies;
+
+      const cookieString = Array.isArray(cookies)
+        ? cookies.join("; ")
+        : cookies;
       expect(cookieString).toContain("HttpOnly");
     });
 
@@ -341,7 +342,7 @@ describe("User Registration API Integration Tests", () => {
         .set("Content-Type", "application/json");
 
       expect(response.status).toBe(400);
-      
+
       const responseText = JSON.stringify(response.body);
       expect(responseText).not.toContain("database");
       expect(responseText).not.toContain("stack");
