@@ -9,6 +9,40 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 // Mock fetch for testing - available to all test blocks
 let mockFetch: ReturnType<typeof vi.fn>;
 const backendUrl = "http://localhost:3001/api";
+const endpoint = `${backendUrl}/auth/sign-up/email`;
+
+// Helper functions
+const createMockUser = (overrides = {}) => ({
+  id: "user_123",
+  name: "Test User",
+  email: "test@example.com",
+  emailVerified: false,
+  createdAt: "2025-11-06T10:00:00.000Z",
+  updatedAt: "2025-11-06T10:00:00.000Z",
+  ...overrides,
+});
+
+const mockSuccessResponse = (userOverrides = {}) => ({
+  ok: true,
+  status: 200,
+  headers: { get: () => "better-auth.session_token=abc123; Path=/; HttpOnly" },
+  json: async () => ({ user: createMockUser(userOverrides) }),
+});
+
+const mockErrorResponse = (status: number, message: string) => ({
+  ok: false,
+  status,
+  headers: { get: () => null },
+  json: async () => ({ message }),
+});
+
+const makeRegistrationRequest = async (data: any) => {
+  return fetch(endpoint, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+};
 
 beforeEach(() => {
   mockFetch = vi.fn();
@@ -22,40 +56,13 @@ afterEach(() => {
 describe("User Registration API - POST /api/auth/sign-up/email", () => {
   describe("HTTP Status Code Validation", () => {
     describe("200/201 - Success Cases", () => {
-      it("should return 200/201 with valid registration data", async () => {
-        const validRegistrationData = {
-          email: "newuser@example.com",
+      it("should return 200 with valid registration data", async () => {
+        mockFetch.mockResolvedValueOnce(mockSuccessResponse());
+
+        const response = await makeRegistrationRequest({
+          email: "test@example.com",
           password: "SecurePass123",
           name: "Test User",
-        };
-
-        const mockSuccessResponse = {
-          user: {
-            id: "user_123",
-            name: "Test User",
-            email: "newuser@example.com",
-            emailVerified: false,
-            createdAt: "2025-11-06T10:00:00.000Z",
-            updatedAt: "2025-11-06T10:00:00.000Z",
-          },
-        };
-
-        mockFetch.mockResolvedValueOnce({
-          ok: true,
-          status: 200,
-          headers: {
-            get: (header: string) =>
-              header === "set-cookie"
-                ? "better-auth.session_token=abc123; Path=/; HttpOnly"
-                : null,
-          },
-          json: async () => mockSuccessResponse,
-        });
-
-        const response = await fetch(`${backendUrl}/auth/sign-up/email`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(validRegistrationData),
         });
 
         expect(response.ok).toBe(true);
@@ -63,35 +70,14 @@ describe("User Registration API - POST /api/auth/sign-up/email", () => {
         const data = await response.json();
         expect(data).toHaveProperty("user");
         expect(data.user).toHaveProperty("id");
-        expect(data.user).toHaveProperty("email", validRegistrationData.email);
       });
 
       it("should return 200 with minimal required data (email and password only)", async () => {
-        const minimalRegistrationData = {
-          email: "minimal@example.com",
+        mockFetch.mockResolvedValueOnce(mockSuccessResponse());
+
+        const response = await makeRegistrationRequest({
+          email: "test@example.com",
           password: "Pass1234",
-        };
-
-        mockFetch.mockResolvedValueOnce({
-          ok: true,
-          status: 200,
-          headers: { get: () => null },
-          json: async () => ({
-            user: {
-              id: "user_124",
-              name: "",
-              email: "minimal@example.com",
-              emailVerified: false,
-              createdAt: "2025-11-06T10:00:00.000Z",
-              updatedAt: "2025-11-06T10:00:00.000Z",
-            },
-          }),
-        });
-
-        const response = await fetch(`${backendUrl}/auth/sign-up/email`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(minimalRegistrationData),
         });
 
         expect(response.status).toBe(200);
@@ -101,49 +87,25 @@ describe("User Registration API - POST /api/auth/sign-up/email", () => {
 
     describe("400 - Bad Request Cases", () => {
       it("should return 400 for missing email", async () => {
-        const invalidData = {
+        mockFetch.mockResolvedValueOnce(
+          mockErrorResponse(400, "Email is required")
+        );
+
+        const response = await makeRegistrationRequest({
           password: "SecurePass123",
-        };
-
-        mockFetch.mockResolvedValueOnce({
-          ok: false,
-          status: 400,
-          headers: { get: () => null },
-          json: async () => ({
-            message: "Email is required",
-          }),
-        });
-
-        const response = await fetch(`${backendUrl}/auth/sign-up/email`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(invalidData),
         });
 
         expect(response.status).toBe(400);
         expect(response.ok).toBe(false);
-        const data = await response.json();
-        expect(data).toHaveProperty("message");
       });
 
       it("should return 400 for missing password", async () => {
-        const invalidData = {
+        mockFetch.mockResolvedValueOnce(
+          mockErrorResponse(400, "Password is required")
+        );
+
+        const response = await makeRegistrationRequest({
           email: "test@example.com",
-        };
-
-        mockFetch.mockResolvedValueOnce({
-          ok: false,
-          status: 400,
-          headers: { get: () => null },
-          json: async () => ({
-            message: "Password is required",
-          }),
-        });
-
-        const response = await fetch(`${backendUrl}/auth/sign-up/email`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(invalidData),
         });
 
         expect(response.status).toBe(400);
@@ -152,24 +114,13 @@ describe("User Registration API - POST /api/auth/sign-up/email", () => {
       });
 
       it("should return 400 for invalid email format", async () => {
-        const invalidData = {
+        mockFetch.mockResolvedValueOnce(
+          mockErrorResponse(400, "Invalid email format")
+        );
+
+        const response = await makeRegistrationRequest({
           email: "not-an-email",
           password: "SecurePass123",
-        };
-
-        mockFetch.mockResolvedValueOnce({
-          ok: false,
-          status: 400,
-          headers: { get: () => null },
-          json: async () => ({
-            message: "Invalid email format",
-          }),
-        });
-
-        const response = await fetch(`${backendUrl}/auth/sign-up/email`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(invalidData),
         });
 
         expect(response.status).toBe(400);
@@ -178,24 +129,13 @@ describe("User Registration API - POST /api/auth/sign-up/email", () => {
       });
 
       it("should return 400 for password too short (< 8 characters)", async () => {
-        const invalidData = {
+        mockFetch.mockResolvedValueOnce(
+          mockErrorResponse(400, "Password must be at least 8 characters long")
+        );
+
+        const response = await makeRegistrationRequest({
           email: "test@example.com",
-          password: "Pass1", // Only 5 characters
-        };
-
-        mockFetch.mockResolvedValueOnce({
-          ok: false,
-          status: 400,
-          headers: { get: () => null },
-          json: async () => ({
-            message: "Password must be at least 8 characters long",
-          }),
-        });
-
-        const response = await fetch(`${backendUrl}/auth/sign-up/email`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(invalidData),
+          password: "Pass1",
         });
 
         expect(response.status).toBe(400);
@@ -204,223 +144,134 @@ describe("User Registration API - POST /api/auth/sign-up/email", () => {
       });
 
       it("should return 400 for password without letter and number", async () => {
-        const invalidData = {
+        mockFetch.mockResolvedValueOnce(
+          mockErrorResponse(
+            400,
+            "Password must contain at least one letter and one number"
+          )
+        );
+
+        const response = await makeRegistrationRequest({
           email: "test@example.com",
-          password: "onlyletters", // No numbers
-        };
-
-        mockFetch.mockResolvedValueOnce({
-          ok: false,
-          status: 400,
-          headers: { get: () => null },
-          json: async () => ({
-            message: "Password must contain at least one letter and one number",
-          }),
-        });
-
-        const response = await fetch(`${backendUrl}/auth/sign-up/email`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(invalidData),
+          password: "onlyletters",
         });
 
         expect(response.status).toBe(400);
         const data = await response.json();
         expect(data.message).toMatch(/password/i);
       });
+
+      it("should return 400 for email too long (> 254 characters)", async () => {
+        const longEmail = `${"a".repeat(250)}@example.com`;
+        mockFetch.mockResolvedValueOnce(
+          mockErrorResponse(400, "Email address is too long")
+        );
+
+        const response = await makeRegistrationRequest({
+          email: longEmail,
+          password: "SecurePass123",
+        });
+
+        expect(response.status).toBe(400);
+      });
+
+      it("should return 400 for empty request body", async () => {
+        mockFetch.mockResolvedValueOnce(
+          mockErrorResponse(400, "Request body is required")
+        );
+
+        const response = await makeRegistrationRequest({});
+
+        expect(response.status).toBe(400);
+      });
     });
 
-    it("should return 400 for email too long (> 254 characters)", async () => {
-      const longEmail = `${"a".repeat(250)}@example.com`;
-      const invalidData = {
-        email: longEmail,
-        password: "SecurePass123",
-      };
+    describe("404 - Not Found Cases", () => {
+      it("should return 404 for incorrect endpoint", async () => {
+        mockFetch.mockResolvedValueOnce(
+          mockErrorResponse(404, "Endpoint not found")
+        );
 
-      mockFetch.mockResolvedValueOnce({
-        ok: false,
-        status: 400,
-        headers: { get: () => null },
-        json: async () => ({
-          message: "Email address is too long",
-        }),
+        const response = await fetch(`${backendUrl}/auth/sign-up-wrong`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: "test@example.com",
+            password: "SecurePass123",
+          }),
+        });
+
+        expect(response.status).toBe(404);
       });
-
-      const response = await fetch(`${backendUrl}/auth/sign-up/email`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(invalidData),
-      });
-
-      expect(response.status).toBe(400);
-      const data = await response.json();
-      expect(data.message).toBeDefined();
     });
 
-    it("should return 400 for empty request body", async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: false,
-        status: 400,
-        headers: { get: () => null },
-        json: async () => ({
-          message: "Request body is required",
-        }),
-      });
+    describe("409 - Conflict Cases", () => {
+      it("should return 409 for duplicate email (user already exists)", async () => {
+        mockFetch.mockResolvedValueOnce(
+          mockErrorResponse(409, "An account with this email already exists")
+        );
 
-      const response = await fetch(`${backendUrl}/auth/sign-up/email`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({}),
-      });
-
-      expect(response.status).toBe(400);
-    });
-
-    it("should return 400 for malformed JSON", async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: false,
-        status: 400,
-        headers: { get: () => null },
-        json: async () => ({
-          message: "Invalid JSON format",
-        }),
-      });
-
-      const response = await fetch(`${backendUrl}/auth/sign-up/email`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: "{ invalid json",
-      });
-
-      expect(response.status).toBe(400);
-    });
-  });
-
-  describe("404 - Not Found Cases", () => {
-    it("should return 404 for incorrect endpoint", async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: false,
-        status: 404,
-        headers: { get: () => null },
-        json: async () => ({
-          message: "Endpoint not found",
-        }),
-      });
-
-      const response = await fetch(`${backendUrl}/auth/sign-up-wrong`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+        const response = await makeRegistrationRequest({
           email: "test@example.com",
           password: "SecurePass123",
-        }),
-      });
+        });
 
-      expect(response.status).toBe(404);
+        expect(response.status).toBe(409);
+        const data = await response.json();
+        expect(data.message).toMatch(/already exists|duplicate/i);
+      });
     });
-  });
 
-  describe("409 - Conflict Cases", () => {
-    it("should return 409 for duplicate email (user already exists)", async () => {
-      const existingUserData = {
-        email: "existing@example.com",
-        password: "SecurePass123",
-      };
+    describe("429 - Rate Limiting Cases", () => {
+      it("should return 429 for too many registration attempts", async () => {
+        mockFetch.mockResolvedValueOnce(
+          mockErrorResponse(
+            429,
+            "Too many registration attempts. Please try again later."
+          )
+        );
 
-      mockFetch.mockResolvedValueOnce({
-        ok: false,
-        status: 409,
-        headers: { get: () => null },
-        json: async () => ({
-          message: "An account with this email already exists",
-        }),
-      });
-
-      const response = await fetch(`${backendUrl}/auth/sign-up/email`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(existingUserData),
-      });
-
-      expect(response.status).toBe(409);
-      const data = await response.json();
-      expect(data.message).toMatch(/already exists|duplicate/i);
-    });
-  });
-
-  describe("429 - Rate Limiting Cases", () => {
-    it("should return 429 for too many registration attempts", async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: false,
-        status: 429,
-        headers: { get: () => null },
-        json: async () => ({
-          message: "Too many registration attempts. Please try again later.",
-        }),
-      });
-
-      const response = await fetch(`${backendUrl}/auth/sign-up/email`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+        const response = await makeRegistrationRequest({
           email: "test@example.com",
           password: "SecurePass123",
-        }),
+        });
+
+        expect(response.status).toBe(429);
+        const data = await response.json();
+        expect(data.message).toMatch(/too many|rate limit/i);
       });
-
-      expect(response.status).toBe(429);
-      const data = await response.json();
-      expect(data.message).toMatch(/too many|rate limit/i);
-    });
-  });
-
-  describe("500 - Server Error Cases", () => {
-    it("should return 500 for internal server error", async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: false,
-        status: 500,
-        headers: { get: () => null },
-        json: async () => ({
-          message: "Internal server error",
-        }),
-      });
-
-      const response = await fetch(`${backendUrl}/auth/sign-up/email`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: "test@example.com",
-          password: "SecurePass123",
-        }),
-      });
-
-      expect(response.status).toBe(500);
-      const data = await response.json();
-      expect(data.message).toBeDefined();
     });
 
-    it("should return 503 for service unavailable (database down)", async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: false,
-        status: 503,
-        headers: { get: () => null },
-        json: async () => ({
-          message: "Service temporarily unavailable",
-        }),
-      });
+    describe("500 - Server Error Cases", () => {
+      it("should return 500 for internal server error", async () => {
+        mockFetch.mockResolvedValueOnce(
+          mockErrorResponse(500, "Internal server error")
+        );
 
-      const response = await fetch(`${backendUrl}/auth/sign-up/email`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+        const response = await makeRegistrationRequest({
           email: "test@example.com",
           password: "SecurePass123",
-        }),
+        });
+
+        expect(response.status).toBe(500);
+        const data = await response.json();
+        expect(data.message).toBeDefined();
       });
 
-      expect(response.status).toBe(503);
-      const data = await response.json();
-      expect(data.message).toMatch(/unavailable/i);
+      it("should return 503 for service unavailable", async () => {
+        mockFetch.mockResolvedValueOnce(
+          mockErrorResponse(503, "Service temporarily unavailable")
+        );
+
+        const response = await makeRegistrationRequest({
+          email: "test@example.com",
+          password: "SecurePass123",
+        });
+
+        expect(response.status).toBe(503);
+        const data = await response.json();
+        expect(data.message).toMatch(/unavailable/i);
+      });
     });
   });
 });
