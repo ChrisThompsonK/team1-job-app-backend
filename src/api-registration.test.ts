@@ -6,20 +6,20 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
  * Endpoint: POST /api/auth/sign-up/email
  */
 
+// Mock fetch for testing - available to all test blocks
+let mockFetch: ReturnType<typeof vi.fn>;
+const backendUrl = "http://localhost:3001/api";
+
+beforeEach(() => {
+  mockFetch = vi.fn();
+  global.fetch = mockFetch;
+});
+
+afterEach(() => {
+  vi.clearAllMocks();
+});
+
 describe("User Registration API - POST /api/auth/sign-up/email", () => {
-  // Mock fetch for testing
-  let mockFetch: ReturnType<typeof vi.fn>;
-  const backendUrl = "http://localhost:3001/api";
-
-  beforeEach(() => {
-    mockFetch = vi.fn();
-    global.fetch = mockFetch;
-  });
-
-  afterEach(() => {
-    vi.clearAllMocks();
-  });
-
   describe("HTTP Status Code Validation", () => {
     describe("200/201 - Success Cases", () => {
       it("should return 200/201 with valid registration data", async () => {
