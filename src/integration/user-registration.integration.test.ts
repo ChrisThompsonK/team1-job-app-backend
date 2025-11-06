@@ -1,5 +1,5 @@
 import request from "supertest";
-import { describe, expect, it, beforeAll, afterAll } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import app from "../app.js";
 
 /**
