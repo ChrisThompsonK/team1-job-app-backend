@@ -123,8 +123,6 @@ describe("User Registration API - Integration Tests", () => {
         expect(JSON.stringify(response.body)).not.toContain(userData.password);
       });
     });
-
-    it("should return user object with all expected fields", async () => {});
   });
 
   describe("Client Errors (4xx)", () => {
