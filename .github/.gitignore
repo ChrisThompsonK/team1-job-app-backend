@@ -158,3 +158,6 @@ build/Release
 
 # Biome cache
 .biome/
+
+
+/test/reports/*
