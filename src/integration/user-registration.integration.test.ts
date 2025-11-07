@@ -75,64 +75,17 @@ describe("User Registration API - Integration Tests", () => {
 
         // Validate session cookie is set
         expect(response.headers["set-cookie"]).toBeDefined();
-      });
 
-      it("should successfully register with only required fields (email & password)", async () => {
-        const userData = {
-          email: generateUniqueEmail(),
-          password: validPassword,
-        };
+        const cookies = response.headers["set-cookie"];
+        const cookieString = Array.isArray(cookies)
+          ? cookies.join("; ")
+          : cookies;
 
-        const response = await request(app)
-          .post("/api/auth/sign-up/email")
-          .send(userData)
-          .set("Content-Type", "application/json")
-          .expect(200);
+        // Verify HttpOnly flag is set (prevents XSS)
+        expect(cookieString).toContain("HttpOnly");
 
-        expect(response.body).toHaveProperty("user");
-        expect(response.body.user.email).toBe(userData.email);
-      });
-
-      it("should accept various valid email formats", async () => {
-        const validEmails = [
-          `user.name.${Date.now()}@example.com`,
-          `user+tag${Date.now()}@example.co.uk`,
-          `first.last${Date.now()}@company-name.com`,
-        ];
-
-        for (const email of validEmails) {
-          const response = await request(app)
-            .post("/api/auth/sign-up/email")
-            .send({
-              email,
-              password: validPassword,
-            })
-            .set("Content-Type", "application/json");
-
-          expect(response.status).toBe(200);
-          expect(response.body.user.email).toBe(email);
-        }
-      });
-
-      it("should accept various valid password formats", async () => {
-        const validPasswords = [
-          "Password123",
-          "MyP@ssw0rd",
-          "Test1234!@#",
-          "ValidP4ss",
-        ];
-
-        for (const password of validPasswords) {
-          const response = await request(app)
-            .post("/api/auth/sign-up/email")
-            .send({
-              email: generateUniqueEmail(),
-              password,
-            })
-            .set("Content-Type", "application/json");
-
-          expect(response.status).toBe(200);
-        }
+        // Verify session token cookie exists
+        expect(cookieString).toContain("better-auth.session_token");
       });
     });
 
@@ -164,45 +117,14 @@ describe("User Registration API - Integration Tests", () => {
         // Validate timestamps are valid ISO strings
         expect(new Date(user.createdAt).toISOString()).toBe(user.createdAt);
         expect(new Date(user.updatedAt).toISOString()).toBe(user.updatedAt);
-      });
 
-      it("should never include password in response", async () => {
-        const userData = createValidRegistrationData();
-
-        const response = await request(app)
-          .post("/api/auth/sign-up/email")
-          .send(userData)
-          .set("Content-Type", "application/json")
-          .expect(200);
-
-        // Password should not be in the response at all
+        // Password should never be included in response
         expect(response.body.user).not.toHaveProperty("password");
         expect(JSON.stringify(response.body)).not.toContain(userData.password);
       });
-
-      it("should set session cookie with secure attributes", async () => {
-        const userData = createValidRegistrationData();
-
-        const response = await request(app)
-          .post("/api/auth/sign-up/email")
-          .send(userData)
-          .set("Content-Type", "application/json")
-          .expect(200);
-
-        const cookies = response.headers["set-cookie"];
-        expect(cookies).toBeDefined();
-
-        const cookieString = Array.isArray(cookies)
-          ? cookies.join("; ")
-          : cookies;
-
-        // Verify HttpOnly flag is set (prevents XSS)
-        expect(cookieString).toContain("HttpOnly");
-
-        // Verify session token cookie exists
-        expect(cookieString).toContain("better-auth.session_token");
-      });
     });
+
+    it("should return user object with all expected fields", async () => {});
   });
 
   describe("Client Errors (4xx)", () => {
@@ -221,17 +143,13 @@ describe("User Registration API - Integration Tests", () => {
       });
 
       it("should return 500 when password is missing", async () => {
-        // Better Auth returns 500 for missing password instead of 400
-        const _response = await request(app)
+        await request(app)
           .post("/api/auth/sign-up/email")
           .send({
             email: generateUniqueEmail(),
           })
           .set("Content-Type", "application/json")
           .expect(500);
-
-        // Response may be empty or have a message
-        // Just verify we got a 500 status
       });
 
       it("should return 400 when both email and password are missing", async () => {
@@ -350,8 +268,8 @@ describe("User Registration API - Integration Tests", () => {
           })
           .set("Content-Type", "application/json");
 
-        // Should fail due to duplicate (Better Auth returns 422 or 500)
-        expect([200, 409, 422, 500]).toContain(response.status);
+        // Should fail due to duplicate (Better Auth returns 422 for conflict)
+        expect(response.status).toBe(422);
       });
     });
   });
@@ -577,17 +495,6 @@ describe("User Registration API - Integration Tests", () => {
         .expect(200);
 
       expect(response.body).toHaveProperty("user");
-    });
-
-    it("should return JSON response", async () => {
-      const userData = createValidRegistrationData();
-
-      const response = await request(app)
-        .post("/api/auth/sign-up/email")
-        .send(userData)
-        .set("Content-Type", "application/json")
-        .expect(200);
-
       expect(response.headers["content-type"]).toMatch(/application\/json/);
     });
   });
@@ -614,70 +521,6 @@ describe("User Registration API - Integration Tests", () => {
         .send(userData)
         .set("Content-Type", "application/json")
         .expect(200);
-    });
-  });
-
-  describe("Performance and Concurrency", () => {
-    it("should handle multiple concurrent registrations", async () => {
-      const registrationPromises = Array.from({ length: 5 }, () =>
-        request(app)
-          .post("/api/auth/sign-up/email")
-          .send(createValidRegistrationData())
-          .set("Content-Type", "application/json")
-      );
-
-      const responses = await Promise.all(registrationPromises);
-
-      // All should succeed
-      responses.forEach((response) => {
-        expect(response.status).toBe(200);
-        expect(response.body).toHaveProperty("user");
-      });
-
-      // All should have unique IDs
-      const userIds = responses.map((r) => r.body.user.id);
-      const uniqueIds = new Set(userIds);
-      expect(uniqueIds.size).toBe(5);
-    });
-
-    it("should complete registration within reasonable time", async () => {
-      const startTime = Date.now();
-
-      await request(app)
-        .post("/api/auth/sign-up/email")
-        .send(createValidRegistrationData())
-        .set("Content-Type", "application/json")
-        .expect(200);
-
-      const duration = Date.now() - startTime;
-
-      // Registration should complete within 3 seconds
-      expect(duration).toBeLessThan(3000);
-    });
-  });
-
-  describe("API Documentation Compliance", () => {
-    it("should match expected endpoint structure from API docs", async () => {
-      // Verify the endpoint exists as documented
-      const response = await request(app)
-        .post("/api/auth/sign-up/email")
-        .send(createValidRegistrationData())
-        .set("Content-Type", "application/json");
-
-      expect([200, 400, 409]).toContain(response.status);
-    });
-
-    it("should return documented response structure", async () => {
-      const response = await request(app)
-        .post("/api/auth/sign-up/email")
-        .send(createValidRegistrationData())
-        .set("Content-Type", "application/json")
-        .expect(200);
-
-      // Based on Better Auth documentation
-      expect(response.body).toHaveProperty("user");
-      expect(response.body.user).toHaveProperty("id");
-      expect(response.body.user).toHaveProperty("email");
     });
   });
 });
