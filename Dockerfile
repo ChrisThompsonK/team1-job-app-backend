@@ -1,0 +1,53 @@
+# Multi-stage build: Build stage
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+# Install build dependencies needed for native modules
+RUN apk add --no-cache python3 make g++
+
+# Copy package files
+COPY package.json package-lock.json ./
+
+# Install all dependencies (needed for build and migrations)
+RUN npm ci
+
+# Copy source code
+COPY . .
+
+# Build the TypeScript application
+RUN npm run build
+
+# Production stage
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copy package files
+COPY package.json package-lock.json ./
+
+# Install production dependencies only (smaller image)
+RUN npm ci --omit=dev
+
+# Install tsx globally for migrations (lightweight)
+RUN npm install -g tsx
+
+# Copy built application from builder stage
+COPY --from=builder /app/dist ./dist
+
+# Copy source code (needed for migrations)
+COPY src ./src
+
+# Copy drizzle migrations and configuration
+COPY drizzle ./drizzle
+COPY drizzle.config.ts ./
+
+# Expose port (3001 as configured in env)
+EXPOSE 3001
+
+# Health check (port 3001 is internal to container)
+HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:3001/', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})" || exit 1
+
+# Start the application
+CMD ["sh", "-c", "tsx src/db/migrate.ts && node dist/server.js"]
