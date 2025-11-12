@@ -54,9 +54,9 @@ RUN addgroup -g 1001 appgroup && \
 
 USER appuser
 
-# Health check using wget (lighter than node)
+# Health check using wget (built into alpine busybox)
 HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:${PORT}/ || exit 1
+  CMD wget --quiet --tries=1 --spider http://localhost:${PORT}/ || exit 1
 
 # Start application
 CMD ["node", "dist/server.js"]
