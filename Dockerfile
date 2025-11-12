@@ -39,6 +39,16 @@ COPY drizzle.config.ts ./
 # Expose port (3001 as configured in env)
 EXPOSE 3001
 
+# Create a non-root user and give ownership of the app directory
+# We create the user after installing deps so installs run as root,
+# then change ownership and switch to the unprivileged user for runtime.
+RUN addgroup -S app \
+  && adduser -S -G app -u 1000 app \
+  && chown -R app:app /app
+
+# Switch to the non-root user
+USER app
+
 # Health check (port 3001 is internal to container)
 HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
   CMD node -e "require('http').get('http://localhost:3001/', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})" || exit 1
