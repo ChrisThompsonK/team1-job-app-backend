@@ -39,15 +39,13 @@ COPY drizzle.config.ts ./
 # Expose port (3001 as configured in env)
 EXPOSE 3001
 
-# Create a non-root user and give ownership of the app directory
-# We create the user after installing deps so installs run as root,
-# then change ownership and switch to the unprivileged user for runtime.
-RUN addgroup -S app \
-  && adduser -S -G app -u 1000 app \
-  && chown -R app:app /app
+# Create a user with explicit UID/GID and switch to it
+# This follows Docker best practices while keeping it simple
+RUN addgroup -g 1001 appgroup && \
+    adduser -u 1001 -G appgroup -s /bin/sh -D appuser && \
+    chown -R appuser:appgroup /app
 
-# Switch to the non-root user
-USER app
+USER appuser
 
 # Health check (port 3001 is internal to container)
 HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
