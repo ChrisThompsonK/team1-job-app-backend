@@ -29,14 +29,8 @@ COPY package.json package-lock.json ./
 # Install production dependencies only (smaller image)
 RUN npm ci --omit=dev
 
-# Install tsx globally for migrations (lightweight)
-RUN npm install -g tsx
-
 # Copy built application from builder stage
 COPY --from=builder /app/dist ./dist
-
-# Copy source code (needed for migrations)
-COPY src ./src
 
 # Copy drizzle migrations and configuration
 COPY drizzle ./drizzle
@@ -49,5 +43,6 @@ EXPOSE 3001
 HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
   CMD node -e "require('http').get('http://localhost:3001/', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})" || exit 1
 
-# Start the application
-CMD ["sh", "-c", "tsx src/db/migrate.ts && node dist/server.js"]
+# Start the application (run compiled migration script from dist)
+# This avoids installing tsx globally at runtime and keeps the final image smaller.
+CMD ["sh", "-c", "node dist/db/migrate.js && node dist/server.js"]
