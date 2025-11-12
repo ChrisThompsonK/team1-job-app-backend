@@ -6,10 +6,10 @@ WORKDIR /app
 # Install build dependencies needed for native modules
 RUN apk add --no-cache python3 make g++
 
-# Copy package files
+# Copy package files first (better layer caching)
 COPY package.json package-lock.json ./
 
-# Install all dependencies (needed for build and migrations)
+# Install all dependencies (needed for build)
 RUN npm ci
 
 # Copy source code
@@ -21,36 +21,42 @@ RUN npm run build
 # Production stage
 FROM node:20-alpine
 
+# Metadata
+LABEL maintainer="team1-job-app-backend"
+LABEL version="1.0.0"
+LABEL description="Job Application Backend API"
+
 WORKDIR /app
 
-# Copy package files
+# Copy package files first (better layer caching)
 COPY package.json package-lock.json ./
 
-# Install production dependencies only (smaller image)
-RUN npm ci --omit=dev
+# Install production dependencies only
+RUN npm ci --omit=dev && npm cache clean --force
 
 # Copy built application from builder stage
 COPY --from=builder /app/dist ./dist
 
-# Copy drizzle migrations and configuration
+# Copy only migration SQL files (not config)
 COPY drizzle ./drizzle
-COPY drizzle.config.ts ./
 
-# Expose port (3001 as configured in env)
+# Environment variables
+ENV NODE_ENV=production
+ENV PORT=3001
+
+# Expose port
 EXPOSE 3001
 
-# Create a user with explicit UID/GID and switch to it
-# This follows Docker best practices while keeping it simple
+# Create non-root user
 RUN addgroup -g 1001 appgroup && \
     adduser -u 1001 -G appgroup -s /bin/sh -D appuser && \
     chown -R appuser:appgroup /app
 
 USER appuser
 
-# Health check (port 3001 is internal to container)
+# Health check using wget (lighter than node)
 HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:3001/', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})" || exit 1
+  CMD wget --no-verbose --tries=1 --spider http://localhost:${PORT}/ || exit 1
 
-# Start the application (run compiled migration script from dist)
-# This avoids installing tsx globally at runtime and keeps the final image smaller.
-CMD ["sh", "-c", "node dist/db/migrate.js && node dist/server.js"]
+# Start application
+CMD ["node", "dist/server.js"]

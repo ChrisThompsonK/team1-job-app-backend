@@ -9,11 +9,15 @@ coverage
 .env.*.local
 .DS_Store
 README.md
+*.md
 docs
 .vscode
 .idea
-test-cases.md
 scripts
 .github
 vitest.config.ts
 biome.json
+tsconfig.json
+**/*.test.ts
+**/*.test.js
+src/integration
