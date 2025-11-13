@@ -51,6 +51,15 @@ jobs:
       - name: Install dependencies
         run: npm ci
       
+      # Set up test database
+      - name: Setup test database
+        run: |
+          npm run db:migrate
+        env:
+          DATABASE_URL: file:test.db
+          BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
+          BETTER_AUTH_URL: http://localhost:3001
+      
       - name: Run unit tests
         run: npm run test:run
 
