@@ -89,4 +89,4 @@ jobs:
           context: .
           # Only push when on main branch, otherwise just build
           push: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
-          tags: aiacademy25-bbaue6bgenhkd0dj.azurecr.io/${{ github.repository }}:v${{ steps.version.outputs.version }}   
+          tags: aiacademy25-bbaue6bgenhkd0dj.azurecr.io/team1-job-app-backend:v${{ steps.version.outputs.version }}   
