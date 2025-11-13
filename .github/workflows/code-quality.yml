@@ -57,7 +57,7 @@ jobs:
       # Login to Azure Container Registry
       - name: Login to ACR
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: az acr login --name aiacademy25bbaue6bgenhkd0dj
+        run: az acr login --name aiacademy25
       
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
