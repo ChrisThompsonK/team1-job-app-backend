@@ -19,8 +19,9 @@ RUN npm run build
 FROM node:20-alpine
 
 # Metadata
+ARG VERSION
 LABEL maintainer="team1-job-app-backend"
-LABEL version="1.0.0"
+LABEL version="${VERSION}"
 LABEL description="Job Application Backend API"
 
 WORKDIR /app

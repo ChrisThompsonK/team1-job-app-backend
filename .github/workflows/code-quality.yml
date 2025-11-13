@@ -64,4 +64,4 @@ jobs:
           context: .
           # Only push when on main branch, otherwise just build
           push: false
-          tags: aiacademy25-bbaue6bgenhkd0dj.azurecr.io/team1-job-app-backend:v${{ steps.version.outputs.version}}   
+          tags: aiacademy25-bbaue6bgenhkd0dj.azurecr.io/team1-job-app-backend:v${{ steps.version.outputs.version }}   
