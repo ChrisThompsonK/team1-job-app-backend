@@ -46,12 +46,19 @@ jobs:
       - name: Extract Version
         id: version
         run: echo "Version=$(jq -r '.version' package.json)" >> $GITHUB_OUTPUT
-        
+      
+      # Login to Azure (required for ACR push)
       - name: Azure login
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         uses: azure/login@v2
         with:
-            creds: ${{ secrets.AZURE_CREDENTIALS }}
-        
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      
+      # Login to Azure Container Registry
+      - name: Login to ACR
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: az acr login --name aiacademy25bbaue6bgenhkd0dj
+      
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       
@@ -60,5 +67,5 @@ jobs:
         with:
           context: .
           # Only push when on main branch, otherwise just build
-          push: false
+          push: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
           tags: aiacademy25-bbaue6bgenhkd0dj.azurecr.io/team1-job-app-backend:v${{ steps.version.outputs.version }}   
