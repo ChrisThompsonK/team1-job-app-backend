@@ -1,9 +1,10 @@
 name: Code Quality Checks
 
 on:
-  push:  # Triggers on ALL branches
   pull_request:
     branches: [ main, develop ]
+  push:
+    branches: [ main ]  # Only run on main (for merges and Docker push)
 
 jobs:
   biome:
