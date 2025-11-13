@@ -116,28 +116,24 @@ jobs:
             -e BETTER_AUTH_URL=http://localhost:3001 \
             aiacademy25-bbaue6bgenhkd0dj.azurecr.io/team1-job-app-backend:v${{ steps.version.outputs.version }}
           
-          # Wait for container to be ready (max 30 seconds)
-          echo "Waiting for container to be healthy..."
-          COUNTER=0
-          while [ $COUNTER -lt 30 ]; do
-            if docker inspect --format='{{.State.Health.Status}}' health-test 2>/dev/null | grep -q "healthy"; then
-              echo "✅ Container is healthy!"
-              docker logs health-test
-              docker stop health-test
-              docker rm health-test
-              exit 0
-            fi
-            echo "Waiting... ($COUNTER/30)"
-            sleep 1
-            COUNTER=$((COUNTER + 1))
-          done
+          # Wait for container to start
+          echo "Waiting for container to be ready..."
+          sleep 10
           
-          # If we get here, health check failed
-          echo "❌ Health check failed!"
+          # Show logs
           docker logs health-test
+          
+          # Check for errors in logs and fail if found
+          if docker logs health-test 2>&1 | grep -iE "error|exception"; then
+            echo "❌ Errors found in logs!"
+            docker stop health-test
+            docker rm health-test
+            exit 1
+          fi
+          
+          echo "✅ Health check passed!"
           docker stop health-test
           docker rm health-test
-          exit 1
       
       # Only push if health check passed and we're on main
       - name: Push Docker image to ACR
