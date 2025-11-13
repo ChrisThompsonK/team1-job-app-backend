@@ -83,10 +83,55 @@ jobs:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
         with:
           context: .
           # Only push when on main branch, otherwise just build
           push: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
-          tags: aiacademy25-bbaue6bgenhkd0dj.azurecr.io/team1-job-app-backend:v${{ steps.version.outputs.version }}   
+          tags: aiacademy25-bbaue6bgenhkd0dj.azurecr.io/team1-job-app-backend:v${{ steps.version.outputs.version }}
+          load: true  # Load image into Docker for health check
+      
+      # Health check: Run the container and verify it starts successfully
+      - name: Test Docker image health
+        run: |
+          # Start container in detached mode
+          docker run -d \
+            --name health-test \
+            -p 3001:3001 \
+            -e DATABASE_URL=file:test.db \
+            -e BETTER_AUTH_SECRET=${{ secrets.BETTER_AUTH_SECRET }} \
+            -e BETTER_AUTH_URL=http://localhost:3001 \
+            aiacademy25-bbaue6bgenhkd0dj.azurecr.io/team1-job-app-backend:v${{ steps.version.outputs.version }}
+          
+          # Wait for container to be ready (max 30 seconds)
+          echo "Waiting for container to be healthy..."
+          COUNTER=0
+          while [ $COUNTER -lt 30 ]; do
+            if docker inspect --format='{{.State.Health.Status}}' health-test 2>/dev/null | grep -q "healthy"; then
+              echo "✅ Container is healthy!"
+              docker logs health-test
+              docker stop health-test
+              docker rm health-test
+              exit 0
+            fi
+            echo "Waiting... ($COUNTER/30)"
+            sleep 1
+            COUNTER=$((COUNTER + 1))
+          done
+          
+          # If we get here, health check failed
+          echo "❌ Health check failed!"
+          docker logs health-test
+          docker stop health-test
+          docker rm health-test
+          exit 1
+      
+      # Only push if health check passed and we're on main
+      - name: Push Docker image to ACR
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: |
+          docker push aiacademy25-bbaue6bgenhkd0dj.azurecr.io/team1-job-app-backend:v${{ steps.version.outputs.version }}   
