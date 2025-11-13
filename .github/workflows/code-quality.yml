@@ -1,8 +1,7 @@
 name: Code Quality Checks
 
 on:
-  push:
-    branches: [ main, develop ]
+  push:  # Triggers on ALL branches
   pull_request:
     branches: [ main, develop ]
 
@@ -39,9 +38,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: biome  # SEQUENTIAL - waits for biome job to complete
     
-    # CONDITIONAL - only build on push to main/develop, not on PRs
-    if: github.event_name == 'push'
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -50,10 +46,12 @@ jobs:
         id: version
         run: echo "Version=$(jq -r '.version' package.json)" >> $GITHUB_OUTPUT
       
+      # # Login only when pushing to main
       # - name: Log in to Azure Container Registry
+      #   if: github.ref == 'refs/heads/main' && github.event_name == 'push'
       #   uses: docker/login-action@v3
       #   with:
-      #     registry: ${{ env.REGISTRY }}
+      #     registry: aiacademy25-bbaue6bgenhkd0dj.azurecr.io
       #     username: ${{ secrets.ACR_USERNAME }}
       #     password: ${{ secrets.ACR_PASSWORD }}
 
@@ -64,5 +62,6 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
+          # Only push when on main branch, otherwise just build
           push: false
           tags: aiacademy25-bbaue6bgenhkd0dj.azurecr.io/team1-job-app-backend:v${{ steps.version.outputs.version}}   
