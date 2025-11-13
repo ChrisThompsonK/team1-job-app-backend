@@ -46,16 +46,12 @@ jobs:
       - name: Extract Version
         id: version
         run: echo "Version=$(jq -r '.version' package.json)" >> $GITHUB_OUTPUT
-      
-      # # Login only when pushing to main
-      # - name: Log in to Azure Container Registry
-      #   if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-      #   uses: docker/login-action@v3
-      #   with:
-      #     registry: aiacademy25-bbaue6bgenhkd0dj.azurecr.io
-      #     username: ${{ secrets.ACR_USERNAME }}
-      #     password: ${{ secrets.ACR_PASSWORD }}
-
+        
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+            creds: ${{ secrets.AZURE_CREDENTIALS }}
+        
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       
