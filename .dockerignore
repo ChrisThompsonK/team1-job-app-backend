@@ -16,8 +16,6 @@ docs
 scripts
 .github
 vitest.config.ts
-biome.json
-tsconfig.json
 **/*.test.ts
 **/*.test.js
 src/integration
