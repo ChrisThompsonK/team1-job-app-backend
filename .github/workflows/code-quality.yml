@@ -161,6 +161,12 @@ jobs:
       # - name: Terraform Format Check
       #   run: terraform fmt -check -recursive
       
+      # Login to Azure (required for ACR push)
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
       - name: Terraform Init
         run: terraform init -backend-config=enviroments/dev/backend.tfvars
       
