@@ -7,144 +7,132 @@ on:
     branches: [ main ]  # Only run on main (for merges and Docker push)
 
 jobs:
-  # biome:
-  #   name: Run Biome checks
-  #   runs-on: ubuntu-latest
-    
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
-        
-  #     - name: Setup Node.js
-  #       uses: actions/setup-node@v4
-  #       with:
-  #         node-version: '20'
-  #         cache: 'npm'
-          
-  #     - name: Install dependencies
-  #       run: npm ci
-        
-  #     - name: Run Biome format check
-  #       run: npm run format:check
-        
-  #     - name: Run Biome lint
-  #       run: npm run lint
-        
-  #     - name: Run Biome full check
-  #       run: npm run check      
-
-  # run-tests:
-  #   name: Run Tests
-  #   runs-on: ubuntu-latest
-  #   needs: biome  # Run after biome passes
-    
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
-      
-  #     - name: Setup Node.js
-  #       uses: actions/setup-node@v4
-  #       with:
-  #         node-version: '20'
-  #         cache: 'npm'
-      
-  #     - name: Install dependencies
-  #       run: npm ci
-      
-  #     # Set up test database
-  #     - name: Setup test database
-  #       run: |
-  #         npm run db:migrate
-  #       env:
-  #         DATABASE_URL: file:test.db
-  #         BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
-  #         BETTER_AUTH_URL: http://localhost:3001
-      
-  #     - name: Run unit tests
-  #       run: npm run test:run
-
-  # # Job 2: Build Docker image (runs AFTER biome AND tests pass)
-  # build-docker:
-  #   name: Build and Push Docker Image
-  #   runs-on: ubuntu-latest
-  #   needs: [biome, run-tests]  # SEQUENTIAL - wait for both to pass
-    
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
-
-  #     - name: Extract Version
-  #       id: version
-  #       run: echo "Version=$(jq -r '.version' package.json)" >> $GITHUB_OUTPUT
-      
-  #     # Login to Azure (required for ACR push)
-  #     - name: Azure login
-  #       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-  #       uses: azure/login@v2
-  #       with:
-  #         creds: ${{ secrets.AZURE_CREDENTIALS }}
-      
-  #     # Login to Azure Container Registry
-  #     - name: Login to ACR
-  #       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-  #       run: az acr login --name aiacademy25
-      
-  #     - name: Set up QEMU
-  #       uses: docker/setup-qemu-action@v3
-      
-  #     - name: Set up Docker Buildx
-  #       uses: docker/setup-buildx-action@v3
-      
-  #     - name: Build and push Docker image
-  #       uses: docker/build-push-action@v6
-  #       with:
-  #         context: .
-  #         # Only push when on main branch, otherwise just build
-  #         push: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
-  #         tags: aiacademy25-bbaue6bgenhkd0dj.azurecr.io/team1-job-app-backend:v${{ steps.version.outputs.version }}
-  #         load: true  # Load image into Docker for health check
-      
-  #     # Health check: Run the container and verify it starts successfully
-  #     - name: Test Docker image health
-  #       run: |
-  #         # Start container in detached mode
-  #         docker run -d \
-  #           --name health-test \
-  #           -p 3001:3001 \
-  #           -e DATABASE_URL=file:test.db \
-  #           -e BETTER_AUTH_SECRET=${{ secrets.BETTER_AUTH_SECRET }} \
-  #           -e BETTER_AUTH_URL=http://localhost:3001 \
-  #           aiacademy25-bbaue6bgenhkd0dj.azurecr.io/team1-job-app-backend:v${{ steps.version.outputs.version }}
-          
-  #         # Wait for container to start
-  #         echo "Waiting for container to be ready..."
-  #         sleep 10
-          
-  #         # Show logs
-  #         docker logs health-test
-          
-  #         # Check for errors in logs and fail if found
-  #         if docker logs health-test 2>&1 | grep -iE "error|exception"; then
-  #           echo "❌ Errors found in logs!"
-  #           docker stop health-test
-  #           docker rm health-test
-  #           exit 1
-  #         fi
-          
-  #         echo "✅ Health check passed!"
-  #         docker stop health-test
-  #         docker rm health-test
-      
-  #     # Only push if health check passed and we're on main
-  #     - name: Push Docker image to ACR
-  #       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-  #       run: |
-  #         docker push aiacademy25-bbaue6bgenhkd0dj.azurecr.io/team1-job-app-backend:v${{ steps.version.outputs.version }}
-
-  terraform:
-    name: Terraform
+  biome:
+    name: Run Biome checks
     runs-on: ubuntu-latest
-    # needs: [biome, run-tests, build-docker]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Run Biome format check
+        run: npm run format:check
+        
+      - name: Run Biome lint
+        run: npm run lint
+        
+      - name: Run Biome full check
+        run: npm run check      
+
+  run-tests:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      # Set up test database
+      - name: Setup test database
+        run: |
+          npm run db:migrate
+        env:
+          DATABASE_URL: file:test.db
+          BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
+          BETTER_AUTH_URL: http://localhost:3001
+      
+      - name: Run unit tests
+        run: npm run test:run
+
+  build-docker:
+    name: Build and Test Docker Image
+    runs-on: ubuntu-latest
+    needs: [biome, run-tests]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Extract Version
+        id: version
+        run: echo "Version=$(jq -r '.version' package.json)" >> $GITHUB_OUTPUT
+      
+      - name: Azure login
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      
+      - name: Login to ACR
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: az acr login --name aiacademy25
+      
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Build Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          tags: aiacademy25-bbaue6bgenhkd0dj.azurecr.io/team1-job-app-backend:v${{ steps.version.outputs.version }}
+          load: true
+      
+      - name: Test Docker image health
+        run: |
+          docker run -d \
+            --name health-test \
+            -p 3001:3001 \
+            -e DATABASE_URL=file:test.db \
+            -e BETTER_AUTH_SECRET=${{ secrets.BETTER_AUTH_SECRET }} \
+            -e BETTER_AUTH_URL=http://localhost:3001 \
+            aiacademy25-bbaue6bgenhkd0dj.azurecr.io/team1-job-app-backend:v${{ steps.version.outputs.version }}
+          
+          echo "Waiting for container to be ready..."
+          sleep 10
+          
+          docker logs health-test
+          
+          if docker logs health-test 2>&1 | grep -iE "error|exception"; then
+            echo "❌ Errors found in logs!"
+            docker stop health-test
+            docker rm health-test
+            exit 1
+          fi
+          
+          echo "✅ Health check passed!"
+          docker stop health-test
+          docker rm health-test
+      
+      - name: Push Docker image to ACR
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: docker push aiacademy25-bbaue6bgenhkd0dj.azurecr.io/team1-job-app-backend:v${{ steps.version.outputs.version }}
+
+  terraform-plan:
+    name: Terraform Plan
+    runs-on: ubuntu-latest
+    needs: build-docker
     defaults:
       run:
         working-directory: ./infrastructure
@@ -158,14 +146,8 @@ jobs:
         with:
           terraform_version: "1.9.0"
       
-      # - name: Terraform Format Check
-      #   run: terraform fmt -check -recursive
-      
-      # Login to Azure (required for ACR push)
-      - name: Azure login
-        uses: azure/login@v2
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive
 
       - name: Set Azure credentials as environment variables
         run: |
@@ -178,14 +160,14 @@ jobs:
       - name: Terraform Init
         run: terraform init -backend-config=enviroments/dev/backend.tfvars
       
-      # - name: Terraform Validate
-      #   run: terraform validate
+      - name: Terraform Validate
+        run: terraform validate
       
-      # - name: Terraform Plan
-      #   run: terraform plan -var-file=enviroments/dev/terraform.tfvars
+      - name: Terraform Plan
+        run: terraform plan -var-file=enviroments/dev/terraform.tfvars
       
-      # - name: Terraform Apply
-      #   if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-      #   run: terraform apply -auto-approve -var-file=enviroments/dev/terraform.tfvars 
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: terraform apply -auto-approve -var-file=enviroments/dev/terraform.tfvars 
         
         
