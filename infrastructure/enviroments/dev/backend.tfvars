@@ -1,4 +1,4 @@
-resource_group_name  = "your-resource-group-name"
-storage_account_name = "your-storage-account-name"
-container_name       = "terraform-state"
-key                  = "dev/terraform.tfstate"
+resource_group_name  = "terraform-state-mgmt"
+storage_account_name = "aistatemgmt"
+container_name       = "terraform-tfstate-ai"
+key                  = "team1.backend.dev.tfstate"
