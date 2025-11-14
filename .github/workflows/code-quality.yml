@@ -139,4 +139,39 @@ jobs:
       - name: Push Docker image to ACR
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: |
-          docker push aiacademy25-bbaue6bgenhkd0dj.azurecr.io/team1-job-app-backend:v${{ steps.version.outputs.version }}   
+          docker push aiacademy25-bbaue6bgenhkd0dj.azurecr.io/team1-job-app-backend:v${{ steps.version.outputs.version }}
+
+  terraform:
+    name: Terraform
+    runs-on: ubuntu-latest
+    needs: [biome, run-tests, build-docker]
+    defaults:
+      run:
+        working-directory: ./infrastructure
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.9.0"
+      
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive
+      
+      - name: Terraform Init
+        run: terraform init
+      
+      - name: Terraform Validate
+        run: terraform validate
+      
+      - name: Terraform Plan
+        run: terraform plan -var-file=enviroments/dev/terraform.tfvars
+      
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: terraform apply -auto-approve -var-file=enviroments/dev/terraform.tfvars 
+        
+        
