@@ -22,6 +22,12 @@ data "azurerm_key_vault" "kv" {
   resource_group_name = var.key_vault_resource_group_name
 }
 
+# Data Source: Existing Container App Environment (from shared resources repo)
+data "azurerm_container_app_environment" "platform_env" {
+  name                = var.container_app_environment_name
+  resource_group_name = var.container_app_environment_resource_group_name
+}
+
 # User-Assigned Managed Identity for Container App
 resource "azurerm_user_assigned_identity" "container_identity" {
   name                = "${var.app_name}-identity"
@@ -48,24 +54,10 @@ resource "azurerm_role_assignment" "kv_secrets_user" {
   principal_id         = azurerm_user_assigned_identity.container_identity.principal_id
 }
 
-# Container App Environment (Managed Platform)
-resource "azurerm_container_app_environment" "main" {
-  name                       = "${var.app_name}-env"
-  location                   = azurerm_resource_group.main.location
-  resource_group_name        = azurerm_resource_group.main.name
-  log_analytics_workspace_id = null
-
-  tags = {
-    Environment = var.environment
-    Application = var.app_name
-    ManagedBy   = "Terraform"
-  }
-}
-
 # Container App for Backend
 resource "azurerm_container_app" "backend" {
   name                         = "${var.app_name}-app"
-  container_app_environment_id = azurerm_container_app_environment.main.id
+  container_app_environment_id = data.azurerm_container_app_environment.platform_env.id
   resource_group_name          = azurerm_resource_group.main.name
   revision_mode                = "Single"
 

@@ -9,7 +9,11 @@ acr_resource_group_name = "container-registry"
 
 # Key Vault Configuration (update when colleague creates it)
 key_vault_name                = "team1-job-app-keyvault"
-key_vault_resource_group_name = "team1-job-app-key-rg"
+key_vault_resource_group_name = "team1-job-app-shared-rg"
+
+# Container App Environment Configuration
+container_app_environment_name                = "team1-job-app-container-app-environment"
+container_app_environment_resource_group_name = "team1-job-app-shared-rg"
 
 # Container App Configuration
 container_image_tag = "v1.0.0"

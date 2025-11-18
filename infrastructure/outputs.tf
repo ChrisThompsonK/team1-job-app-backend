@@ -9,12 +9,6 @@ output "resource_group_location" {
   value       = azurerm_resource_group.main.location
 }
 
-# Container App Environment
-output "container_app_environment_id" {
-  description = "ID of the Container App Environment"
-  value       = azurerm_container_app_environment.main.id
-}
-
 # Container App
 output "container_app_id" {
   description = "ID of the backend Container App"

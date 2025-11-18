@@ -40,10 +40,23 @@ variable "key_vault_name" {
 variable "key_vault_resource_group_name" {
   description = "Resource group containing the Key Vault"
   type        = string
-  default     = "team1-job-app-key-rg"
+  default     = "team1-job-app-shared-rg"
 }
 
-# Container Instance Configuration
+# Shared Container App Environment Configuration
+variable "container_app_environment_name" {
+  description = "Name of the Container App Environment"
+  type        = string
+  default     = "team1-job-app-container-app-environment"
+}
+
+variable "container_app_environment_resource_group_name" {
+  description = "Resource group containing the Container App Environment"
+  type        = string
+  default     = "team1-job-app-shared-rg"
+}
+
+# Container App Configuration
 variable "container_image_tag" {
   description = "Tag of the container image to deploy"
   type        = string
