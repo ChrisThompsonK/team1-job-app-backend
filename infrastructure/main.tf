@@ -143,7 +143,7 @@ resource "azurerm_container_app" "backend" {
     allow_insecure_connections = false
     external_enabled           = false
     target_port                = var.container_port
-    transport                  = "tcp"
+    transport                  = "http"
 
     traffic_weight {
       latest_revision = true
