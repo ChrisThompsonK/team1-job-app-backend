@@ -9,12 +9,14 @@ terraform {
   }
 
   backend "azurerm" {
-    # Set via backend-config flags or environment variables
+    resource_group_name  = "terraform-state-mgmt"
+    storage_account_name = "aistatemgmt"
+    container_name       = "terraform-tfstate-ai"
+    key                  = "team1.backend.dev.tfstate"
   }
 }
 
 provider "azurerm" {
   features {}
-  # Automatically uses ARM_* environment variables for authentication
 }
 

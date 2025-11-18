@@ -158,16 +158,16 @@ jobs:
           echo "ARM_TENANT_ID=$(jq -r .tenantId <<< '${{ secrets.AZURE_CREDENTIALS }}')" >> $GITHUB_ENV
 
       - name: Terraform Init
-        run: terraform init -backend-config=enviroments/dev/terraform.tfvars
+        run: terraform init
       
       - name: Terraform Validate
         run: terraform validate
       
       - name: Terraform Plan
-        run: terraform plan
+        run: terraform plan -var-file=enviroments/dev/terraform.tfvars
       
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: terraform apply -auto-approve 
+        run: terraform apply -auto-approve -var-file=enviroments/dev/terraform.tfvars 
         
         

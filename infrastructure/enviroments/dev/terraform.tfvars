@@ -24,9 +24,3 @@ container_port      = 3001
 # Application Configuration
 app_name        = "team1-job-app-backend"
 better_auth_url = "http://team1-job-app-backend.team1-job-app-backend-env.internal:3001"
-
-# Terraform Backend Configuration
-terraform_backend_resource_group_name  = "terraform-state-mgmt"
-terraform_backend_storage_account_name = "aistatemgmt"
-terraform_backend_container_name       = "terraform-tfstate-ai"
-terraform_backend_key                  = "team1.backend.dev.tfstate"
