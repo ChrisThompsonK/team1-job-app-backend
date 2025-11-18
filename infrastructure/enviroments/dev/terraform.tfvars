@@ -13,10 +13,10 @@ key_vault_resource_group_name = "team1-job-app-key-rg"
 
 # Container App Configuration
 container_image_tag = "v1.0.0"
-container_cpu       = "1"
-container_memory    = "2Gi"
+container_cpu       = "0.5"
+container_memory    = "1Gi"
 container_port      = 3001
 
 # Application Configuration
 app_name        = "team1-job-app-backend"
-better_auth_url = "http://localhost:3001"
+better_auth_url = "http://team1-job-app-backend.team1-job-app-backend-env.internal:3001"

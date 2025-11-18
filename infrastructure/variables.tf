@@ -53,13 +53,13 @@ variable "container_image_tag" {
 variable "container_cpu" {
   description = "CPU cores for the container (e.g., '0.5', '1', '2')"
   type        = string
-  default     = "1"
+  default     = "0.5"
 }
 
 variable "container_memory" {
   description = "Memory for the container (e.g., '1Gi', '2Gi')"
   type        = string
-  default     = "2Gi"
+  default     = "1Gi"
 }
 
 variable "container_port" {
@@ -78,5 +78,5 @@ variable "app_name" {
 variable "better_auth_url" {
   description = "Better Auth URL for the application"
   type        = string
-  default     = "http://localhost:3001"
+  default     = "http://team1-job-app-backend.team1-job-app-backend-env.internal:3001"
 }
