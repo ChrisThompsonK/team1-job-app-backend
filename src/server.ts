@@ -1,13 +1,10 @@
 import app from "./app.js";
 import { env } from "./config/env.js";
-import { runMigrationsWithRetry } from "./db/runMigrations.js";
 import { jobScheduler } from "./di/container.js";
-
 
 // Health/readiness endpoint
 app.get("/health", (_req, res) => {
   res.status(200).json({ status: "ready", timestamp: new Date() });
-
 });
 
 app.listen(env.port, () => {
