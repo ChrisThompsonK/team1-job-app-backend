@@ -60,6 +60,5 @@ USER appuser
 # Health check using wget (built into alpine busybox)
 HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
   CMD wget --quiet --tries=1 --spider http://localhost:${PORT}/ || exit 1
-
 # Start application - run migrations and seeds first, then start server
 CMD ["sh", "-c", "npm run db:setup && node dist/server.js"]
