@@ -53,7 +53,3 @@ export async function runMigrationsWithRetry(): Promise<void> {
 }
 
 // Run migrations but don't exit the process
-runMigrationsWithRetry().catch((error) => {
-  console.error("💥 Unexpected error during migrations:", error);
-  // Don't exit - let the server start anyway
-});
