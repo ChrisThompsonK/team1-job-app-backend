@@ -1,7 +1,7 @@
 import app from "./app.js";
 import { env } from "./config/env.js";
-import { jobScheduler } from "./di/container.js";
 import { runMigrationsWithRetry } from "./db/runMigrations.js";
+import { jobScheduler } from "./di/container.js";
 
 // Run migrations on startup in production (non-blocking)
 // In development, migrations should be run manually via `npm run db:migrate`
