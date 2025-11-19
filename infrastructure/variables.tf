@@ -60,7 +60,7 @@ variable "container_app_environment_resource_group_name" {
 variable "container_image_tag" {
   description = "Tag of the container image to deploy"
   type        = string
-  default     = "v1.0.0"
+  default     = "v1.0.1"
 }
 
 variable "container_cpu" {
