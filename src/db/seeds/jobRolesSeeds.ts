@@ -1,4 +1,4 @@
-import { jobsTable } from "../schemas/jobs";
+import { jobsTable } from "../schemas/jobs.js";
 
 export const jobRolesSeeds: (typeof jobsTable.$inferInsert)[] = [
   {

@@ -1,12 +1,7 @@
 import { createClient } from "@libsql/client";
 import { drizzle } from "drizzle-orm/libsql";
 import { env } from "../../config/env.js";
-import {
-  comprehensiveJobSeeds,
-  jobRolesTable,
-  runApplicationSeeds,
-  runAuthSeeds,
-} from "./index.js";
+import { comprehensiveJobSeeds, jobRolesTable } from "./index.js";
 
 const client = createClient({
   url: env.databaseUrl,
@@ -18,8 +13,9 @@ export async function runSeeds(): Promise<void> {
   try {
     console.log("🌱 Starting database seeding...");
 
+    // Skip auth seeding - tables may not exist yet during Docker startup
     // Seed auth data first (users and accounts)
-    await runAuthSeeds();
+    // await runAuthSeeds();
 
     // Clear existing data (optional - remove if you want to append)
     console.log("🗑️  Clearing existing job roles...");
@@ -42,8 +38,9 @@ export async function runSeeds(): Promise<void> {
       "     special characters, various locations, 0 positions, etc."
     );
 
+    // Skip application seeding for Docker startup
     // Seed sample applications
-    await runApplicationSeeds();
+    // await runApplicationSeeds();
   } catch (error) {
     console.error("❌ Error seeding database:", error);
     throw error;

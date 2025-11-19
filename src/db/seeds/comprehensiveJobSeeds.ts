@@ -1,4 +1,4 @@
-import type { jobsTable } from "../schemas/jobs";
+import type { jobsTable } from "../schemas/jobs.js";
 
 /**
  * Comprehensive seed data covering all 10 capabilities and edge cases
