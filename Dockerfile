@@ -56,5 +56,5 @@ USER appuser
 HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
   CMD wget --quiet --tries=1 --spider http://localhost:${PORT}/ || exit 1
 
-# Start application - run migrations first, then start server
-CMD ["sh", "-c", "node dist/db/migrate.js && node dist/server.js"]
+# Start application - migrations run on server startup
+CMD ["node", "dist/server.js"]

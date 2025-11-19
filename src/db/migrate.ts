@@ -1,29 +1,7 @@
-import { createClient } from "@libsql/client";
-import { drizzle } from "drizzle-orm/libsql";
-import { migrate } from "drizzle-orm/libsql/migrator";
-import { env } from "../config/env.js";
+import { runMigrationsWithRetry } from "./runMigrations.js";
 
-const client = createClient({
-  url: env.databaseUrl,
-});
-
-const db = drizzle(client);
-
-export async function runMigrations(): Promise<void> {
-  try {
-    console.log("🔄 Running database migrations...");
-
-    await migrate(db, { migrationsFolder: "./drizzle" });
-
-    console.log("✅ Migrations completed successfully!");
-  } catch (error) {
-    console.error("❌ Error running migrations:", error);
-    throw error;
-  }
-}
-
-// Run migrations
-runMigrations()
+// Run migrations (with exit for CLI usage)
+runMigrationsWithRetry()
   .then(() => {
     console.log("🎉 Migration process completed!");
     process.exit(0);
