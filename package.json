@@ -1,6 +1,6 @@
 {
   "name": "team1-job-app-backend",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Modern Node.js TypeScript project with ES modules",
   "type": "module",
   "main": "dist/server.js",
