@@ -4,8 +4,8 @@ import { env } from "../../config/env.js";
 import {
   comprehensiveJobSeeds,
   jobRolesTable,
-  runAuthSeeds,
   runApplicationSeeds,
+  runAuthSeeds,
 } from "./index.js";
 
 const client = createClient({
