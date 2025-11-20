@@ -136,6 +136,7 @@ resource "azurerm_container_app" "backend" {
     external_enabled           = false
     target_port                = var.container_port
     transport                  = "http"
+    client_certificate_mode    = "ignore"
 
     traffic_weight {
       latest_revision = true
