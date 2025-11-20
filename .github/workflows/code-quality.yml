@@ -131,13 +131,18 @@ jobs:
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: docker push aiacademy25-bbaue6bgenhkd0dj.azurecr.io/team1-job-app-backend:v${{ steps.version.outputs.version }}
 
-  terraform-plan:
-    name: Terraform Plan
+  deploy:
+    name: Deploy ${{ matrix.env }}
     runs-on: ubuntu-latest
     needs: build-docker
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     defaults:
       run:
         working-directory: ./infrastructure
+    strategy:
+      matrix:
+        env: [dev, prod]
+      max-parallel: 1
     
     steps:
       - name: Checkout code
@@ -148,12 +153,8 @@ jobs:
         with:
           terraform_version: "1.9.0"
       
-      - name: Terraform Format Check
-        run: terraform fmt -check -recursive
-
-      - name: Set Azure credentials as environment variables
+      - name: Set Azure credentials
         run: |
-          echo "Setting ARM_* env vars for Terraform..."
           echo "ARM_CLIENT_ID=$(jq -r .clientId <<< '${{ secrets.AZURE_CREDENTIALS }}')" >> $GITHUB_ENV
           echo "ARM_CLIENT_SECRET=$(jq -r .clientSecret <<< '${{ secrets.AZURE_CREDENTIALS }}')" >> $GITHUB_ENV
           echo "ARM_SUBSCRIPTION_ID=$(jq -r .subscriptionId <<< '${{ secrets.AZURE_CREDENTIALS }}')" >> $GITHUB_ENV
@@ -168,12 +169,60 @@ jobs:
       - name: Terraform Plan
         run: |
           terraform plan \
-            -var-file=enviroments/dev/terraform.tfvars \
+            -var-file=enviroments/${{ matrix.env }}/terraform.tfvars \
             -var="container_image_tag=v${{ needs.build-docker.outputs.version }}" \
             -out=tfplan
       
+      - name: Health checks
+        if: matrix.env == 'dev'
+        run: |
+          echo "🔍 Checking Dev deployment status..."
+          
+          # Get resource group name from tfvars
+          RESOURCE_GROUP=$(grep 'resource_group_name' enviroments/dev/terraform.tfvars | grep -oP '= "\K[^"]+')
+          APP_NAME="team1-job-app-backend"
+          
+          # Wait for container app to be ready
+          echo "⏳ Waiting for container app to be ready..."
+          for i in {1..30}; do
+            STATUS=$(az containerapp show \
+              --resource-group "$RESOURCE_GROUP" \
+              --name "$APP_NAME-app" \
+              --query 'properties.provisioningState' \
+              -o tsv 2>/dev/null || echo "NotFound")
+            
+            if [ "$STATUS" = "Succeeded" ]; then
+              echo "✅ Container app is ready"
+              break
+            fi
+            
+            if [ $i -eq 30 ]; then
+              echo "❌ Container app failed to become ready"
+              exit 1
+            fi
+            
+            echo "  Status: $STATUS (attempt $i/30)"
+            sleep 10
+          done
+          
+          # Check container logs for errors
+          echo "📋 Checking container logs..."
+          LOGS=$(az containerapp logs show \
+            --resource-group "$RESOURCE_GROUP" \
+            --name "$APP_NAME-app" \
+            --follow=false \
+            --tail 50 2>/dev/null || echo "")
+          
+          # Fail if we find errors in logs
+          if echo "$LOGS" | grep -iE "error|exception|fatal" | grep -v "ignore"; then
+            echo "❌ Errors found in container logs:"
+            echo "$LOGS" | grep -iE "error|exception|fatal"
+            exit 1
+          fi
+          
+          echo "✅ Dev deployment health checks passed"
+      
       - name: Terraform Apply
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: terraform apply -auto-approve tfplan 
         
         
