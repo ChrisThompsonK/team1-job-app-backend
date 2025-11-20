@@ -18,9 +18,9 @@ container_app_environment_resource_group_name = "team1-job-app-shared-rg"
 # Container App Configuration
 # container_image_tag is set by CI/CD pipeline (see .github/workflows/code-quality.yml)
 # Do not set manually - it will be overridden by the GitHub workflow
-container_cpu       = "0.5"
-container_memory    = "1Gi"
-container_port      = 3001
+container_cpu    = "0.5"
+container_memory = "1Gi"
+container_port   = 3001
 
 # Application Configuration
 app_name        = "team1-job-app-backend"
