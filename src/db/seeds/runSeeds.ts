@@ -29,7 +29,7 @@ export async function runSeeds(): Promise<void> {
     await runApplicationSeeds();
     console.log("✅ Applications seeded");
   } catch (error) {
-    console.error("❌ Seeding failed:", error);
+    console.error("❌ Error seeding database:", error);
     throw error;
   }
 }
