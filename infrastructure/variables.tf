@@ -58,9 +58,8 @@ variable "container_app_environment_resource_group_name" {
 
 # Container App Configuration
 variable "container_image_tag" {
-  description = "Tag of the container image to deploy"
+  description = "Tag of the container image to deploy. Set by CI/CD pipeline from package.json version"
   type        = string
-  default     = "v1.0.1"
 }
 
 variable "container_cpu" {
